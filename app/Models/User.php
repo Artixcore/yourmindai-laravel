@@ -15,6 +15,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
 
     protected $fillable = [
         'name',
+        'full_name',
         'email',
         'username',
         'password',
@@ -23,6 +24,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
         'phone',
         'address',
         'avatar',
+        'avatar_path',
     ];
 
     protected $hidden = [
@@ -45,6 +47,22 @@ class User extends Model implements AuthenticatableContract, JWTSubject
     public function doctorPatients()
     {
         return $this->hasMany(PatientProfile::class, 'doctor_id');
+    }
+
+    public function papers()
+    {
+        return $this->hasMany(DoctorPaper::class, 'user_id');
+    }
+
+    /**
+     * Get the avatar URL.
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar_path) {
+            return asset('storage/' . $this->avatar_path);
+        }
+        return null;
     }
 
     /**

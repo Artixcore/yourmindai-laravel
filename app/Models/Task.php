@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
-    protected $collection = 'tasks';
+    protected $table = 'tasks';
 
     protected $fillable = [
         'patient_id',

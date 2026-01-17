@@ -58,7 +58,7 @@ class DoctorController extends Controller
      */
     public function listPatients(Request $request)
     {
-        $doctorId = $request->user()->_id;
+        $doctorId = $request->user()->id;
 
         $patients = PatientProfile::where('doctor_id', $doctorId)
             ->orderBy('created_at', 'desc')
@@ -69,7 +69,7 @@ class DoctorController extends Controller
             'data' => [
                 'patients' => $patients->map(function ($p) {
                     return [
-                        'id' => (string) $p->_id,
+                        'id' => (string) $p->id,
                         'patientNumber' => $p->patient_number,
                         'userId' => (string) $p->user_id,
                         'fullName' => $p->full_name,
@@ -109,7 +109,7 @@ class DoctorController extends Controller
             ], 400);
         }
 
-        $doctorId = $request->user()->_id;
+        $doctorId = $request->user()->id;
         $existingUser = User::where('email', $request->email)->first();
 
         if ($existingUser) {
@@ -141,7 +141,7 @@ class DoctorController extends Controller
 
             $profile = PatientProfile::create([
                 'patient_number' => $patientNumber,
-                'user_id' => $user->_id,
+                'user_id' => $user->id,
                 'doctor_id' => $doctorId,
                 'full_name' => $request->fullName,
                 'date_of_birth' => $request->dateOfBirth,
@@ -157,7 +157,7 @@ class DoctorController extends Controller
                 'success' => true,
                 'data' => [
                     'user' => [
-                        'id' => (string) $user->_id,
+                        'id' => (string) $user->id,
                         'email' => $user->email,
                         'username' => $user->username,
                         'role' => $user->role,
@@ -165,7 +165,7 @@ class DoctorController extends Controller
                         'updatedAt' => $user->updated_at->toISOString(),
                     ],
                     'profile' => [
-                        'id' => (string) $profile->_id,
+                        'id' => (string) $profile->id,
                         'patientNumber' => $profile->patient_number,
                         'userId' => (string) $profile->user_id,
                         'doctorId' => (string) $profile->doctor_id,
@@ -218,7 +218,7 @@ class DoctorController extends Controller
      */
     public function deletePatient(Request $request, string $id)
     {
-        $doctorId = $request->user()->_id;
+        $doctorId = $request->user()->id;
         $patient = PatientProfile::find($id);
 
         if (!$patient) {
@@ -249,7 +249,7 @@ class DoctorController extends Controller
      */
     public function resetPassword(Request $request, string $id)
     {
-        $doctorId = $request->user()->_id;
+        $doctorId = $request->user()->id;
         $patient = PatientProfile::find($id);
 
         if (!$patient) {

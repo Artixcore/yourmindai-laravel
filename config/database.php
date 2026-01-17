@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mongodb'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -30,15 +30,6 @@ return [
     */
 
     'connections' => [
-
-        'mongodb' => [
-            'driver' => 'mongodb',
-            'dsn' => env('MONGODB_URI', 'mongodb://localhost:27017'),
-            'database' => env('MONGODB_DATABASE', 'yourmindai'),
-            'options' => [
-                'database' => env('MONGODB_DATABASE', 'yourmindai'),
-            ],
-        ],
 
         'sqlite' => [
             'driver' => 'sqlite',

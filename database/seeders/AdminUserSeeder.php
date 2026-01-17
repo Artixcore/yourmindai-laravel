@@ -16,7 +16,7 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        echo "🌱 Starting MongoDB seed...\n\n";
+        echo "🌱 Starting MySQL seed...\n\n";
 
         // Check if admin already exists
         $existingAdmin = User::where('email', self::ADMIN_EMAIL)->first();
@@ -30,7 +30,9 @@ class AdminUserSeeder extends Seeder
 
         // Create admin account
         $admin = User::create([
+            'name' => 'Admin User',
             'email' => self::ADMIN_EMAIL,
+            'password' => '', // Empty since we use password_hash
             'password_hash' => Hash::make(self::ADMIN_PASSWORD),
             'role' => 'DOCTOR',
         ]);
@@ -42,7 +44,7 @@ class AdminUserSeeder extends Seeder
         echo "║  Email:    " . str_pad(self::ADMIN_EMAIL, 40) . "║\n";
         echo "║  Password: " . str_pad(self::ADMIN_PASSWORD, 40) . "║\n";
         echo "╚════════════════════════════════════════════════════════╝\n";
-        echo "\n   User ID: " . (string) $admin->_id . "\n\n";
+        echo "\n   User ID: " . (string) $admin->id . "\n\n";
         echo "🎉 Seed completed!\n\n";
     }
 }

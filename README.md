@@ -1,10 +1,10 @@
 # YourMindAI Laravel Backend
 
-Laravel-based backend API for YourMindAI, replacing the Node.js/TypeScript API with MongoDB support, JWT authentication, and OpenAI integration.
+Laravel-based backend API for YourMindAI, replacing the Node.js/TypeScript API with MySQL database, JWT authentication, and OpenAI integration.
 
 ## Features
 
-- **MongoDB Integration**: Full MongoDB support using `mongodb/laravel-mongodb`
+- **MySQL Database**: Full MySQL support using Laravel Eloquent ORM
 - **JWT Authentication**: Secure token-based authentication with role-based access control
 - **OpenAI Integration**: Clinical note summarization and treatment suggestions
 - **CORS Support**: Configured for web frontend communication
@@ -14,7 +14,7 @@ Laravel-based backend API for YourMindAI, replacing the Node.js/TypeScript API w
 
 - PHP 8.2 or higher
 - Composer
-- MongoDB (local or cloud instance)
+- MySQL 5.7+ or MariaDB 10.3+
 - OpenAI API Key (for AI features)
 
 ## Local Development Setup
@@ -49,9 +49,13 @@ APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
 
-# MongoDB
-MONGODB_URI=mongodb://localhost:27017/yourmindai
-MONGODB_DATABASE=yourmindai
+# MySQL
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=yourmindai
+DB_USERNAME=root
+DB_PASSWORD=
 
 # JWT
 JWT_SECRET=your-secret-key-here
@@ -204,7 +208,7 @@ docker-compose up
 ### Prerequisites
 
 1. DigitalOcean App Platform account
-2. MongoDB database (DigitalOcean Managed Database or external)
+2. MySQL database (DigitalOcean Managed Database or external)
 3. OpenAI API key
 4. GitHub repository with Laravel code pushed
 
@@ -251,8 +255,12 @@ Go to **Settings** → **App-Level Environment Variables** and set:
 | `APP_URL` | Plain | Your DO app URL | `https://your-app-name.ondigitalocean.app` |
 | `APP_ENV` | Plain | Environment | `production` |
 | `APP_DEBUG` | Plain | Debug mode | `false` |
-| `MONGODB_URI` | **Encrypted** | MongoDB connection string | Your MongoDB URI |
-| `MONGODB_DATABASE` | Plain | Database name | `yourmindai` |
+| `DB_CONNECTION` | Plain | Database connection | `mysql` |
+| `DB_HOST` | Plain | Database host | `127.0.0.1` or your DB host |
+| `DB_PORT` | Plain | Database port | `3306` |
+| `DB_DATABASE` | Plain | Database name | `yourmindai` |
+| `DB_USERNAME` | Plain | Database username | Your MySQL username |
+| `DB_PASSWORD` | **Encrypted** | Database password | Your MySQL password |
 | `JWT_SECRET` | **Encrypted** | JWT signing secret | Generate: `openssl rand -base64 64` |
 | `JWT_TTL` | Plain | JWT expiration | `604800` (7 days) |
 | `CORS_ORIGIN` | Plain | Allowed CORS origins | `https://yourmindaid.com` (or comma-separated) |
@@ -304,7 +312,7 @@ The Dockerfile is configured for production:
 - **Uses PORT env var**: `--port=${PORT:-8000}` (DO sets PORT automatically)
 - **Health check**: Configured to check `/api/health` endpoint
 - **Production optimizations**: Config cache, route cache, view cache
-- **MongoDB extension**: Installed and enabled
+- **MySQL PDO extension**: Installed and enabled
 - **Proper permissions**: Storage directories have correct permissions
 
 ### Troubleshooting DigitalOcean Issues
@@ -375,7 +383,7 @@ The Dockerfile is configured for production:
 - **Auto-Detection**: DigitalOcean will auto-detect the Dockerfile and configure the service automatically.
 - **PORT Variable**: DigitalOcean sets `PORT` automatically from `http_port`. The Dockerfile handles this correctly.
 - **Health Checks**: Health check is configured in Dockerfile. DO will monitor `/api/health` endpoint.
-- **MongoDB**: MongoDB doesn't require migrations, but seeders should be run manually after first deploy.
+- **MySQL**: Run migrations after first deploy: `php artisan migrate`, then run seeders: `php artisan db:seed`
 - **package.json**: The `package.json` file is for frontend assets only. It will NOT trigger Node.js detection because we're using Docker.
 
 ## Database Seeding
@@ -421,11 +429,12 @@ yourmindai-laravel/
 
 ## Troubleshooting
 
-### MongoDB Connection Issues
+### MySQL Connection Issues
 
-- Verify `MONGODB_URI` is correct
-- Check MongoDB is running and accessible
+- Verify `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` are correct
+- Check MySQL is running and accessible
 - Ensure network/firewall allows connections
+- Run migrations: `php artisan migrate`
 
 ### JWT Token Issues
 

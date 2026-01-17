@@ -22,23 +22,23 @@ yourmindai-laravel/
 │   │   │   └── RequireRole.php             ✅ Implemented
 │   │   └── Requests/                       (For future validation)
 │   ├── Models/
-│   │   ├── User.php                        ✅ MongoDB model
-│   │   ├── PatientProfile.php               ✅ MongoDB model
-│   │   ├── ClinicalNote.php                ✅ MongoDB model
-│   │   ├── Goal.php                        ✅ MongoDB model
-│   │   ├── Task.php                        ✅ MongoDB model
-│   │   ├── Appointment.php                 ✅ MongoDB model
-│   │   ├── Assessment.php                  ✅ MongoDB model
-│   │   ├── AssessmentResult.php            ✅ MongoDB model
-│   │   ├── Reminder.php                    ✅ MongoDB model
-│   │   ├── DoctorInstruction.php           ✅ MongoDB model
-│   │   ├── ParentLink.php                  ✅ MongoDB model
-│   │   ├── InviteCode.php                  ✅ MongoDB model
-│   │   └── PatientPoints.php               ✅ MongoDB model
+│   │   ├── User.php                        ✅ Eloquent model
+│   │   ├── PatientProfile.php               ✅ Eloquent model
+│   │   ├── ClinicalNote.php                ✅ Eloquent model
+│   │   ├── Goal.php                        ✅ Eloquent model
+│   │   ├── Task.php                        ✅ Eloquent model
+│   │   ├── Appointment.php                 ✅ Eloquent model
+│   │   ├── Assessment.php                  ✅ Eloquent model
+│   │   ├── AssessmentResult.php            ✅ Eloquent model
+│   │   ├── Reminder.php                    ✅ Eloquent model
+│   │   ├── DoctorInstruction.php           ✅ Eloquent model
+│   │   ├── ParentLink.php                  ✅ Eloquent model
+│   │   ├── InviteCode.php                  ✅ Eloquent model
+│   │   └── PatientPoints.php               ✅ Eloquent model
 │   └── Services/
 │       └── OpenAIService.php               ✅ Fully implemented
 ├── config/
-│   ├── database.php                         ✅ MongoDB configured
+│   ├── database.php                         ✅ MySQL configured
 │   ├── cors.php                            ✅ CORS configured
 │   └── jwt.php                             ✅ JWT configured
 ├── database/
@@ -132,7 +132,7 @@ yourmindai-laravel/
 ## Key Features Implemented
 
 ### ✅ Completed
-1. **MongoDB Integration** - All models created with proper relationships
+1. **MySQL Database Integration** - All models created with proper relationships and migrations
 2. **JWT Authentication** - Full auth flow with role-based access
 3. **OpenAI Integration** - Clinical note summarization and treatment suggestions
 4. **CORS Configuration** - Configured for web frontend
@@ -171,7 +171,7 @@ OPENAI_MODEL=gpt-4o-mini
 ## Dependencies Installed
 
 - `laravel/framework` (v12.47.0)
-- `mongodb/laravel-mongodb` (v5.5.0)
+- MySQL database (via Laravel Eloquent ORM)
 - `tymon/jwt-auth` (v2.2.1)
 - `openai-php/laravel` (v0.18.0)
 
@@ -188,7 +188,7 @@ OPENAI_MODEL=gpt-4o-mini
 1. Connect repository to DigitalOcean App Platform
 2. Set all environment variables
 3. Build will auto-detect PHP from Dockerfile
-4. Run `php artisan db:seed` on first deploy
+4. Run `php artisan migrate` then `php artisan db:seed` on first deploy
 5. No `app.yaml` or `project.yml` needed - Dockerfile handles everything
 
 ## Notes

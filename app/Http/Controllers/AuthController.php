@@ -70,7 +70,7 @@ class AuthController extends Controller
             'success' => true,
             'data' => [
                 'user' => [
-                    'id' => (string) $user->_id,
+                    'id' => (string) $user->id,
                     'email' => $user->email,
                     'role' => $user->role,
                     'createdAt' => $user->created_at->toISOString(),
@@ -119,7 +119,7 @@ class AuthController extends Controller
             'data' => [
                 'token' => $token,
                 'user' => [
-                    'id' => (string) $user->_id,
+                    'id' => (string) $user->id,
                     'email' => $user->email,
                     'role' => $user->role,
                     'createdAt' => $user->created_at->toISOString(),
@@ -203,7 +203,7 @@ class AuthController extends Controller
 
             $profile = PatientProfile::create([
                 'patient_number' => $patientNumber,
-                'user_id' => $user->_id,
+                'user_id' => $user->id,
                 'doctor_id' => $invite->creator_id,
                 'full_name' => $request->fullName,
                 'date_of_birth' => $request->dateOfBirth,
@@ -214,7 +214,7 @@ class AuthController extends Controller
             $invite->update([
                 'used' => true,
                 'used_at' => now(),
-                'patient_id' => $profile->_id,
+                'patient_id' => $profile->id,
             ]);
 
             DB::commit();
@@ -226,14 +226,14 @@ class AuthController extends Controller
                 'data' => [
                     'token' => $token,
                     'user' => [
-                        'id' => (string) $user->_id,
+                        'id' => (string) $user->id,
                         'email' => $user->email,
                         'role' => $user->role,
                         'createdAt' => $user->created_at->toISOString(),
                         'updatedAt' => $user->updated_at->toISOString(),
                     ],
                     'profile' => [
-                        'id' => (string) $profile->_id,
+                        'id' => (string) $profile->id,
                         'patientNumber' => $profile->patient_number,
                         'fullName' => $profile->full_name,
                         'dateOfBirth' => $profile->date_of_birth->format('Y-m-d'),
@@ -328,7 +328,7 @@ class AuthController extends Controller
             ]);
 
             ParentLink::create([
-                'parent_id' => $user->_id,
+                'parent_id' => $user->id,
                 'patient_id' => $invite->patient_id,
             ]);
 
@@ -347,14 +347,14 @@ class AuthController extends Controller
                 'data' => [
                     'token' => $token,
                     'user' => [
-                        'id' => (string) $user->_id,
+                        'id' => (string) $user->id,
                         'email' => $user->email,
                         'role' => $user->role,
                         'createdAt' => $user->created_at->toISOString(),
                         'updatedAt' => $user->updated_at->toISOString(),
                     ],
                     'linkedPatient' => $patient ? [
-                        'id' => (string) $patient->_id,
+                        'id' => (string) $patient->id,
                         'fullName' => $patient->full_name,
                     ] : null,
                 ],
@@ -381,7 +381,7 @@ class AuthController extends Controller
             'success' => true,
             'data' => [
                 'user' => [
-                    'id' => (string) $user->_id,
+                    'id' => (string) $user->id,
                     'email' => $user->email,
                     'username' => $user->username,
                     'role' => $user->role,

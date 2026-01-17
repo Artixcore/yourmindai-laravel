@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
 class AssessmentResult extends Model
 {
-    protected $collection = 'assessment_results';
+    protected $table = 'assessment_results';
 
     protected $fillable = [
         'assessment_id',

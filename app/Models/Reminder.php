@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
 class Reminder extends Model
 {
-    protected $collection = 'reminders';
+    protected $table = 'reminders';
 
     protected $fillable = [
         'user_id',

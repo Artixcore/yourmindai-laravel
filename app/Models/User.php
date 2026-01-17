@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Auth\Authenticatable;
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Model implements AuthenticatableContract, JWTSubject
 {
     use Authenticatable;
 
-    protected $collection = 'users';
+    protected $table = 'users';
 
     protected $fillable = [
         'name',
@@ -61,7 +61,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
     public function getJWTCustomClaims()
     {
         return [
-            'userId' => (string) $this->_id,
+            'userId' => (string) $this->id,
             'email' => $this->email,
             'role' => $this->role,
         ];
@@ -72,7 +72,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
      */
     public function getAuthIdentifierName()
     {
-        return '_id';
+        return 'id';
     }
 
     /**

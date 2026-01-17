@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
 class ParentLink extends Model
 {
-    protected $collection = 'parent_links';
+    protected $table = 'parent_links';
 
     protected $fillable = [
         'parent_id',

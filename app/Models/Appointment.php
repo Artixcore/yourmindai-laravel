@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
-    protected $collection = 'appointments';
+    protected $table = 'appointments';
 
     protected $fillable = [
         'doctor_id',

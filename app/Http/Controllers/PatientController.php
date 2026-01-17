@@ -62,7 +62,7 @@ class PatientController extends Controller
      */
     public function show(Request $request, string $id)
     {
-        $userId = (string) $request->user()->_id;
+        $userId = (string) $request->user()->id;
         $role = $request->user()->role;
 
         $profile = PatientProfile::with(['user', 'doctor'])->find($id);
@@ -85,7 +85,7 @@ class PatientController extends Controller
             'success' => true,
             'data' => [
                 'profile' => [
-                    'id' => (string) $profile->_id,
+                    'id' => (string) $profile->id,
                     'patientNumber' => $profile->patient_number,
                     'userId' => (string) $profile->user_id,
                     'doctorId' => (string) $profile->doctor_id,
@@ -119,7 +119,7 @@ class PatientController extends Controller
      */
     public function getNotes(Request $request, string $id)
     {
-        $userId = (string) $request->user()->_id;
+        $userId = (string) $request->user()->id;
         $role = $request->user()->role;
 
         if (!in_array($role, ['DOCTOR', 'THERAPIST'])) {
@@ -146,14 +146,14 @@ class PatientController extends Controller
             'data' => [
                 'notes' => $notes->map(function ($note) {
                     return [
-                        'id' => (string) $note->_id,
+                        'id' => (string) $note->id,
                         'patientId' => (string) $note->patient_id,
                         'authorId' => (string) $note->author_id,
                         'rawText' => $note->raw_text,
                         'aiSummary' => $note->ai_summary,
                         'createdAt' => $note->created_at->toISOString(),
                         'author' => $note->author ? [
-                            'id' => (string) $note->author->_id,
+                            'id' => (string) $note->author->id,
                             'email' => $note->author->email,
                             'role' => $note->author->role,
                         ] : null,
@@ -180,7 +180,7 @@ class PatientController extends Controller
             ], 400);
         }
 
-        $userId = (string) $request->user()->_id;
+        $userId = (string) $request->user()->id;
         $role = $request->user()->role;
 
         if (!in_array($role, ['DOCTOR', 'THERAPIST'])) {
@@ -219,7 +219,7 @@ class PatientController extends Controller
             'success' => true,
             'data' => [
                 'note' => [
-                    'id' => (string) $note->_id,
+                    'id' => (string) $note->id,
                     'patientId' => (string) $note->patient_id,
                     'authorId' => (string) $note->author_id,
                     'rawText' => $note->raw_text,
@@ -241,7 +241,7 @@ class PatientController extends Controller
      */
     public function getGoals(Request $request, string $id)
     {
-        $userId = (string) $request->user()->_id;
+        $userId = (string) $request->user()->id;
         $role = $request->user()->role;
 
         if (!$this->canAccessPatient($userId, $role, $id)) {
@@ -267,7 +267,7 @@ class PatientController extends Controller
             'data' => [
                 'goals' => $goals->map(function ($g) {
                     return [
-                        'id' => (string) $g->_id,
+                        'id' => (string) $g->id,
                         'patientId' => (string) $g->patient_id,
                         'title' => $g->title,
                         'description' => $g->description,
@@ -301,7 +301,7 @@ class PatientController extends Controller
      */
     public function getTasks(Request $request, string $id)
     {
-        $userId = (string) $request->user()->_id;
+        $userId = (string) $request->user()->id;
         $role = $request->user()->role;
 
         if (!$this->canAccessPatient($userId, $role, $id)) {
@@ -327,7 +327,7 @@ class PatientController extends Controller
             'data' => [
                 'tasks' => $tasks->map(function ($t) {
                     return [
-                        'id' => (string) $t->_id,
+                        'id' => (string) $t->id,
                         'patientId' => (string) $t->patient_id,
                         'title' => $t->title,
                         'description' => $t->description,
@@ -350,7 +350,7 @@ class PatientController extends Controller
      */
     public function dashboard(Request $request)
     {
-        $userId = (string) $request->user()->_id;
+        $userId = (string) $request->user()->id;
         $role = $request->user()->role;
 
         if ($role !== 'PATIENT') {
@@ -371,7 +371,7 @@ class PatientController extends Controller
             ], 404);
         }
 
-        $tasks = Task::where('patient_id', $patientProfile->_id)
+        $tasks = Task::where('patient_id', $patientProfile->id)
             ->where('visible_to_patient', true)
             ->with('assignedByDoctor')
             ->orderBy('created_at', 'desc')
@@ -393,17 +393,17 @@ class PatientController extends Controller
             'success' => true,
             'data' => [
                 'profile' => [
-                    'id' => (string) $patientProfile->_id,
+                    'id' => (string) $patientProfile->id,
                     'fullName' => $patientProfile->full_name,
                     'patientNumber' => $patientProfile->patient_number,
                     'doctor' => $patientProfile->doctor ? [
-                        'id' => (string) $patientProfile->doctor->_id,
+                        'id' => (string) $patientProfile->doctor->id,
                         'email' => $patientProfile->doctor->email,
                     ] : null,
                 ],
                 'tasks' => $tasks->map(function ($t) {
                     return [
-                        'id' => (string) $t->_id,
+                        'id' => (string) $t->id,
                         'patientId' => (string) $t->patient_id,
                         'title' => $t->title,
                         'description' => $t->description,
@@ -413,7 +413,7 @@ class PatientController extends Controller
                         'assignedByDoctorId' => (string) $t->assigned_by_doctor_id,
                         'completedAt' => $t->completed_at ? $t->completed_at->toISOString() : null,
                         'assignedByDoctor' => $t->assignedByDoctor ? [
-                            'id' => (string) $t->assignedByDoctor->_id,
+                            'id' => (string) $t->assignedByDoctor->id,
                             'email' => $t->assignedByDoctor->email,
                         ] : null,
                         'createdAt' => $t->created_at->toISOString(),
@@ -423,7 +423,7 @@ class PatientController extends Controller
                 'totalPoints' => $patientPoints ? $patientPoints->total_points : 0,
                 'reminders' => $reminders->map(function ($r) {
                     return [
-                        'id' => (string) $r->_id,
+                        'id' => (string) $r->id,
                         'type' => $r->type,
                         'title' => $r->title,
                         'message' => $r->message,
@@ -434,13 +434,13 @@ class PatientController extends Controller
                 }),
                 'instructions' => $instructions->map(function ($i) {
                     return [
-                        'id' => (string) $i->_id,
+                        'id' => (string) $i->id,
                         'instructionType' => $i->instruction_type,
                         'title' => $i->title,
                         'content' => $i->content,
                         'taskId' => $i->task_id ? (string) $i->task_id : null,
                         'doctor' => $i->doctor ? [
-                            'id' => (string) $i->doctor->_id,
+                            'id' => (string) $i->doctor->id,
                             'email' => $i->doctor->email,
                         ] : null,
                         'createdAt' => $i->created_at->toISOString(),

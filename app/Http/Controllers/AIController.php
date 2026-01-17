@@ -83,7 +83,7 @@ class AIController extends Controller
             ], 404);
         }
 
-        if ((string) $patient->doctor_id !== (string) $user->_id) {
+        if ((string) $patient->doctor_id !== (string) $user->id) {
             return response()->json([
                 'success' => false,
                 'error' => "You don't have permission to access this patient's data.",

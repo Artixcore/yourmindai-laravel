@@ -49,6 +49,11 @@ class User extends Model implements AuthenticatableContract, JWTSubject
         return $this->hasMany(PatientProfile::class, 'doctor_id');
     }
 
+    public function patients()
+    {
+        return $this->hasMany(Patient::class, 'doctor_id');
+    }
+
     public function papers()
     {
         return $this->hasMany(DoctorPaper::class, 'user_id');

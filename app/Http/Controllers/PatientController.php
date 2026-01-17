@@ -10,10 +10,14 @@ use App\Models\Reminder;
 use App\Models\DoctorInstruction;
 use App\Models\PatientPoints;
 use App\Models\ParentLink;
+use App\Models\Patient;
 use App\Services\OpenAIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PatientController extends Controller
 {

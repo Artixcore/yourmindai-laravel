@@ -25,6 +25,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
         'address',
         'avatar',
         'avatar_path',
+        'status',
     ];
 
     protected $hidden = [
@@ -62,6 +63,94 @@ class User extends Model implements AuthenticatableContract, JWTSubject
     public function sessions()
     {
         return $this->hasMany(Session::class, 'doctor_id');
+    }
+
+    /**
+     * Get the assistant assignments for this user (if they are an assistant).
+     */
+    public function assistantAssignments()
+    {
+        return $this->hasMany(AssistantDoctorAssignment::class, 'assistant_id');
+    }
+
+    /**
+     * Get the doctor assignments for this user (if they are a doctor).
+     */
+    public function doctorAssignments()
+    {
+        return $this->hasMany(AssistantDoctorAssignment::class, 'doctor_id');
+    }
+
+    /**
+     * Get the assigned doctors for this assistant.
+     */
+    public function assignedDoctors()
+    {
+        return $this->belongsToMany(User::class, 'assistant_doctor_assignments', 'assistant_id', 'doctor_id');
+    }
+
+    /**
+     * Get the assigned assistants for this doctor.
+     */
+    public function assignedAssistants()
+    {
+        return $this->belongsToMany(User::class, 'assistant_doctor_assignments', 'doctor_id', 'assistant_id');
+    }
+
+    /**
+     * Get the AI reports requested by this user.
+     */
+    public function requestedReports()
+    {
+        return $this->hasMany(AiReport::class, 'requested_by');
+    }
+
+    /**
+     * Get the AI reports for this doctor.
+     */
+    public function doctorReports()
+    {
+        return $this->hasMany(AiReport::class, 'doctor_id');
+    }
+
+    /**
+     * Get the audit logs created by this user.
+     */
+    public function auditLogs()
+    {
+        return $this->hasMany(AuditLog::class, 'actor_user_id');
+    }
+
+    /**
+     * Check if user is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Check if user is admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is doctor.
+     */
+    public function isDoctor(): bool
+    {
+        return $this->role === 'doctor';
+    }
+
+    /**
+     * Check if user is assistant.
+     */
+    public function isAssistant(): bool
+    {
+        return $this->role === 'assistant';
     }
 
     /**

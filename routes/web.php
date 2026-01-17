@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorProfileController;
 use App\Http\Controllers\DoctorPaperController;
+use App\Http\Controllers\WebPatientController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -43,4 +44,7 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('doctors.papers.destroy');
     Route::get('/doctors/papers/{paper}/download', [DoctorPaperController::class, 'download'])
         ->name('doctors.papers.download');
+    
+    // Patient management routes
+    Route::resource('patients', WebPatientController::class);
 });

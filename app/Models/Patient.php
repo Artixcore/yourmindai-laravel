@@ -52,11 +52,16 @@ class Patient extends Model
      */
     public function setPasswordAttribute($value)
     {
-        // Only hash if the value is not already hashed
-        if (!empty($value) && !Hash::needsRehash($value)) {
-            $this->attributes['password'] = $value;
-        } elseif (!empty($value)) {
-            $this->attributes['password'] = Hash::make($value);
+        // Only hash if the value is not already a bcrypt hash
+        if (!empty($value)) {
+            // Check if it's already a bcrypt hash (starts with $2y$)
+            if (strlen($value) === 60 && strpos($value, '$2y$') === 0) {
+                // Already hashed, use as is
+                $this->attributes['password'] = $value;
+            } else {
+                // Not hashed, hash it
+                $this->attributes['password'] = Hash::make($value);
+            }
         }
     }
 }

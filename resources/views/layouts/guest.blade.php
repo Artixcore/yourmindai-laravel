@@ -12,7 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
     
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <x-vite-assets />
 </head>
 <body class="font-sans antialiased bg-gradient-to-br from-slate-50 to-teal-50">
     <x-navbar />

@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'jwt.auth' => \App\Http\Middleware\JwtAuth::class,
             'role' => \App\Http\Middleware\RequireRole::class,
+            'blade.role' => \App\Http\Middleware\BladeRoleMiddleware::class,
         ]);
         
         // Enable CORS for API routes

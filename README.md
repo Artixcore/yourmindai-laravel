@@ -199,49 +199,184 @@ A `docker-compose.yml` file is available at the repository root for local develo
 docker-compose up
 ```
 
-## DigitalOcean Deployment
+## DigitalOcean App Platform Deployment
 
 ### Prerequisites
 
 1. DigitalOcean App Platform account
 2. MongoDB database (DigitalOcean Managed Database or external)
 3. OpenAI API key
+4. GitHub repository with Laravel code pushed
+
+### Why This Setup Prevents Errors
+
+This Laravel backend is configured to avoid the runtime detection errors that occurred with the Node.js project:
+
+- **No Spec Files**: No `app.yaml` or `project.yml` files that could trigger auto-detection
+- **Docker-Only**: DigitalOcean auto-detects Dockerfile, bypassing runtime detection
+- **No TypeScript**: PHP project, so no "typescript:default" errors possible
+- **PORT Handling**: Dockerfile uses `PORT` environment variable (set automatically by DO)
+- **Health Check**: Configured health check endpoint for DO monitoring
 
 ### Deployment Steps
 
-1. **Connect Repository**: Connect your Git repository to DigitalOcean App Platform
+#### Step 1: Create App in DigitalOcean
 
-2. **Set Environment Variables** in DigitalOcean App Platform:
+1. Go to [DigitalOcean App Platform](https://cloud.digitalocean.com/apps)
+2. Click **Create App**
+3. Connect your GitHub repository: `Artixcore/yourmindai-laravel`
+4. Select branch: `main` (or your deployment branch)
+5. Click **Next**
 
-   - `APP_KEY` - Generate with `php artisan key:generate`
-   - `APP_URL` - Your DigitalOcean app URL
-   - `APP_ENV=production`
-   - `APP_DEBUG=false`
-   - `MONGODB_URI` - Your MongoDB connection string
-   - `MONGODB_DATABASE` - Database name
-   - `JWT_SECRET` - Generate a secure random string
-   - `JWT_TTL=604800`
-   - `CORS_ORIGIN` - Your web frontend URL
-   - `OPENAI_API_KEY` - Your OpenAI API key
-   - `OPENAI_MODEL=gpt-4o-mini`
+#### Step 2: Configure Service
 
-3. **Build Configuration**: DigitalOcean will auto-detect PHP from the Dockerfile
+**DigitalOcean will auto-detect the Dockerfile.** Verify the following:
 
-4. **Run Migrations and Seeders** (on first deploy):
+- **Component Type**: Web Service (auto-detected)
+- **HTTP Port**: `8000` (DigitalOcean will set `PORT=8000` automatically)
+- **Dockerfile Path**: `Dockerfile` (root of repository)
+- **Health Check Path**: `/api/health` (configured in Dockerfile)
 
-   Connect to your app via DigitalOcean console and run:
+**Important**: Do NOT create `app.yaml` or `project.yml` files. The Docker-only approach prevents runtime detection issues.
 
+#### Step 3: Set Environment Variables
+
+Go to **Settings** → **App-Level Environment Variables** and set:
+
+**Required Variables (All Run Time):**
+
+| Variable | Type | Description | How to Generate |
+|----------|------|-------------|-----------------|
+| `APP_KEY` | **Encrypted** | Laravel application key | Generate: `php artisan key:generate --show` |
+| `APP_URL` | Plain | Your DO app URL | `https://your-app-name.ondigitalocean.app` |
+| `APP_ENV` | Plain | Environment | `production` |
+| `APP_DEBUG` | Plain | Debug mode | `false` |
+| `MONGODB_URI` | **Encrypted** | MongoDB connection string | Your MongoDB URI |
+| `MONGODB_DATABASE` | Plain | Database name | `yourmindai` |
+| `JWT_SECRET` | **Encrypted** | JWT signing secret | Generate: `openssl rand -base64 64` |
+| `JWT_TTL` | Plain | JWT expiration | `604800` (7 days) |
+| `CORS_ORIGIN` | Plain | Allowed CORS origins | `https://yourmindaid.com` (or comma-separated) |
+| `OPENAI_API_KEY` | **Encrypted** | OpenAI API key | Your OpenAI key |
+| `OPENAI_MODEL` | Plain | OpenAI model | `gpt-4o-mini` (optional) |
+
+**Note**: `PORT` is automatically set by DigitalOcean from the `http_port` value. Do not set it manually.
+
+#### Step 4: Deploy
+
+1. Click **Deploy** or push to your connected branch
+2. Monitor deployment in **Activity** tab
+3. Wait for build to complete (usually 5-10 minutes for first build)
+
+#### Step 5: Run Database Seeders
+
+After first successful deployment, connect to your app via DigitalOcean console:
+
+1. Go to **Settings** → **Console**
+2. Run:
    ```bash
    php artisan db:seed
    ```
 
-5. **Deploy**: Push to your connected branch to trigger deployment
+This creates the admin user:
+- **Email**: `admin@yourmindaid.com`
+- **Password**: `Admin123456`
+
+#### Step 6: Verify Deployment
+
+1. **Health Check**: Visit `https://your-app-name.ondigitalocean.app/api/health`
+   - Should return: `{"status":"ok","timestamp":"..."}`
+
+2. **Check Logs**: Go to **Runtime Logs** tab
+   - Should show: "Starting server on port 8000"
+   - No errors about missing env vars
+
+3. **Test API**: Try login endpoint:
+   ```bash
+   curl -X POST https://your-app-name.ondigitalocean.app/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"identifier":"admin@yourmindaid.com","password":"Admin123456"}'
+   ```
+
+### Dockerfile Configuration
+
+The Dockerfile is configured for production:
+
+- **Uses PORT env var**: `--port=${PORT:-8000}` (DO sets PORT automatically)
+- **Health check**: Configured to check `/api/health` endpoint
+- **Production optimizations**: Config cache, route cache, view cache
+- **MongoDB extension**: Installed and enabled
+- **Proper permissions**: Storage directories have correct permissions
+
+### Troubleshooting DigitalOcean Issues
+
+#### Build Fails
+
+**Check:**
+- Dockerfile syntax is correct
+- All dependencies install successfully
+- MongoDB extension installs (check build logs)
+
+**Solution:**
+- Review build logs in **Activity** tab
+- Ensure MongoDB extension dependencies are installed (libmongoc-dev, libbson-dev)
+
+#### Runtime Errors: "Missing Environment Variable"
+
+**Check:**
+- All required env vars are set in DO dashboard
+- Variable names match exactly (case-sensitive)
+- Secrets are marked as **Encrypted**
+
+**Solution:**
+- Verify all variables from the table above are set
+- Check variable names match exactly
+- Ensure APP_KEY is generated and set
+
+#### Health Check Fails
+
+**Check:**
+- `/api/health` endpoint is accessible
+- PORT env var is set correctly
+- Application is running
+
+**Solution:**
+- Verify health check path in DO settings: `/api/health`
+- Check runtime logs for errors
+- Ensure server started successfully
+
+#### "Runtime Detection" or "typescript:default" Errors
+
+**This should NOT happen with Laravel**, but if it does:
+
+**Check:**
+- No `app.yaml` or `project.yml` files exist in repository
+- Dockerfile is being used (not buildpack)
+- No TypeScript files in repository
+
+**Solution:**
+- Ensure Docker-only deployment
+- Delete any `app.yaml` or `project.yml` files
+- Verify DO is using Dockerfile (check App Spec in DO dashboard)
+
+#### PORT Not Working
+
+**Check:**
+- Dockerfile uses `${PORT:-8000}` syntax
+- DO has set http_port to 8000
+- CMD uses shell form to expand env var
+
+**Solution:**
+- Verify Dockerfile CMD uses: `sh -c "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"`
+- Check DO settings show http_port: 8000
 
 ### Important Notes
 
-- The Dockerfile uses PHP 8.3 with MongoDB extension
-- No `app.yaml` or `project.yml` files are needed - DigitalOcean auto-detects from Dockerfile
-- Migrations are optional (MongoDB doesn't require migrations, but seeders should be run)
+- **No Spec Files Needed**: This project uses Docker-only deployment. No `app.yaml` or `project.yml` files are required or recommended.
+- **Auto-Detection**: DigitalOcean will auto-detect the Dockerfile and configure the service automatically.
+- **PORT Variable**: DigitalOcean sets `PORT` automatically from `http_port`. The Dockerfile handles this correctly.
+- **Health Checks**: Health check is configured in Dockerfile. DO will monitor `/api/health` endpoint.
+- **MongoDB**: MongoDB doesn't require migrations, but seeders should be run manually after first deploy.
+- **package.json**: The `package.json` file is for frontend assets only. It will NOT trigger Node.js detection because we're using Docker.
 
 ## Database Seeding
 

@@ -2,22 +2,33 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Auth\Authenticatable;
 use MongoDB\Laravel\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model implements JWTSubject
+class User extends Model implements AuthenticatableContract, JWTSubject
 {
+    use Authenticatable;
+
     protected $collection = 'users';
 
     protected $fillable = [
+        'name',
         'email',
         'username',
+        'password',
         'password_hash',
         'role',
+        'phone',
+        'address',
+        'avatar',
     ];
 
     protected $hidden = [
+        'password',
         'password_hash',
+        'remember_token',
     ];
 
     protected $casts = [
@@ -54,5 +65,53 @@ class User extends Model implements JWTSubject
             'email' => $this->email,
             'role' => $this->role,
         ];
+    }
+
+    /**
+     * Get the name of the unique identifier for the user.
+     */
+    public function getAuthIdentifierName()
+    {
+        return '_id';
+    }
+
+    /**
+     * Get the unique identifier for the user.
+     */
+    public function getAuthIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Get the password for the user.
+     */
+    public function getAuthPassword()
+    {
+        return $this->password_hash ?? $this->password;
+    }
+
+    /**
+     * Get the token value for the "remember me" session.
+     */
+    public function getRememberToken()
+    {
+        return $this->remember_token;
+    }
+
+    /**
+     * Set the token value for the "remember me" session.
+     */
+    public function setRememberToken($value)
+    {
+        $this->remember_token = $value;
+    }
+
+    /**
+     * Get the column name for the "remember me" token.
+     */
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
     }
 }

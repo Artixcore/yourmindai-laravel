@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Patient;
 use App\Models\Session;
 use App\Models\SessionDay;
+use App\Models\PatientResource;
 use App\Policies\PatientPolicy;
 use App\Policies\SessionPolicy;
 use App\Policies\SessionDayPolicy;
+use App\Policies\PatientResourcePolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,5 +31,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Patient::class, PatientPolicy::class);
         Gate::policy(Session::class, SessionPolicy::class);
         Gate::policy(SessionDay::class, SessionDayPolicy::class);
+        Gate::policy(PatientResource::class, PatientResourcePolicy::class);
     }
 }

@@ -224,6 +224,77 @@
         @endif
     </x-card>
 
+    <!-- Resources Section -->
+    <x-card class="mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-stone-900">Patient Resources</h2>
+            <a
+                href="{{ route('patients.resources.index', $patient) }}"
+                class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center space-x-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Manage Resources</span>
+            </a>
+        </div>
+
+        @php
+            $recentResources = \App\Models\PatientResource::where('patient_id', $patient->id)
+                ->with(['session', 'sessionDay'])
+                ->orderBy('created_at', 'desc')
+                ->take(3)
+                ->get();
+        @endphp
+
+        @if($recentResources->isEmpty())
+            <div class="text-center py-8 text-stone-500">
+                <svg class="w-12 h-12 mx-auto mb-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p>No resources yet.</p>
+                <p class="text-sm mt-2">Add resources to share PDFs and YouTube videos with this patient.</p>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach($recentResources as $resource)
+                    <div class="border border-stone-200 rounded-lg p-4 hover:bg-stone-50 transition-colors">
+                        <div class="flex items-start space-x-3 mb-2">
+                            @if($resource->is_pdf)
+                                <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                            @else
+                                <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                </svg>
+                            @endif
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-semibold text-stone-900 truncate">{{ $resource->title }}</h3>
+                                <p class="text-xs text-stone-500 mt-1">{{ $resource->created_at->format('M d, Y') }}</p>
+                            </div>
+                        </div>
+                        @if($resource->session)
+                            <p class="text-xs text-stone-600 mt-2">
+                                <span class="font-medium">Session:</span> {{ $resource->session->title }}
+                            </p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+            @if(\App\Models\PatientResource::where('patient_id', $patient->id)->count() > 3)
+                <div class="mt-4 text-center">
+                    <a
+                        href="{{ route('patients.resources.index', $patient) }}"
+                        class="text-sm text-teal-600 hover:text-teal-800 font-medium"
+                    >
+                        View all resources →
+                    </a>
+                </div>
+            @endif
+        @endif
+    </x-card>
+
     <!-- Back Link -->
     <div class="mt-6">
         <a

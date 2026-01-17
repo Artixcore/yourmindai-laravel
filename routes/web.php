@@ -9,6 +9,7 @@ use App\Http\Controllers\DoctorPaperController;
 use App\Http\Controllers\WebPatientController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SessionDayController;
+use App\Http\Controllers\PatientResourceController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -60,4 +61,16 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('patients.sessions.days.update');
     Route::delete('patients/{patient}/sessions/{session}/days/{day}', [SessionDayController::class, 'destroy'])
         ->name('patients.sessions.days.destroy');
+    
+    // Patient Resources routes (nested under patients)
+    Route::get('patients/{patient}/resources', [PatientResourceController::class, 'index'])
+        ->name('patients.resources.index');
+    Route::post('patients/{patient}/resources', [PatientResourceController::class, 'store'])
+        ->name('patients.resources.store');
+    Route::put('patients/{patient}/resources/{resource}', [PatientResourceController::class, 'update'])
+        ->name('patients.resources.update');
+    Route::delete('patients/{patient}/resources/{resource}', [PatientResourceController::class, 'destroy'])
+        ->name('patients.resources.destroy');
+    Route::get('patients/{patient}/resources/{resource}/download', [PatientResourceController::class, 'download'])
+        ->name('patients.resources.download');
 });

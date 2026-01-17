@@ -157,6 +157,73 @@
         </x-card>
     </div>
 
+    <!-- Sessions Section -->
+    <x-card class="mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-stone-900">Therapy Sessions</h2>
+            <a
+                href="{{ route('patients.sessions.create', $patient) }}"
+                class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center space-x-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Create Session</span>
+            </a>
+        </div>
+
+        @php
+            $sessions = $patient->sessions()->with('doctor')->orderBy('created_at', 'desc')->get();
+        @endphp
+
+        @if($sessions->isEmpty())
+            <div class="text-center py-8 text-stone-500">
+                <svg class="w-12 h-12 mx-auto mb-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p>No therapy sessions yet.</p>
+                <p class="text-sm mt-2">Create your first session to start tracking therapy progress.</p>
+            </div>
+        @else
+            <div class="space-y-3">
+                @foreach($sessions as $session)
+                    <div class="border border-stone-200 rounded-lg p-4 hover:bg-stone-50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3">
+                                    <a
+                                        href="{{ route('patients.sessions.show', [$patient, $session]) }}"
+                                        class="text-lg font-semibold text-stone-900 hover:text-teal-600 transition-colors"
+                                    >
+                                        {{ $session->title }}
+                                    </a>
+                                    <x-badge :variant="$session->status === 'active' ? 'success' : 'default'">
+                                        {{ ucfirst($session->status) }}
+                                    </x-badge>
+                                </div>
+                                @if($session->notes)
+                                    <p class="text-sm text-stone-600 mt-1 line-clamp-2">{{ Str::limit($session->notes, 100) }}</p>
+                                @endif
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-stone-500">
+                                    <span>{{ $session->created_at->format('M d, Y') }}</span>
+                                    <span>{{ $session->days->count() }} day{{ $session->days->count() !== 1 ? 's' : '' }}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 ml-4">
+                                <a
+                                    href="{{ route('patients.sessions.show', [$patient, $session]) }}"
+                                    class="px-3 py-1.5 text-sm bg-stone-100 text-stone-700 rounded hover:bg-stone-200 transition-colors"
+                                >
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-card>
+
     <!-- Back Link -->
     <div class="mt-6">
         <a

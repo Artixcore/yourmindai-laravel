@@ -59,6 +59,11 @@ class User extends Model implements AuthenticatableContract, JWTSubject
         return $this->hasMany(DoctorPaper::class, 'user_id');
     }
 
+    public function sessions()
+    {
+        return $this->hasMany(Session::class, 'doctor_id');
+    }
+
     /**
      * Get the avatar URL.
      */

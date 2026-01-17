@@ -7,6 +7,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorProfileController;
 use App\Http\Controllers\DoctorPaperController;
 use App\Http\Controllers\WebPatientController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SessionDayController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -47,4 +49,15 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     
     // Patient management routes
     Route::resource('patients', WebPatientController::class);
+    
+    // Session routes (nested under patients)
+    Route::resource('patients.sessions', SessionController::class);
+    
+    // Session day routes
+    Route::post('patients/{patient}/sessions/{session}/days', [SessionDayController::class, 'store'])
+        ->name('patients.sessions.days.store');
+    Route::put('patients/{patient}/sessions/{session}/days/{day}', [SessionDayController::class, 'update'])
+        ->name('patients.sessions.days.update');
+    Route::delete('patients/{patient}/sessions/{session}/days/{day}', [SessionDayController::class, 'destroy'])
+        ->name('patients.sessions.days.destroy');
 });

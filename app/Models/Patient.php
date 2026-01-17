@@ -37,6 +37,14 @@ class Patient extends Model
     }
 
     /**
+     * Get the sessions for the patient.
+     */
+    public function sessions()
+    {
+        return $this->hasMany(Session::class, 'patient_id');
+    }
+
+    /**
      * Get the photo URL attribute.
      */
     public function getPhotoUrlAttribute()

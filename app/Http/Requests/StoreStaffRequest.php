@@ -11,7 +11,7 @@ class StoreStaffRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user() && $this->user()->isAdmin();
     }
 
     /**
@@ -22,7 +22,14 @@ class StoreStaffRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'username' => 'required|string|max:255|unique:users,username',
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'role' => 'required|in:doctor,assistant',
+            'password' => 'required|string|min:8|confirmed',
+            'status' => 'nullable|in:active,inactive',
         ];
     }
 }

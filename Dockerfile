@@ -10,10 +10,14 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libsqlite3-dev \
     zip \
     unzip \
     libicu-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -26,10 +30,15 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     gd \
     zip \
     intl \
-    opcache
+    opcache \
+    soap \
+    && docker-php-ext-enable opcache
 
 # Install Redis extension
 RUN pecl install redis && docker-php-ext-enable redis
+
+# Verify all extensions are installed
+RUN php -m | grep -E "(pdo_mysql|mbstring|exif|pcntl|bcmath|gd|zip|intl|opcache|redis|soap|fileinfo|curl|xml|tokenizer)" || echo "Some extensions may be missing"
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -53,7 +62,7 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.fast_shutdown=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.revalidate_freq=0" >> /usr/local/etc/php/conf.d/opcache.ini
 
-# Configure PHP production settings
+# Configure PHP production settings and security
 RUN echo "expose_php = Off" >> /usr/local/etc/php/conf.d/production.ini \
     && echo "display_errors = Off" >> /usr/local/etc/php/conf.d/production.ini \
     && echo "display_startup_errors = Off" >> /usr/local/etc/php/conf.d/production.ini \
@@ -62,7 +71,10 @@ RUN echo "expose_php = Off" >> /usr/local/etc/php/conf.d/production.ini \
     && echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/production.ini \
     && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/production.ini \
     && echo "upload_max_filesize = 20M" >> /usr/local/etc/php/conf.d/production.ini \
-    && echo "post_max_size = 20M" >> /usr/local/etc/php/conf.d/production.ini
+    && echo "post_max_size = 20M" >> /usr/local/etc/php/conf.d/production.ini \
+    && echo "disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source" >> /usr/local/etc/php/conf.d/production.ini \
+    && echo "allow_url_fopen = Off" >> /usr/local/etc/php/conf.d/production.ini \
+    && echo "allow_url_include = Off" >> /usr/local/etc/php/conf.d/production.ini
 
 # Set working directory
 WORKDIR /var/www/html
@@ -76,6 +88,10 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction || \
      composer diagnose && \
      exit 1)
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Copy the rest of the application files
 COPY . .
 
@@ -87,8 +103,29 @@ RUN chown -R www-data:www-data /var/www/html \
     && touch /var/log/php_errors.log \
     && chown www-data:www-data /var/log/php_errors.log
 
+# Clean up unnecessary files
+RUN rm -rf /var/www/html/tests \
+    /var/www/html/.git \
+    /var/www/html/.phpunit.cache \
+    /var/www/html/.editorconfig \
+    /var/www/html/.gitattributes \
+    /var/www/html/node_modules \
+    /var/www/html/.vscode \
+    /var/www/html/.idea \
+    /tmp/* \
+    /var/tmp/* \
+    /root/.composer/cache/* \
+    /root/.npm \
+    /var/lib/apt/lists/* \
+    /var/cache/apt/archives/*
+
 # Expose PHP-FPM port
 EXPOSE 9000
 
-# Start PHP-FPM
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD php -r "exit(0);" || exit 1
+
+# Use entrypoint script
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]

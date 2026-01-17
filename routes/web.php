@@ -10,6 +10,14 @@ use App\Http\Controllers\WebPatientController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SessionDayController;
 use App\Http\Controllers\PatientResourceController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\AssistantAssignmentController;
+use App\Http\Controllers\Admin\AdminPatientController;
+use App\Http\Controllers\Admin\AdminSessionController;
+use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\AiReportController;
+use App\Http\Controllers\Admin\ContactController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -73,4 +81,42 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('patients.resources.destroy');
     Route::get('patients/{patient}/resources/{resource}/download', [PatientResourceController::class, 'download'])
         ->name('patients.resources.download');
+});
+
+// Admin routes
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    
+    // Staff Management
+    Route::resource('staff', StaffController::class);
+    Route::post('staff/{staff}/toggle-status', [StaffController::class, 'toggleStatus'])->name('staff.toggle-status');
+    Route::get('staff/assignments', [AssistantAssignmentController::class, 'index'])->name('staff.assignments.index');
+    Route::post('staff/assignments', [AssistantAssignmentController::class, 'store'])->name('staff.assignments.store');
+    Route::delete('staff/assignments/{assignment}', [AssistantAssignmentController::class, 'destroy'])->name('staff.assignments.destroy');
+    
+    // Patient Oversight
+    Route::get('patients', [AdminPatientController::class, 'index'])->name('patients.index');
+    Route::get('patients/{patient}', [AdminPatientController::class, 'show'])->name('patients.show');
+    
+    // Sessions Explorer
+    Route::get('sessions', [AdminSessionController::class, 'index'])->name('sessions.index');
+    Route::get('sessions/{session}', [AdminSessionController::class, 'show'])->name('sessions.show');
+    
+    // Analytics
+    Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    
+    // AI Reports
+    Route::get('ai-reports', [AiReportController::class, 'index'])->name('ai-reports.index');
+    Route::get('ai-reports/{id}', [AiReportController::class, 'show'])->name('ai-reports.show');
+    Route::post('ai-reports/generate-patient', [AiReportController::class, 'generatePatient'])->name('ai-reports.generate-patient');
+    Route::post('ai-reports/generate-doctor', [AiReportController::class, 'generateDoctor'])->name('ai-reports.generate-doctor');
+    Route::post('ai-reports/generate-clinic', [AiReportController::class, 'generateClinic'])->name('ai-reports.generate-clinic');
+    Route::post('ai-reports/{id}/regenerate', [AiReportController::class, 'regenerate'])->name('ai-reports.regenerate');
+    
+    // Contact Inbox
+    Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
+    Route::get('contact/{contact}', [ContactController::class, 'show'])->name('contact.show');
+    Route::post('contact/{contact}/resolve', [ContactController::class, 'resolve'])->name('contact.resolve');
+    Route::post('contact/{contact}/notes', [ContactController::class, 'addNotes'])->name('contact.notes');
 });

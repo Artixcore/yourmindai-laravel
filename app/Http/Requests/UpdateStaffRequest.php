@@ -11,7 +11,7 @@ class UpdateStaffRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user() && $this->user()->isAdmin();
     }
 
     /**
@@ -21,8 +21,17 @@ class UpdateStaffRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('staff') ?? $this->route('user');
+        
         return [
-            //
+            'username' => 'sometimes|string|max:255|unique:users,username,' . $userId,
+            'full_name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'role' => 'sometimes|in:doctor,assistant',
+            'password' => 'nullable|string|min:8|confirmed',
+            'status' => 'nullable|in:active,inactive',
         ];
     }
 }

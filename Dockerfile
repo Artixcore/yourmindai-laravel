@@ -67,11 +67,17 @@ RUN echo "expose_php = Off" >> /usr/local/etc/php/conf.d/production.ini \
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application files
-COPY . .
+# Copy composer files first for better layer caching
+COPY composer.json composer.lock ./
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Install dependencies (this layer will be cached if composer files don't change)
+RUN composer install --no-dev --optimize-autoloader --no-interaction || \
+    (echo "Composer install failed. Checking for errors..." && \
+     composer diagnose && \
+     exit 1)
+
+# Copy the rest of the application files
+COPY . .
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \

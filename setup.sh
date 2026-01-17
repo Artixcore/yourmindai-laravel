@@ -212,9 +212,15 @@ else
 fi
 
 echo -e "${GREEN}[8/12]${NC} Installing Certbot for SSL..."
-apt-get install -y -qq certbot python3-certbot-nginx
+apt-get install -y -qq certbot python3-certbot-nginx || {
+    echo -e "${YELLOW}Certbot installation had issues. SSL setup will be skipped.${NC}"
+}
 
 echo -e "${GREEN}[9/12]${NC} Setting up SSL certificates..."
+# Create certbot directory early to avoid errors
+mkdir -p /var/www/certbot
+chmod 755 /var/www/certbot
+
 if [ ! -d "/etc/letsencrypt/live/yourmindaid.com" ]; then
     echo -e "${YELLOW}SSL certificates will be obtained after DNS is configured.${NC}"
     echo -e "${YELLOW}Make sure yourmindaid.com points to this server's IP address.${NC}"
@@ -222,17 +228,32 @@ if [ ! -d "/etc/letsencrypt/live/yourmindaid.com" ]; then
     read -p "Has DNS been configured? (y/n): " DNS_CONFIGURED
     if [ "$DNS_CONFIGURED" = "y" ] || [ "$DNS_CONFIGURED" = "Y" ]; then
         # Start nginx temporarily for certbot validation
-        docker-compose up -d nginx 2>/dev/null || true
-        sleep 5
+        echo "Starting nginx container for certificate validation..."
+        docker-compose up -d nginx 2>/dev/null || {
+            echo -e "${YELLOW}Could not start nginx container. SSL setup will be skipped.${NC}"
+            echo "You can run scripts/setup-ssl.sh later after containers are running."
+        }
         
-        certbot certonly --webroot \
-            --webroot-path=/var/www/certbot \
-            --email admin@yourmindaid.com \
-            --agree-tos \
-            --no-eff-email \
-            -d yourmindaid.com \
-            -d www.yourmindaid.com \
-            --non-interactive || echo -e "${YELLOW}SSL certificate generation failed. You can run this later.${NC}"
+        if docker-compose ps nginx | grep -q "Up"; then
+            sleep 5
+            
+            if certbot certonly --webroot \
+                --webroot-path=/var/www/certbot \
+                --email admin@yourmindaid.com \
+                --agree-tos \
+                --no-eff-email \
+                -d yourmindaid.com \
+                -d www.yourmindaid.com \
+                --non-interactive 2>&1; then
+                echo -e "${GREEN}SSL certificates obtained successfully!${NC}"
+            else
+                echo -e "${YELLOW}SSL certificate generation failed. This is not critical.${NC}"
+                echo "You can run scripts/setup-ssl.sh later after verifying:"
+                echo "  1. DNS is pointing to this server"
+                echo "  2. Port 80 is open and accessible"
+                echo "  3. Nginx container is running"
+            fi
+        fi
     else
         echo -e "${YELLOW}Skipping SSL setup. Run scripts/setup-ssl.sh after DNS is configured.${NC}"
     fi

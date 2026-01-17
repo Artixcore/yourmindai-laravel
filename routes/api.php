@@ -4,11 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PatientAuthController;
+use App\Http\Controllers\Api\PatientController as ApiPatientController;
+use App\Http\Controllers\Api\PatientSessionController;
+use App\Http\Controllers\Api\PatientResourceController;
 use App\Http\Controllers\AIController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ParentController;
+use App\Http\Controllers\WebhookController;
 
 // Health check
 Route::get('/health', function () {
@@ -106,3 +111,18 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/parents/children/{id}/goals', [ParentController::class, 'getChildGoals']);
     Route::get('/parents/children/{id}/tasks', [ParentController::class, 'getChildTasks']);
 });
+
+// Patient API routes (Sanctum authentication)
+Route::post('/patient/login', [PatientAuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/patient/logout', [PatientAuthController::class, 'logout']);
+    Route::get('/patient/me', [ApiPatientController::class, 'me']);
+    Route::get('/patient/sessions', [PatientSessionController::class, 'index']);
+    Route::get('/patient/sessions/{session}', [PatientSessionController::class, 'show']);
+    Route::get('/patient/sessions/{session}/days/{day}', [PatientSessionController::class, 'showDay']);
+    Route::get('/patient/resources', [PatientResourceController::class, 'index']);
+});
+
+// Webhook routes (no authentication required, but signature verification is done in controller)
+Route::post('/webhook/deploy', [WebhookController::class, 'deploy']);

@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
 
-class Patient extends Model
+class Patient extends Model implements AuthenticatableContract
 {
+    use Authenticatable, HasApiTokens;
     protected $fillable = [
         'doctor_id',
         'name',
@@ -42,6 +46,14 @@ class Patient extends Model
     public function sessions()
     {
         return $this->hasMany(Session::class, 'patient_id');
+    }
+
+    /**
+     * Get the resources for the patient.
+     */
+    public function resources()
+    {
+        return $this->hasMany(PatientResource::class, 'patient_id');
     }
 
     /**

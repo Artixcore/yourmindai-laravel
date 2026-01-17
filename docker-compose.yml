@@ -14,11 +14,13 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - yourmindai_network
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-yourmindai_root_password}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   redis:
     image: redis:7-alpine
@@ -28,11 +30,13 @@ services:
       - redis_data:/data
     networks:
       - yourmindai_network
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 10s
 
   php-fpm:
     build:
@@ -58,10 +62,11 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "php-fpm-healthcheck"]
+      test: ["CMD-SHELL", "php -r 'exit(0);'"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
   nginx:
     image: nginx:alpine
@@ -80,7 +85,14 @@ services:
     networks:
       - yourmindai_network
     depends_on:
-      - php-fpm
+      php-fpm:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep nginx || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
 volumes:

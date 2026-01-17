@@ -26,7 +26,7 @@ return new class extends Migration
             // Foreign key constraints with cascade delete
             $table->foreign('doctor_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
-            $table->foreign('session_id')->references('id')->on('sessions')->onDelete('cascade');
+            $table->foreign('session_id')->references('id')->on('therapy_sessions')->onDelete('cascade');
             $table->foreign('session_day_id')->references('id')->on('session_days')->onDelete('cascade');
 
             // Indexes for performance

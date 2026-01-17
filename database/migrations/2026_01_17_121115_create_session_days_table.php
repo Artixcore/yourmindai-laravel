@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign key constraint with cascade delete
-            $table->foreign('session_id')->references('id')->on('sessions')->onDelete('cascade');
+            $table->foreign('session_id')->references('id')->on('therapy_sessions')->onDelete('cascade');
 
             // Unique constraint: one entry per date per session
             $table->unique(['session_id', 'day_date']);

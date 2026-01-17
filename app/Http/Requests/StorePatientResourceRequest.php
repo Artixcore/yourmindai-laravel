@@ -28,8 +28,8 @@ class StorePatientResourceRequest extends FormRequest
             'patient_id' => ['required', 'exists:patients,id'],
             'session_id' => [
                 'nullable',
-                'exists:sessions,id',
-                Rule::exists('sessions', 'id')->where('patient_id', $patientId),
+                'exists:therapy_sessions,id',
+                Rule::exists('therapy_sessions', 'id')->where('patient_id', $patientId),
             ],
             'session_day_id' => [
                 'nullable',

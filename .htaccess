@@ -1,0 +1,49 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # ------------------------------------------------------------------
+    # Block access to environment & sensitive config files
+    # ------------------------------------------------------------------
+    <FilesMatch "(^\.env|\.env\.example|\.git|\.gitignore|\.gitattributes|composer\.json|composer\.lock|package\.json|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|phpunit\.xml|artisan|server\.php|webpack\.mix\.js|vite\.config\.js|tsconfig\.json|Dockerfile|docker-compose\.yml|docker-compose\.yaml|\.dockerignore|\.htaccess|\.htpasswd)$">
+        Require all denied
+    </FilesMatch>
+
+    # ------------------------------------------------------------------
+    # Block access to hidden files and directories (except .well-known)
+    # ------------------------------------------------------------------
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteRule (^|/)\. - [F]
+
+    # ------------------------------------------------------------------
+    # Prevent directory listing
+    # ------------------------------------------------------------------
+    Options -Indexes
+
+    # ------------------------------------------------------------------
+    # Prevent access to vendor, storage, node_modules if misconfigured
+    # ------------------------------------------------------------------
+    RewriteRule ^(vendor|storage|node_modules|bootstrap|resources|routes|config)/ - [F,NC,L]
+
+    # ------------------------------------------------------------------
+    # Force HTTPS (optional but recommended)
+    # ------------------------------------------------------------------
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # ------------------------------------------------------------------
+    # Laravel front controller
+    # ------------------------------------------------------------------
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Extra hardening (if mod_headers is available)
+# ----------------------------------------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

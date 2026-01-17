@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@php
+use Illuminate\Support\Str;
+@endphp
+
 @section('title', 'Doctor Papers')
 
 @section('content')
@@ -67,7 +71,7 @@
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-lg font-semibold text-stone-900 truncate">{{ $paper->title }}</h3>
                                 <div class="flex items-center space-x-2 mt-1">
-                                    <x-badge :type="$paper->category === 'license' ? 'success' : ($paper->category === 'certificate' ? 'info' : 'default')">
+                                    <x-badge :variant="$paper->category === 'license' ? 'success' : ($paper->category === 'certificate' ? 'info' : 'default')">
                                         {{ ucfirst($paper->category) }}
                                     </x-badge>
                                 </div>

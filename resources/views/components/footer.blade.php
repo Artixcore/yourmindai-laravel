@@ -1,33 +1,39 @@
-<footer class="bg-stone-800 text-stone-200 mt-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-                <h3 class="text-xl font-bold text-white mb-4">Your Mind Aid</h3>
-                <p class="text-stone-400">
+<footer class="bg-dark text-light mt-5">
+    <div class="container-fluid px-4 px-md-5 py-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h3 class="h5 fw-bold text-white mb-3">Your Mind Aid</h3>
+                <p class="text-muted">
                     Providing compassionate mental health care with a focus on healing and growth.
                 </p>
             </div>
             
-            <div>
-                <h4 class="text-lg font-semibold text-white mb-4">Quick Links</h4>
-                <ul class="space-y-2">
-                    <li><a href="{{ route('landing') }}#about" class="text-stone-400 hover:text-teal-400 transition-colors">About Us</a></li>
-                    <li><a href="{{ route('landing') }}#doctors" class="text-stone-400 hover:text-teal-400 transition-colors">Our Doctors</a></li>
-                    <li><a href="{{ route('landing') }}#contact" class="text-stone-400 hover:text-teal-400 transition-colors">Contact</a></li>
+            <div class="col-md-4">
+                <h4 class="h6 fw-semibold text-white mb-3">Quick Links</h4>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                    <li><a href="{{ route('landing') }}#about" class="text-muted text-decoration-none hover-text-teal-400">About Us</a></li>
+                    <li><a href="{{ route('landing') }}#doctors" class="text-muted text-decoration-none hover-text-teal-400">Our Doctors</a></li>
+                    <li><a href="{{ route('landing') }}#contact" class="text-muted text-decoration-none hover-text-teal-400">Contact</a></li>
                 </ul>
             </div>
             
-            <div>
-                <h4 class="text-lg font-semibold text-white mb-4">Contact</h4>
-                <p class="text-stone-400">
+            <div class="col-md-4">
+                <h4 class="h6 fw-semibold text-white mb-3">Contact</h4>
+                <p class="text-muted">
                     Email: info@yourmindaid.com<br>
                     Phone: (555) 123-4567
                 </p>
             </div>
         </div>
         
-        <div class="mt-8 pt-8 border-t border-stone-700 text-center text-stone-400">
+        <div class="mt-4 pt-4 border-top border-secondary text-center text-muted">
             <p>&copy; {{ date('Y') }} Your Mind Aid. All rights reserved.</p>
         </div>
     </div>
 </footer>
+
+<style>
+    .hover-text-teal-400:hover {
+        color: #2dd4bf !important;
+    }
+</style>

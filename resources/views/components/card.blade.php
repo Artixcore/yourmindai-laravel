@@ -1,5 +1,7 @@
-@props(['padding' => 'p-6', 'shadow' => 'shadow-lg'])
+@props(['padding' => 'p-4 p-md-5', 'shadow' => 'shadow'])
 
-<div {{ $attributes->merge(['class' => "bg-white rounded-xl {$shadow} {$padding} transition-all duration-200 hover:shadow-xl"]) }}>
-    {{ $slot }}
+<div {{ $attributes->merge(['class' => "card bg-white rounded-xl {$shadow}"]) }}>
+    <div class="card-body {$padding}">
+        {{ $slot }}
+    </div>
 </div>

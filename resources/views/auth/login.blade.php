@@ -1,21 +1,21 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8" data-aos="fade-up">
+    <div class="min-vh-100 d-flex align-items-center justify-content-center py-5 px-3">
+        <div class="w-100" style="max-width: 448px;" data-aos="fade-up">
             <div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-stone-900">
+                <h2 class="mt-3 text-center h2 fw-bold text-stone-900">
                     Sign in to Your Mind Aid
                 </h2>
-                <p class="mt-2 text-center text-sm text-stone-600">
+                <p class="mt-2 text-center small text-stone-600">
                     Access your dashboard
                 </p>
             </div>
             
-            <form class="mt-8 space-y-6" method="POST" action="{{ route('login') }}">
+            <form class="mt-5" method="POST" action="{{ route('login') }}">
                 @csrf
                 
-                <div class="space-y-4">
+                <div class="d-flex flex-column gap-3">
                     <x-input 
                         type="email" 
                         name="email" 
@@ -33,23 +33,23 @@
                         :error="$errors->first('password')"
                     />
                     
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
                             <input 
                                 id="remember" 
                                 name="remember" 
                                 type="checkbox" 
-                                class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-stone-300 rounded"
+                                class="form-check-input"
                             >
-                            <label for="remember" class="ml-2 block text-sm text-stone-700">
+                            <label for="remember" class="form-check-label ms-2 small text-stone-700">
                                 Remember me
                             </label>
                         </div>
                     </div>
                 </div>
                 
-                <div>
-                    <x-button type="submit" variant="primary" size="lg" class="w-full">
+                <div class="mt-4">
+                    <x-button type="submit" variant="primary" size="lg" class="w-100">
                         Sign in
                     </x-button>
                 </div>

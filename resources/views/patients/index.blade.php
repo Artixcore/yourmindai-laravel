@@ -3,18 +3,18 @@
 @section('title', 'Patients')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="container-fluid">
     <!-- Header -->
-    <div class="mb-6 flex items-center justify-between">
+    <div class="mb-4 d-flex align-items-center justify-content-between">
         <div>
-            <h1 class="text-3xl font-bold text-stone-900">Patients</h1>
-            <p class="text-stone-600 mt-2">Manage your patient accounts</p>
+            <h1 class="h2 fw-bold text-stone-900">Patients</h1>
+            <p class="text-stone-600 mt-2 mb-0">Manage your patient accounts</p>
         </div>
         <a
             href="{{ route('patients.create') }}"
-            class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center space-x-2"
+            class="btn btn-primary d-flex align-items-center gap-2"
         >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             <span>Create Patient</span>
@@ -32,35 +32,36 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="mb-6 p-4 bg-emerald-100 border border-emerald-400 text-emerald-700 rounded-lg"
+            class="alert alert-success alert-dismissible fade show mb-4"
             x-init="setTimeout(() => show = false, 5000)"
         >
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     <!-- Search Bar -->
-    <div class="mb-6">
-        <form method="GET" action="{{ route('patients.index') }}" class="flex items-center space-x-4">
-            <div class="flex-1">
+    <div class="mb-4">
+        <form method="GET" action="{{ route('patients.index') }}" class="d-flex align-items-center gap-3">
+            <div class="flex-grow-1">
                 <input
                     type="text"
                     name="search"
                     value="{{ $search }}"
                     placeholder="Search by name or email..."
-                    class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    class="form-control"
                 />
             </div>
             <button
                 type="submit"
-                class="px-6 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-700 transition-colors duration-200"
+                class="btn btn-secondary"
             >
                 Search
             </button>
             @if($search)
                 <a
                     href="{{ route('patients.index') }}"
-                    class="px-6 py-2 bg-stone-300 text-stone-700 rounded-lg hover:bg-stone-400 transition-colors duration-200"
+                    class="btn btn-outline-secondary"
                 >
                     Clear
                 </a>

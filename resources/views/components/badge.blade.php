@@ -4,23 +4,34 @@
     $variants = [
         'primary' => 'bg-teal-100 text-teal-800',
         'secondary' => 'bg-indigo-100 text-indigo-800',
-        'success' => 'bg-emerald-100 text-emerald-800',
-        'warning' => 'bg-amber-100 text-amber-800',
-        'danger' => 'bg-red-100 text-red-800',
-        'info' => 'bg-blue-100 text-blue-800',
-        'default' => 'bg-stone-100 text-stone-800',
+        'success' => 'bg-success bg-opacity-25 text-success',
+        'warning' => 'bg-warning bg-opacity-25 text-warning',
+        'danger' => 'bg-danger bg-opacity-25 text-danger',
+        'info' => 'bg-info bg-opacity-25 text-info',
+        'default' => 'bg-secondary bg-opacity-25 text-secondary',
     ];
     
     $sizes = [
-        'sm' => 'px-2 py-0.5 text-xs',
-        'md' => 'px-3 py-1 text-sm',
-        'lg' => 'px-4 py-1.5 text-base',
+        'sm' => 'badge-sm',
+        'md' => '',
+        'lg' => 'badge-lg',
     ];
     
     $selectedVariant = $type ?? $variant;
-    $classes = 'inline-flex items-center font-medium rounded-full ' . ($variants[$selectedVariant] ?? $variants['primary']) . ' ' . ($sizes[$size] ?? $sizes['md']);
+    $classes = 'badge rounded-pill ' . ($variants[$selectedVariant] ?? $variants['primary']) . ' ' . ($sizes[$size] ?? $sizes['md']);
 @endphp
 
 <span {{ $attributes->merge(['class' => $classes]) }}>
     {{ $slot }}
 </span>
+
+<style>
+    .badge-sm {
+        padding: 0.125rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    .badge-lg {
+        padding: 0.375rem 1rem;
+        font-size: 1rem;
+    }
+</style>

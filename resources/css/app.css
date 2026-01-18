@@ -1,20 +1,23 @@
-@import 'tailwindcss';
+/* Bootstrap Custom Theme - Your Mind Aid Psychological Palette */
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+:root {
+    /* Bootstrap Variable Overrides */
+    --bs-primary: #0f766e; /* Deep teal */
+    --bs-primary-rgb: 15, 118, 110;
+    --bs-secondary: #1e40af; /* Indigo */
+    --bs-secondary-rgb: 30, 64, 175;
+    --bs-success: #10b981; /* Emerald */
+    --bs-success-rgb: 16, 185, 129;
+    --bs-info: #3b82f6; /* Indigo light */
+    --bs-info-rgb: 59, 130, 246;
+    --bs-warning: #f59e0b;
+    --bs-warning-rgb: 245, 158, 11;
+    --bs-danger: #ef4444;
+    --bs-danger-rgb: 239, 68, 68;
     
-    /* Your Mind Aid Psychological Palette */
-    --color-primary: #0f766e; /* Deep teal */
+    /* Custom Colors */
     --color-primary-dark: #134e4a;
     --color-primary-light: #14b8a6;
-    --color-indigo: #1e40af;
-    --color-indigo-light: #3b82f6;
     --color-mint: #a7f3d0;
     --color-mint-light: #6ee7b7;
     --color-accent: #10b981;
@@ -22,6 +25,115 @@
     --color-text-dark: #57534e;
     --color-bg-gradient-start: #f8fafc;
     --color-bg-gradient-end: #f0fdfa;
+    
+    /* Font */
+    --bs-font-sans-serif: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Custom Background Colors */
+.bg-stone-50 {
+    background-color: #fafaf9 !important;
+}
+
+.bg-teal-50 {
+    background-color: #f0fdfa !important;
+}
+
+.bg-teal-100 {
+    background-color: #ccfbf1 !important;
+}
+
+.bg-indigo-100 {
+    background-color: #e0e7ff !important;
+}
+
+.bg-emerald-100 {
+    background-color: #d1fae5 !important;
+}
+
+.bg-amber-100 {
+    background-color: #fef3c7 !important;
+}
+
+.bg-red-100 {
+    background-color: #fee2e2 !important;
+}
+
+/* Custom Text Colors */
+.text-stone-700 {
+    color: #44403c !important;
+}
+
+.text-stone-600 {
+    color: #57534e !important;
+}
+
+.text-stone-500 {
+    color: #78716c !important;
+}
+
+.text-stone-400 {
+    color: #a8a29e !important;
+}
+
+.text-stone-900 {
+    color: #0c0a09 !important;
+}
+
+.text-teal-700 {
+    color: #0f766e !important;
+}
+
+.text-teal-800 {
+    color: #115e59 !important;
+}
+
+.text-indigo-700 {
+    color: #4338ca !important;
+}
+
+.text-emerald-700 {
+    color: #047857 !important;
+}
+
+.text-amber-700 {
+    color: #b45309 !important;
+}
+
+.text-red-600 {
+    color: #dc2626 !important;
+}
+
+.text-red-700 {
+    color: #b91c1c !important;
+}
+
+/* Custom Border Colors */
+.border-stone-200 {
+    border-color: #e7e5e4 !important;
+}
+
+.border-stone-300 {
+    border-color: #d6d3d1 !important;
+}
+
+.border-emerald-400 {
+    border-color: #34d399 !important;
+}
+
+.border-red-400 {
+    border-color: #f87171 !important;
+}
+
+/* Custom Utilities */
+.sidebar-width {
+    width: 256px; /* 64 * 4px = 256px */
+}
+
+@media (min-width: 768px) {
+    .sidebar-width {
+        width: 256px;
+    }
 }
 
 /* Custom animations */
@@ -45,4 +157,34 @@
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
+}
+
+/* Custom hover effects */
+.hover-bg-teal-50:hover {
+    background-color: #f0fdfa !important;
+}
+
+.hover-text-teal-700:hover {
+    color: #0f766e !important;
+}
+
+/* Custom spacing for sidebar */
+.sidebar-margin {
+    margin-left: 0;
+}
+
+@media (min-width: 768px) {
+    .sidebar-margin {
+        margin-left: 256px;
+    }
+}
+
+/* Custom rounded corners */
+.rounded-xl {
+    border-radius: 0.75rem !important;
+}
+
+/* Custom shadows */
+.shadow-xl {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
 }

@@ -1,36 +1,36 @@
-<nav class="bg-white shadow-sm border-b border-stone-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <div class="flex items-center">
-                <a href="{{ route('landing') }}" class="flex items-center space-x-2">
-                    <span class="text-2xl font-bold bg-gradient-to-r from-teal-700 to-indigo-700 bg-clip-text text-transparent">
+<nav class="bg-white shadow-sm border-bottom border-stone-200">
+    <div class="container-fluid px-4 px-md-5">
+        <div class="d-flex justify-content-between align-items-center" style="height: 64px;">
+            <div class="d-flex align-items-center">
+                <a href="{{ route('landing') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+                    <span class="fs-2 fw-bold text-teal-700">
                         Your Mind Aid
                     </span>
                 </a>
             </div>
             
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="{{ route('landing') }}#about" class="text-stone-700 hover:text-teal-700 transition-colors">About</a>
-                <a href="{{ route('landing') }}#doctors" class="text-stone-700 hover:text-teal-700 transition-colors">Doctors</a>
-                <a href="{{ route('landing') }}#contact" class="text-stone-700 hover:text-teal-700 transition-colors">Contact</a>
+            <div class="d-none d-md-flex align-items-center gap-4">
+                <a href="{{ route('landing') }}#about" class="text-stone-700 hover-text-teal-700 text-decoration-none">About</a>
+                <a href="{{ route('landing') }}#doctors" class="text-stone-700 hover-text-teal-700 text-decoration-none">Doctors</a>
+                <a href="{{ route('landing') }}#contact" class="text-stone-700 hover-text-teal-700 text-decoration-none">Contact</a>
                 
                 @auth
-                    <a href="{{ route('dashboard') }}" class="text-stone-700 hover:text-teal-700 transition-colors">Dashboard</a>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                    <a href="{{ route('dashboard') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none">Dashboard</a>
+                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
                         @csrf
-                        <button type="submit" class="text-stone-700 hover:text-teal-700 transition-colors">Logout</button>
+                        <button type="submit" class="btn btn-link text-stone-700 hover-text-teal-700 p-0 border-0 text-decoration-none">Logout</button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-800 transition-colors">
+                    <a href="{{ route('login') }}" class="btn btn-primary">
                         Login
                     </a>
                 @endauth
             </div>
             
             <!-- Mobile menu button -->
-            <div class="md:hidden">
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-stone-700 hover:text-teal-700">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="d-md-none">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="btn btn-link text-stone-700 hover-text-teal-700 border-0 p-2">
+                    <svg style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
@@ -39,19 +39,19 @@
     </div>
     
     <!-- Mobile menu -->
-    <div x-data="{ mobileMenuOpen: false }" x-show="mobileMenuOpen" x-cloak class="md:hidden border-t border-stone-200">
-        <div class="px-4 py-3 space-y-2">
-            <a href="{{ route('landing') }}#about" class="block text-stone-700 hover:text-teal-700">About</a>
-            <a href="{{ route('landing') }}#doctors" class="block text-stone-700 hover:text-teal-700">Doctors</a>
-            <a href="{{ route('landing') }}#contact" class="block text-stone-700 hover:text-teal-700">Contact</a>
+    <div x-data="{ mobileMenuOpen: false }" x-show="mobileMenuOpen" x-cloak class="d-md-none border-top border-stone-200">
+        <div class="px-4 py-3 d-flex flex-column gap-2">
+            <a href="{{ route('landing') }}#about" class="text-stone-700 hover-text-teal-700 text-decoration-none">About</a>
+            <a href="{{ route('landing') }}#doctors" class="text-stone-700 hover-text-teal-700 text-decoration-none">Doctors</a>
+            <a href="{{ route('landing') }}#contact" class="text-stone-700 hover-text-teal-700 text-decoration-none">Contact</a>
             @auth
-                <a href="{{ route('dashboard') }}" class="block text-stone-700 hover:text-teal-700">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none">Dashboard</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="block w-full text-left text-stone-700 hover:text-teal-700">Logout</button>
+                    <button type="submit" class="btn btn-link text-stone-700 hover-text-teal-700 p-0 border-0 text-start text-decoration-none w-100">Logout</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="block px-4 py-2 bg-teal-700 text-white rounded-lg text-center">Login</a>
+                <a href="{{ route('login') }}" class="btn btn-primary text-center">Login</a>
             @endauth
         </div>
     </div>

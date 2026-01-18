@@ -1,30 +1,30 @@
 @props(['currentAvatar' => null, 'name' => 'profile_photo', 'label' => 'Profile Photo'])
 
-<div class="mb-6" x-data="avatarUpload('{{ $currentAvatar }}')">
-    <label class="block text-sm font-medium text-stone-700 mb-2">
+<div class="mb-4" x-data="avatarUpload('{{ $currentAvatar }}')">
+    <label class="form-label text-stone-700">
         {{ $label }}
     </label>
     
-    <div class="flex items-center space-x-4">
+    <div class="d-flex align-items-center gap-4">
         <!-- Avatar Preview -->
-        <div class="relative">
-            <div class="w-24 h-24 rounded-full overflow-hidden bg-stone-200 border-2 border-stone-300 flex items-center justify-center">
+        <div class="position-relative">
+            <div class="rounded-circle overflow-hidden bg-stone-200 border border-stone-300 d-flex align-items-center justify-content-center" style="width: 96px; height: 96px;">
                 <template x-if="preview">
-                    <img :src="preview" alt="Avatar preview" class="w-full h-full object-cover">
+                    <img :src="preview" alt="Avatar preview" class="w-100 h-100 object-fit-cover">
                 </template>
                 <template x-if="!preview && currentAvatar">
-                    <img :src="currentAvatar" alt="Current avatar" class="w-full h-full object-cover">
+                    <img :src="currentAvatar" alt="Current avatar" class="w-100 h-100 object-fit-cover">
                 </template>
                 <template x-if="!preview && !currentAvatar">
-                    <svg class="w-12 h-12 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 48px; height: 48px;" class="text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </template>
             </div>
             
             <!-- Loading Overlay -->
-            <div x-show="uploading" x-cloak class="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-                <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div x-show="uploading" x-cloak class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 rounded-circle d-flex align-items-center justify-content-center">
+                <svg style="width: 24px; height: 24px;" class="spinner-border text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -32,10 +32,10 @@
         </div>
         
         <!-- Upload Button -->
-        <div class="flex-1">
+        <div class="flex-grow-1">
             <label for="{{ $name }}" class="cursor-pointer">
-                <span class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="btn btn-primary d-inline-flex align-items-center gap-2">
+                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     <span x-text="preview || currentAvatar ? 'Change Photo' : 'Upload Photo'"></span>
@@ -45,7 +45,7 @@
                     id="{{ $name }}" 
                     name="{{ $name }}"
                     accept="image/jpeg,image/jpg,image/png"
-                    class="hidden"
+                    class="d-none"
                     @change="handleFileSelect($event)"
                 >
             </label>
@@ -55,12 +55,12 @@
                 type="button"
                 x-show="preview || currentAvatar"
                 @click="removeAvatar()"
-                class="ml-3 text-sm text-red-600 hover:text-red-700 transition-colors"
+                class="btn btn-link text-danger p-0 small ms-3"
             >
                 Remove
             </button>
             
-            <p class="mt-2 text-xs text-stone-500">JPG, PNG up to 2MB</p>
+            <p class="mt-2 small text-stone-500 mb-0">JPG, PNG up to 2MB</p>
         </div>
     </div>
     
@@ -115,5 +115,8 @@ function avatarUpload(currentAvatar) {
 </script>
 
 <style>
-[x-cloak] { display: none !important; }
+    [x-cloak] { display: none !important; }
+    .cursor-pointer {
+        cursor: pointer;
+    }
 </style>

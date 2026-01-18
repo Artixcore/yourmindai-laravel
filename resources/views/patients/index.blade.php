@@ -86,7 +86,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-stone-200">
                         @foreach($patients as $patient)
-                            <tr class="hover:bg-stone-50 transition-colors">
+                            <tr class="hover-bg-stone-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($patient->photo_path)
                                         <img 
@@ -165,19 +165,19 @@
 
             <!-- Pagination -->
             @if($patients->hasPages())
-                <div class="px-6 py-4 border-t border-stone-200">
+                <div class="p-3 border-top border-stone-200">
                     {{ $patients->links() }}
                 </div>
             @endif
         </x-card>
     @else
         <!-- Empty State -->
-        <x-card class="text-center py-12">
-            <svg class="mx-auto h-16 w-16 text-stone-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <x-card class="text-center py-5">
+            <svg class="mx-auto mb-3 text-stone-400" style="width: 64px; height: 64px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h3 class="text-lg font-semibold text-stone-900 mb-2">No patients found</h3>
-            <p class="text-stone-600 mb-6">
+            <h3 class="h5 fw-semibold text-stone-900 mb-2">No patients found</h3>
+            <p class="text-stone-600 mb-4">
                 @if($search)
                     No patients match your search criteria.
                 @else
@@ -186,9 +186,9 @@
             </p>
             <a
                 href="{{ route('patients.create') }}"
-                class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200 inline-flex items-center space-x-2"
+                class="btn btn-primary d-inline-flex align-items-center gap-2"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
                 <span>Create Patient</span>

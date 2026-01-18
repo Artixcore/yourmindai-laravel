@@ -1,6 +1,6 @@
 @props(['user'])
 
-<div class="h-16 bg-white border-bottom border-stone-200 position-fixed top-0 start-0 end-0" style="z-index: 1040;">
+<div class="h-16 bg-white border-bottom border-stone-200 position-fixed top-0 start-0 end-0" style="z-index: 1050;">
     <div class="d-flex align-items-center justify-content-between px-4 px-md-5 h-100">
         <div class="d-flex align-items-center">
             <button @click="sidebarOpen = !sidebarOpen" class="btn btn-link d-md-none text-stone-700 hover-text-teal-700 p-2 border-0">

@@ -3,11 +3,11 @@
 @section('title', 'Doctor Settings')
 
 @section('content')
-<div class="max-w-4xl mx-auto" x-data="doctorSettings()">
+<div class="container-fluid" style="max-width: 896px;" x-data="doctorSettings()">
     <!-- Header -->
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-stone-900">Doctor Settings</h1>
-        <p class="text-stone-600 mt-2">Manage your profile information and preferences</p>
+    <div class="mb-4">
+        <h1 class="h2 fw-bold text-stone-900">Doctor Settings</h1>
+        <p class="text-stone-600 mt-2 mb-0">Manage your profile information and preferences</p>
     </div>
 
     <!-- Success Message -->
@@ -21,10 +21,11 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="mb-6 p-4 bg-emerald-100 border border-emerald-400 text-emerald-700 rounded-lg"
+            class="alert alert-success alert-dismissible fade show mb-4"
             x-init="setTimeout(() => show = false, 5000)"
         >
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
@@ -56,7 +57,6 @@
                 required
                 x-model="form.username"
                 @blur="validateField('username')"
-                :class="$errors->has('username') ? 'border-red-500' : ''"
             />
 
             <!-- Full Name -->
@@ -69,7 +69,6 @@
                 required
                 x-model="form.full_name"
                 @blur="validateField('full_name')"
-                :class="$errors->has('full_name') ? 'border-red-500' : ''"
             />
 
             <!-- Email -->
@@ -82,7 +81,6 @@
                 required
                 x-model="form.email"
                 @blur="validateField('email')"
-                :class="$errors->has('email') ? 'border-red-500' : ''"
             />
 
             <!-- Phone -->
@@ -96,8 +94,8 @@
             />
 
             <!-- Address -->
-            <div class="mb-4">
-                <label for="address" class="block text-sm font-medium text-stone-700 mb-2">
+            <div class="mb-3">
+                <label for="address" class="form-label text-stone-700">
                     Address
                 </label>
                 <textarea
@@ -105,30 +103,32 @@
                     name="address"
                     rows="3"
                     x-model="form.address"
-                    class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200 @error('address') border-red-500 @enderror"
+                    class="form-control @error('address') is-invalid @enderror"
                 >{{ old('address', $doctor->address ?? '') }}</textarea>
                 @error('address')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
                 @enderror
             </div>
 
             <!-- Submit Button -->
-            <div class="flex items-center justify-end space-x-4 mt-6">
+            <div class="d-flex align-items-center justify-content-end gap-3 mt-4">
                 <button
                     type="button"
                     @click="window.history.back()"
-                    class="px-6 py-2 border border-stone-300 text-stone-700 rounded-lg hover:bg-stone-50 transition-colors duration-200"
+                    class="btn btn-outline-secondary"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
                     :disabled="saving"
-                    class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
+                    class="btn btn-primary d-flex align-items-center gap-2"
                 >
                     <span x-show="!saving">Save Changes</span>
-                    <span x-show="saving" class="flex items-center">
-                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <span x-show="saving" class="d-flex align-items-center">
+                        <svg class="spinner-border spinner-border-sm me-2" style="width: 16px; height: 16px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>

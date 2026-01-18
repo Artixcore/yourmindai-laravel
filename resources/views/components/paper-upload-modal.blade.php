@@ -24,16 +24,17 @@
     ></div>
 
     <!-- Modal -->
-    <div class="flex min-h-full items-center justify-center p-4">
+    <div class="d-flex min-vh-100 align-items-center justify-content-center p-4">
         <div 
             x-show="open"
             x-transition:enter="ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:enter-start="opacity-0 translate-y-4"
+            x-transition:enter-end="opacity-100 translate-y-0"
             x-transition:leave="ease-in duration-200"
-            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            class="relative transform overflow-hidden rounded-xl bg-white shadow-xl transition-all sm:max-w-2xl w-full"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-4"
+            class="position-relative overflow-hidden rounded-xl bg-white shadow-xl w-100"
+            style="max-width: 672px;"
             @click.stop
         >
             <!-- Header -->
@@ -86,8 +87,8 @@
                         </template>
                         
                         <template x-if="selectedFile">
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-center space-x-2">
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center justify-content-center gap-2">
                                     <svg class="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
@@ -160,7 +161,7 @@
                         rows="3"
                         x-model="form.notes"
                         placeholder="Additional information about this document..."
-                        class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200 @error('notes') border-red-500 @enderror"
+                        class="form-control @error('notes') is-invalid @enderror"
                     >{{ old('notes') }}</textarea>
                     @error('notes')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -168,21 +169,21 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="flex items-center justify-end space-x-4 mt-6">
+                <div class="d-flex align-items-center justify-content-end gap-3 mt-4">
                     <button
                         type="button"
                         @click="close()"
-                        class="px-6 py-2 border border-stone-300 text-stone-700 rounded-lg hover:bg-stone-50 transition-colors duration-200"
+                        class="btn btn-outline-secondary"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         :disabled="uploading || !selectedFile"
-                        class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
+                        class="btn btn-primary d-flex align-items-center gap-2"
                     >
                         <span x-show="!uploading">Upload</span>
-                        <span x-show="uploading" class="flex items-center">
+                        <span x-show="uploading" class="d-flex align-items-center">
                             <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

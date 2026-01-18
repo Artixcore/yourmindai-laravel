@@ -5,7 +5,7 @@
         'primary' => 'btn-primary',
         'secondary' => 'btn-secondary',
         'outline' => 'btn-outline-primary',
-        'ghost' => 'btn-link text-teal-700 hover-bg-teal-50',
+        'ghost' => 'btn-link text-teal-700',
     ];
     
     $sizes = [
@@ -15,6 +15,10 @@
     ];
     
     $classes = 'btn ' . ($variants[$variant] ?? $variants['primary']) . ' ' . ($sizes[$size] ?? $sizes['md']);
+    
+    if ($variant === 'ghost') {
+        $classes .= ' hover-bg-teal-50';
+    }
 @endphp
 
 <button type="{{ $type }}" {{ $attributes->merge(['class' => $classes]) }}>

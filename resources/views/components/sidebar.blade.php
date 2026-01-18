@@ -1,6 +1,6 @@
 @props(['role' => 'assistant'])
 
-<div class="sidebar-width bg-white border-end border-stone-200 position-fixed start-0 top-0" style="min-height: 100vh; padding-top: 64px;">
+<div class="sidebar-width bg-white border-end border-stone-200 position-fixed start-0 top-0 h-100" style="padding-top: 64px; z-index: 1030; overflow-y: auto;">
     <nav class="p-4">
         <div class="d-flex flex-column gap-2">
             <a href="{{ route('dashboard') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('dashboard') ? 'bg-teal-50 text-teal-700' : '' }}">

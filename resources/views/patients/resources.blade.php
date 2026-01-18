@@ -3,19 +3,19 @@
 @section('title', $patient->name . ' - Resources')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="container-fluid">
     <!-- Header -->
-    <div class="mb-6 flex items-center justify-between">
+    <div class="mb-4 d-flex align-items-center justify-content-between">
         <div>
-            <h1 class="text-3xl font-bold text-stone-900">{{ $patient->name }}</h1>
-            <p class="text-stone-600 mt-2">Patient Resources</p>
+            <h1 class="h2 fw-bold text-stone-900">{{ $patient->name }}</h1>
+            <p class="text-stone-600 mt-2 mb-0">Patient Resources</p>
         </div>
-        <div class="flex items-center space-x-2">
+        <div class="d-flex align-items-center gap-2">
             <a
                 href="{{ route('patients.show', $patient) }}"
-                class="px-6 py-2 border border-stone-300 text-stone-700 rounded-lg hover:bg-stone-50 transition-colors duration-200 flex items-center space-x-2"
+                class="btn btn-outline-secondary d-flex align-items-center gap-2"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
                 <span>Back to Patient</span>
@@ -23,9 +23,9 @@
             <button
                 type="button"
                 @click="$dispatch('resource-modal-open')"
-                class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200 flex items-center space-x-2"
+                class="btn btn-primary d-flex align-items-center gap-2"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
                 <span>Add Resource</span>
@@ -44,30 +44,32 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="mb-6 p-4 bg-emerald-100 border border-emerald-400 text-emerald-700 rounded-lg"
+            class="alert alert-success alert-dismissible fade show mb-4"
             x-init="setTimeout(() => show = false, 5000)"
         >
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     <!-- Filters -->
-    <x-card class="mb-6">
-        <div class="flex flex-wrap items-center gap-4">
-            <span class="text-sm font-medium text-stone-700">Filter:</span>
+    <x-card class="mb-4">
+        <div class="d-flex flex-wrap align-items-center gap-3">
+            <span class="small font-medium text-stone-700">Filter:</span>
             
             <a
                 href="{{ route('patients.resources.index', $patient) }}"
-                class="px-4 py-2 rounded-lg transition-colors duration-200 {{ !$selectedSessionId && !$selectedSessionDayId ? 'bg-teal-600 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}"
+                class="btn btn-sm {{ !$selectedSessionId && !$selectedSessionDayId ? 'btn-primary' : 'btn-outline-secondary' }}"
             >
                 All Resources
             </a>
 
-            <div class="relative">
+            <div class="position-relative">
                 <select
                     id="session-filter"
                     onchange="filterBySession(this.value)"
-                    class="px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200 appearance-none bg-white pr-8"
+                    class="form-select form-select-sm"
+                    style="padding-right: 2rem;"
                 >
                     <option value="">By Session</option>
                     @foreach($sessions as $session)
@@ -76,17 +78,15 @@
                         </option>
                     @endforeach
                 </select>
-                <svg class="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-stone-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
             </div>
 
             @if($selectedSessionId)
-                <div class="relative">
+                <div class="position-relative">
                     <select
                         id="session-day-filter"
                         onchange="filterBySessionDay(this.value)"
-                        class="px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200 appearance-none bg-white pr-8"
+                        class="form-select form-select-sm"
+                        style="padding-right: 2rem;"
                     >
                         <option value="">By Day</option>
                         @foreach($sessionDays as $day)
@@ -95,9 +95,6 @@
                             </option>
                         @endforeach
                     </select>
-                    <svg class="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-stone-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
                 </div>
             @endif
         </div>
@@ -106,18 +103,18 @@
     <!-- Resources Grid -->
     @if($resources->isEmpty())
         <x-card>
-            <div class="text-center py-12">
-                <svg class="w-16 h-16 mx-auto mb-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="text-center py-5">
+                <svg class="mx-auto mb-3 text-stone-400" style="width: 64px; height: 64px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <h3 class="text-lg font-semibold text-stone-900 mb-2">No Resources Yet</h3>
-                <p class="text-stone-600 mb-6">Start by adding your first resource for this patient.</p>
+                <h3 class="h5 font-semibold text-stone-900 mb-2">No Resources Yet</h3>
+                <p class="text-stone-600 mb-4">Start by adding your first resource for this patient.</p>
                 <button
                     type="button"
                     @click="$dispatch('resource-modal-open')"
-                    class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200 inline-flex items-center space-x-2"
+                    class="btn btn-primary d-inline-flex align-items-center gap-2"
                 >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     <span>Add Resource</span>
@@ -125,9 +122,11 @@
             </div>
         </x-card>
     @else
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="row g-4">
             @foreach($resources as $resource)
-                <x-resource-card :resource="$resource" :patient="$patient" />
+                <div class="col-12 col-md-6 col-lg-4">
+                    <x-resource-card :resource="$resource" :patient="$patient" />
+                </div>
             @endforeach
         </div>
     @endif

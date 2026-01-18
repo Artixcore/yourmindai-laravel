@@ -24,16 +24,17 @@
     ></div>
 
     <!-- Modal -->
-    <div class="flex min-h-full items-center justify-center p-4">
+    <div class="d-flex min-vh-100 align-items-center justify-content-center p-4">
         <div 
             x-show="open"
             x-transition:enter="ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+            x-transition:enter-start="opacity-0 translate-y-4"
+            x-transition:enter-end="opacity-100 translate-y-0"
             x-transition:leave="ease-in duration-200"
-            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            class="relative transform overflow-hidden rounded-xl bg-white shadow-xl transition-all sm:max-w-2xl w-full"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-4"
+            class="position-relative overflow-hidden rounded-xl bg-white shadow-xl w-100"
+            style="max-width: 672px;"
             @click.stop
         >
             <!-- Header -->
@@ -149,8 +150,8 @@
                         </template>
                         
                         <template x-if="selectedFile || form.existingFile">
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-center space-x-2">
+                                <div class="d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center justify-content-center gap-2">
                                     <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
@@ -230,21 +231,21 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="flex items-center justify-end space-x-4 mt-6">
+                <div class="d-flex align-items-center justify-content-end gap-3 mt-4">
                     <button
                         type="button"
                         @click="close()"
-                        class="px-6 py-2 border border-stone-300 text-stone-700 rounded-lg hover:bg-stone-50 transition-colors duration-200"
+                        class="btn btn-outline-secondary"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         :disabled="submitting || (form.type === 'pdf' && !selectedFile && !form.existingFile) || (form.type === 'youtube' && !form.youtube_url)"
-                        class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2"
+                        class="btn btn-primary d-flex align-items-center gap-2"
                     >
                         <span x-show="!submitting" x-text="editing ? 'Update' : 'Create'"></span>
-                        <span x-show="submitting" class="flex items-center">
+                        <span x-show="submitting" class="d-flex align-items-center">
                             <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

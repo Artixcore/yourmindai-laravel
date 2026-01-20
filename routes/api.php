@@ -14,6 +14,7 @@ use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\ClientIntakeController;
 
 // Health check
 Route::get('/health', function () {
@@ -92,6 +93,12 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post('/assessments/{id}/complete', [AssessmentController::class, 'complete']);
     Route::get('/assessments/{id}/result', [AssessmentController::class, 'getResult']);
     Route::get('/assessments/patient/{patientId}/history', [AssessmentController::class, 'getHistory']);
+});
+
+// Client intake routes (protected)
+Route::middleware('jwt.auth')->group(function () {
+    Route::post('/client/intake/persist', [ClientIntakeController::class, 'persist']);
+    Route::get('/client/intake', [ClientIntakeController::class, 'index']);
 });
 
 // User management routes

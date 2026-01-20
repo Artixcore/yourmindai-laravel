@@ -16,16 +16,9 @@
     
     <!-- Custom Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-       
-       <link href="{{ asset('https://storaeall.s3.us-east-1.amazonaws.com/public/build/assets/app-Dt_pb0sm.css') }}" rel="stylesheet">
-       <link href="{{ asset('https://storaeall.s3.us-east-1.amazonaws.com/public/build/assets/app-DvB2Xm2x.css') }}" rel="stylesheet">
-       <script src="{{ asset('https://storaeall.s3.us-east-1.amazonaws.com/public/build/assets/app-DAh8zfi3.js') }}"></script>
-
-   <script src="{{ asset('js/app.js') }}"></script>
-   <script src="{{ asset('https://storaeall.s3.us-east-1.amazonaws.com/doctor/assets/app-DAh8zfi3.js') }}"></script>
-   
-   <!-- Bootstrap 5.3 JS Bundle -->
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- AOS Animation Library CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body class="bg-stone-50">
     <div x-data="{ sidebarOpen: false }" class="d-flex" style="height: 100vh; overflow: hidden;">
@@ -84,6 +77,80 @@
             </main>
         </div>
     </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        window.axios = axios;
+        window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    </script>
+    
+    <!-- Alpine.js Components -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('modal', (initialOpen = false) => ({
+                open: initialOpen,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                },
+            }));
+
+            Alpine.data('dropdown', (initialOpen = false) => ({
+                open: initialOpen,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                },
+            }));
+
+            Alpine.data('sidebar', (initialOpen = false) => ({
+                open: initialOpen,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                },
+            }));
+        });
+        
+        // Initialize AOS
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof AOS !== 'undefined') {
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true,
+                        offset: 100,
+                    });
+                }
+            });
+        } else {
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 800,
+                    easing: 'ease-in-out',
+                    once: true,
+                    offset: 100,
+                });
+            }
+        }
+    </script>
     
     <style>
         [x-cloak] { display: none !important; }

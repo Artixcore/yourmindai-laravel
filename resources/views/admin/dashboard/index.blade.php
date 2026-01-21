@@ -1,104 +1,119 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard - Your Mind Aid')
+@section('title', 'Admin Dashboard')
 
 @section('content')
-<div class="mb-4">
-    <h1 class="h2 fw-bold text-stone-900">Admin Dashboard</h1>
-    <p class="text-stone-600 mt-2 mb-0">Welcome back, {{ auth()->user()->full_name ?? auth()->user()->name }}!</p>
-</div>
-
-<div class="row g-4 mb-5">
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Total Doctors</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ \App\Models\User::where('role', 'doctor')->where('status', 'active')->count() }}</p>
-                </div>
-                <div class="bg-teal-100 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-            </div>
-        </x-card>
-    </div>
-    
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Total Patients</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ \App\Models\Patient::where('status', 'active')->count() }}</p>
-                </div>
-                <div class="bg-primary bg-opacity-25 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
-            </div>
-        </x-card>
-    </div>
-    
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Active Sessions</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ \App\Models\Session::where('status', 'active')->count() }}</p>
-                </div>
-                <div class="bg-emerald-100 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-        </x-card>
-    </div>
-    
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Pending Messages</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ \App\Models\ContactMessage::where('status', 'new')->count() }}</p>
-                </div>
-                <div class="bg-amber-100 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
-                </div>
-            </div>
-        </x-card>
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <x-breadcrumb :items="[
+            ['label' => 'Home', 'url' => route('admin.dashboard')],
+            ['label' => 'Dashboard']
+        ]" />
+        <h1 class="h3 mb-1 fw-semibold">Admin Dashboard</h1>
+        <p class="text-muted mb-0">Welcome back, {{ auth()->user()->full_name ?? auth()->user()->name }}!</p>
     </div>
 </div>
 
-<div class="row g-4">
-    <div class="col-12 col-lg-6">
-        <x-card>
-            <h2 class="h5 fw-semibold text-stone-900 mb-4">Quick Actions</h2>
-            <div class="d-flex flex-column gap-3">
-                <a href="{{ route('admin.staff.create') }}" class="btn btn-primary w-100">
-                    Add New Staff Member
-                </a>
-                <a href="{{ route('admin.ai-reports.index') }}" class="btn btn-primary w-100">
-                    Generate AI Report
-                </a>
-                <a href="{{ route('admin.analytics.index') }}" class="btn btn-success w-100">
-                    View Analytics
-                </a>
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Total Doctors</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\User::where('role', 'doctor')->where('status', 'active')->count() }}</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-person-badge text-primary fs-4"></i>
+                    </div>
+                </div>
             </div>
-        </x-card>
+        </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Total Patients</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\Patient::where('status', 'active')->count() }}</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-people text-success fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Active Sessions</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\Session::where('status', 'active')->count() }}</h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-calendar-check text-info fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Pending Messages</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\ContactMessage::where('status', 'new')->count() }}</h3>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-chat-dots text-warning fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions & Recent Activity -->
+<div class="row g-3">
+    <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom py-3">
+                <h5 class="card-title mb-0 fw-semibold">Quick Actions</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-grid gap-2">
+                    <a href="{{ route('admin.staff.create') }}" class="btn btn-primary">
+                        <i class="bi bi-person-plus me-2"></i>Add New Staff Member
+                    </a>
+                    <a href="{{ route('admin.ai-reports.index') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-file-earmark-text me-2"></i>Generate AI Report
+                    </a>
+                    <a href="{{ route('admin.analytics.index') }}" class="btn btn-outline-success">
+                        <i class="bi bi-graph-up me-2"></i>View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="col-12 col-lg-6">
-        <x-card>
-            <h2 class="h5 fw-semibold text-stone-900 mb-4">Recent Activity</h2>
-            <div>
-                <p class="text-stone-600 mb-0">Recent activity will be displayed here.</p>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom py-3">
+                <h5 class="card-title mb-0 fw-semibold">Recent Activity</h5>
             </div>
-        </x-card>
+            <div class="card-body p-4">
+                <p class="text-muted mb-0">Recent activity will be displayed here.</p>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

@@ -1,53 +1,35 @@
 @extends('layouts.app')
 
-@section('title', 'Admin - Patients')
+@section('title', 'Patients')
 
 @section('content')
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="mb-4 d-flex align-items-center justify-content-between">
-        <div>
-            <h1 class="h2 fw-bold text-stone-900">Patient Management</h1>
-            <p class="text-stone-600 mt-2 mb-0">View and manage all patients across the system</p>
-        </div>
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <x-breadcrumb :items="[
+            ['label' => 'Home', 'url' => route('admin.dashboard')],
+            ['label' => 'Patients']
+        ]" />
+        <h1 class="h3 mb-1 fw-semibold">Patient Management</h1>
+        <p class="text-muted mb-0">View and manage all patients across the system</p>
     </div>
+    <a href="{{ route('patients.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Add Patient
+    </a>
+</div>
 
-    <!-- Success Message -->
-    @if(session('success'))
-        <div 
-            x-data="{ show: true }"
-            x-show="show"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform translate-y-2"
-            x-transition:enter-end="opacity-100 transform translate-y-0"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="alert alert-success alert-dismissible fade show mb-4"
-            x-init="setTimeout(() => show = false, 5000)"
-        >
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <!-- Filters -->
-    <x-card class="mb-4">
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
         <form method="GET" action="{{ route('admin.patients.index') }}" class="row g-3">
             <div class="col-12 col-md-3">
-                <label class="form-label small text-stone-600">Search</label>
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Name, email, or phone..."
-                    class="form-control"
-                />
+                <label class="form-label small text-muted">Search</label>
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="Name, email, or phone..." class="form-control form-control-sm">
             </div>
-            
             <div class="col-12 col-md-3">
-                <label class="form-label small text-stone-600">Doctor</label>
-                <select name="doctor_id" class="form-select">
+                <label class="form-label small text-muted">Doctor</label>
+                <select name="doctor_id" class="form-select form-select-sm">
                     <option value="">All Doctors</option>
                     @foreach($doctors as $doctor)
                         <option value="{{ $doctor->id }}" {{ request('doctor_id') == $doctor->id ? 'selected' : '' }}>
@@ -56,112 +38,94 @@
                     @endforeach
                 </select>
             </div>
-            
             <div class="col-12 col-md-2">
-                <label class="form-label small text-stone-600">Status</label>
-                <select name="status" class="form-select">
+                <label class="form-label small text-muted">Status</label>
+                <select name="status" class="form-select form-select-sm">
                     <option value="">All Statuses</option>
                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                 </select>
             </div>
-            
             <div class="col-12 col-md-2">
-                <label class="form-label small text-stone-600">Created From</label>
-                <input
-                    type="date"
-                    name="created_from"
-                    value="{{ request('created_from') }}"
-                    class="form-control"
-                />
+                <label class="form-label small text-muted">Created From</label>
+                <input type="date" name="created_from" value="{{ request('created_from') }}" 
+                       class="form-control form-control-sm">
             </div>
-            
             <div class="col-12 col-md-2">
-                <label class="form-label small text-stone-600">Created To</label>
-                <input
-                    type="date"
-                    name="created_to"
-                    value="{{ request('created_to') }}"
-                    class="form-control"
-                />
+                <label class="form-label small text-muted">Created To</label>
+                <input type="date" name="created_to" value="{{ request('created_to') }}" 
+                       class="form-control form-control-sm">
             </div>
-            
-            <div class="col-12 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <div class="col-12 col-md-12 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
                 @if(request()->hasAny(['search', 'doctor_id', 'status', 'created_from', 'created_to']))
-                    <a href="{{ route('admin.patients.index') }}" class="btn btn-outline-secondary">Clear</a>
+                    <a href="{{ route('admin.patients.index') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
                 @endif
             </div>
         </form>
-    </x-card>
+    </div>
+</div>
 
-    <!-- Patients Table -->
-    @if($patients->count() > 0)
-        <x-card class="overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-stone-200">
-                    <thead class="bg-stone-50">
+<!-- Table -->
+@if($patients->count() > 0)
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Photo</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Phone</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Doctor</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Created</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Actions</th>
+                            <th class="border-0" style="width: 60px;">Photo</th>
+                            <th class="border-0">Name</th>
+                            <th class="border-0">Email</th>
+                            <th class="border-0">Phone</th>
+                            <th class="border-0">Doctor</th>
+                            <th class="border-0">Status</th>
+                            <th class="border-0">Created</th>
+                            <th class="border-0 text-end" style="width: 100px;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-stone-200">
+                    <tbody>
                         @foreach($patients as $patient)
-                            <tr class="hover-bg-stone-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
+                            <tr>
+                                <td>
                                     @if($patient->photo_path)
-                                        <img 
-                                            src="{{ $patient->photo_url }}" 
-                                            alt="{{ $patient->name }}"
-                                            class="w-10 h-10 rounded-full object-cover"
-                                        />
+                                        <img src="{{ $patient->photo_url }}" alt="{{ $patient->name }}"
+                                             class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                                     @else
-                                        <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center">
-                                            <span class="text-teal-600 font-semibold text-sm">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px;">
+                                            <span class="text-primary fw-semibold small">
                                                 {{ strtoupper(substr($patient->name, 0, 1)) }}
                                             </span>
                                         </div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-stone-900">{{ $patient->name }}</div>
+                                <td>
+                                    <div class="fw-medium">{{ $patient->name }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-stone-600">{{ $patient->email }}</div>
+                                <td>
+                                    <div class="text-muted small">{{ $patient->email }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-stone-600">{{ $patient->phone ?? '—' }}</div>
+                                <td>
+                                    <div class="text-muted small">{{ $patient->phone ?? '—' }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-stone-600">
+                                <td>
+                                    <div class="text-muted small">
                                         {{ $patient->doctor ? ($patient->doctor->name ?? $patient->doctor->email) : '—' }}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td>
                                     <x-badge :variant="$patient->status === 'active' ? 'success' : 'default'">
                                         {{ ucfirst($patient->status) }}
                                     </x-badge>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-stone-600">{{ $patient->created_at->format('M d, Y') }}</div>
+                                <td>
+                                    <div class="text-muted small">{{ $patient->created_at->format('M d, Y') }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a
-                                        href="{{ route('admin.patients.show', $patient) }}"
-                                        class="text-teal-600 hover:text-teal-900"
-                                        title="View"
-                                    >
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
+                                <td class="text-end">
+                                    <a href="{{ route('admin.patients.show', $patient) }}" 
+                                       class="btn btn-sm btn-link text-primary p-1" title="View">
+                                        <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -169,29 +133,27 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Pagination -->
             @if($patients->hasPages())
-                <div class="p-3 border-top border-stone-200">
+                <div class="card-footer bg-transparent border-top py-3">
                     {{ $patients->links() }}
                 </div>
             @endif
-        </x-card>
-    @else
-        <!-- Empty State -->
-        <x-card class="text-center py-5">
-            <svg class="mx-auto mb-3 text-stone-400" style="width: 64px; height: 64px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <h3 class="h5 fw-semibold text-stone-900 mb-2">No patients found</h3>
-            <p class="text-stone-600 mb-0">
+        </div>
+    </div>
+@else
+    <!-- Empty state -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+            <h5 class="mt-3 mb-2">No patients found</h5>
+            <p class="text-muted mb-0">
                 @if(request()->hasAny(['search', 'doctor_id', 'status', 'created_from', 'created_to']))
                     No patients match your filter criteria.
                 @else
                     No patients have been created yet.
                 @endif
             </p>
-        </x-card>
-    @endif
-</div>
+        </div>
+    </div>
+@endif
 @endsection

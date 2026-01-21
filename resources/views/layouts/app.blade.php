@@ -17,6 +17,9 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     
+    <!-- Admin Panel Styles (loads after Bootstrap, before app.css) -->
+    <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
+    
     <!-- Custom Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/patient.css') }}" rel="stylesheet">
@@ -100,6 +103,12 @@
     
     <!-- Alpine.js Components -->
     <script>
+        // Initialize sidebar collapsed state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            document.body.setAttribute('data-sidebar-collapsed', collapsed);
+        });
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('modal', (initialOpen = false) => ({
                 open: initialOpen,

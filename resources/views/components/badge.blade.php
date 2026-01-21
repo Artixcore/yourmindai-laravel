@@ -1,14 +1,15 @@
-@props(['variant' => 'primary', 'size' => 'md', 'type' => null])
+@props(['variant' => 'primary', 'size' => 'md'])
 
 @php
+    // Bootstrap 5.7 bg-*-subtle pattern
     $variants = [
-        'primary' => 'bg-teal-100 text-teal-800',
-        'secondary' => 'bg-indigo-100 text-indigo-800',
-        'success' => 'bg-success bg-opacity-25 text-success',
-        'warning' => 'bg-warning bg-opacity-25 text-warning',
-        'danger' => 'bg-danger bg-opacity-25 text-danger',
-        'info' => 'bg-info bg-opacity-25 text-info',
-        'default' => 'bg-secondary bg-opacity-25 text-secondary',
+        'primary' => 'bg-primary-subtle text-primary-emphasis border border-primary-subtle',
+        'secondary' => 'bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle',
+        'success' => 'bg-success-subtle text-success-emphasis border border-success-subtle',
+        'warning' => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+        'danger' => 'bg-danger-subtle text-danger-emphasis border border-danger-subtle',
+        'info' => 'bg-info-subtle text-info-emphasis border border-info-subtle',
+        'default' => 'bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle',
     ];
     
     $sizes = [
@@ -17,8 +18,7 @@
         'lg' => 'badge-lg',
     ];
     
-    $selectedVariant = $type ?? $variant;
-    $classes = 'badge rounded-pill ' . ($variants[$selectedVariant] ?? $variants['primary']) . ' ' . ($sizes[$size] ?? $sizes['md']);
+    $classes = 'badge ' . ($variants[$variant] ?? $variants['primary']) . ' ' . ($sizes[$size] ?? $sizes['md']);
 @endphp
 
 <span {{ $attributes->merge(['class' => $classes]) }}>

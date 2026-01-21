@@ -1,23 +1,22 @@
 @extends('layouts.app')
 
-@section('title', 'Admin - ' . $patient->name)
+@section('title', $patient->name)
 
 @section('content')
 <div class="container-fluid" style="max-width: 1024px;">
-    <!-- Header -->
-    <div class="mb-4 d-flex align-items-center justify-content-between">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h1 class="h2 fw-bold text-stone-900">{{ $patient->name }}</h1>
-            <p class="text-stone-600 mt-2 mb-0">Patient Profile - Admin View</p>
+            <x-breadcrumb :items="[
+                ['label' => 'Home', 'url' => route('admin.dashboard')],
+                ['label' => 'Patients', 'url' => route('admin.patients.index')],
+                ['label' => $patient->name]
+            ]" />
+            <h1 class="h3 mb-1 fw-semibold">{{ $patient->name }}</h1>
+            <p class="text-muted mb-0">Patient Profile - Admin View</p>
         </div>
-        <a
-            href="{{ route('admin.patients.index') }}"
-            class="btn btn-outline-secondary d-flex align-items-center gap-2"
-        >
-            <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Back to Patients</span>
+        <a href="{{ route('admin.patients.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Patients
         </a>
     </div>
 
@@ -41,134 +40,146 @@
     @endif
 
     <!-- Patient Details -->
-    <div class="row g-4">
+    <div class="row g-3 mb-4">
         <!-- Main Info Card -->
         <div class="col-12 col-md-8">
-            <x-card>
-                <h2 class="h5 font-semibold text-stone-900 mb-3">Patient Information</h2>
-                
-                <div class="d-flex flex-column gap-3">
-                    <div>
-                        <label class="small font-medium text-stone-500">Full Name</label>
-                        <p class="text-stone-900 font-medium mt-1 mb-0">{{ $patient->name }}</p>
-                    </div>
-                    
-                    <div>
-                        <label class="small font-medium text-stone-500">Email</label>
-                        <p class="text-stone-900 font-medium mt-1 mb-0">{{ $patient->email }}</p>
-                    </div>
-                    
-                    <div>
-                        <label class="small font-medium text-stone-500">Phone</label>
-                        <p class="text-stone-900 font-medium mt-1 mb-0">{{ $patient->phone ?? '—' }}</p>
-                    </div>
-                    
-                    <div>
-                        <label class="small font-medium text-stone-500">Status</label>
-                        <div class="mt-1">
-                            <x-badge :variant="$patient->status === 'active' ? 'success' : 'default'">
-                                {{ ucfirst($patient->status) }}
-                            </x-badge>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold">Patient Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted">Full Name</label>
+                            <p class="fw-medium mb-0">{{ $patient->name }}</p>
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted">Email</label>
+                            <p class="fw-medium mb-0">{{ $patient->email }}</p>
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted">Phone</label>
+                            <p class="fw-medium mb-0">{{ $patient->phone ?? '—' }}</p>
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted">Status</label>
+                            <div>
+                                <x-badge :variant="$patient->status === 'active' ? 'success' : 'default'">
+                                    {{ ucfirst($patient->status) }}
+                                </x-badge>
+                            </div>
+                        </div>
+                        
+                        @if($patient->doctor)
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted">Assigned Doctor</label>
+                            <p class="fw-medium mb-0">
+                                {{ $patient->doctor->name ?? $patient->doctor->email }}
+                            </p>
+                        </div>
+                        @endif
+                        
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small text-muted">Created</label>
+                            <p class="fw-medium mb-0">{{ $patient->created_at->format('M d, Y') }}</p>
                         </div>
                     </div>
-                    
-                    @if($patient->doctor)
-                    <div>
-                        <label class="small font-medium text-stone-500">Assigned Doctor</label>
-                        <p class="text-stone-900 font-medium mt-1 mb-0">
-                            {{ $patient->doctor->name ?? $patient->doctor->email }}
-                        </p>
-                    </div>
-                    @endif
-                    
-                    <div>
-                        <label class="small font-medium text-stone-500">Created</label>
-                        <p class="text-stone-900 font-medium mt-1 mb-0">{{ $patient->created_at->format('M d, Y') }}</p>
-                    </div>
                 </div>
-            </x-card>
+            </div>
         </div>
 
         <!-- Photo Card -->
         <div class="col-12 col-md-4">
-            <x-card>
-                <h2 class="h5 font-semibold text-stone-900 mb-3">Photo</h2>
-                
-                @if($patient->photo_path)
-                    <img 
-                        src="{{ $patient->photo_url }}" 
-                        alt="{{ $patient->name }}"
-                        class="w-100 rounded object-fit-cover mb-3"
-                        style="aspect-ratio: 1;"
-                    />
-                @else
-                    <div class="w-100 rounded bg-teal-100 d-flex align-items-center justify-content-center mb-3" style="aspect-ratio: 1;">
-                        <span class="text-teal-600 font-semibold display-4">
-                            {{ strtoupper(substr($patient->name, 0, 1)) }}
-                        </span>
-                    </div>
-                @endif
-            </x-card>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold">Photo</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if($patient->photo_path)
+                        <img 
+                            src="{{ $patient->photo_url }}" 
+                            alt="{{ $patient->name }}"
+                            class="w-100 rounded"
+                            style="aspect-ratio: 1; object-fit: cover;"
+                        />
+                    @else
+                        <div class="w-100 rounded bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="aspect-ratio: 1;">
+                            <span class="text-primary fw-bold" style="font-size: 4rem;">
+                                {{ strtoupper(substr($patient->name, 0, 1)) }}
+                            </span>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Sessions Summary -->
-    <x-card class="mt-4">
-        <h2 class="h5 font-semibold text-stone-900 mb-3">Therapy Sessions Summary</h2>
-        
-        <div class="row g-3">
-            <div class="col-12 col-md-4">
-                <div class="border border-stone-200 rounded p-3">
-                    <p class="small text-stone-600 mb-0">Total Sessions</p>
-                    <p class="h4 fw-bold text-stone-900 mt-2 mb-0">{{ $sessionsSummary['total'] }}</p>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-bottom py-3">
+            <h5 class="card-title mb-0 fw-semibold">Therapy Sessions Summary</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <div class="border rounded p-3">
+                        <p class="text-muted small mb-1">Total Sessions</p>
+                        <h4 class="fw-bold mb-0">{{ $sessionsSummary['total'] }}</h4>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12 col-md-4">
-                <div class="border border-stone-200 rounded p-3">
-                    <p class="small text-stone-600 mb-0">Active Sessions</p>
-                    <p class="h4 fw-bold text-emerald-600 mt-2 mb-0">{{ $sessionsSummary['active'] }}</p>
+                <div class="col-12 col-md-4">
+                    <div class="border rounded p-3">
+                        <p class="text-muted small mb-1">Active Sessions</p>
+                        <h4 class="fw-bold text-success mb-0">{{ $sessionsSummary['active'] }}</h4>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12 col-md-4">
-                <div class="border border-stone-200 rounded p-3">
-                    <p class="small text-stone-600 mb-0">Closed Sessions</p>
-                    <p class="h4 fw-bold text-stone-600 mt-2 mb-0">{{ $sessionsSummary['closed'] }}</p>
+                <div class="col-12 col-md-4">
+                    <div class="border rounded p-3">
+                        <p class="text-muted small mb-1">Closed Sessions</p>
+                        <h4 class="fw-bold text-muted mb-0">{{ $sessionsSummary['closed'] }}</h4>
+                    </div>
                 </div>
             </div>
         </div>
-    </x-card>
+    </div>
 
     <!-- Recent Activity -->
     @if($recentActivity->count() > 0)
-    <x-card class="mt-4">
-        <h2 class="h5 font-semibold text-stone-900 mb-3">Recent Activity</h2>
-        
-        <div class="d-flex flex-column gap-3">
-            @foreach($recentActivity as $session)
-                <div class="border border-stone-200 rounded p-3 hover-bg-stone-50">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h3 class="h6 font-semibold text-stone-900 mb-0">{{ $session->title }}</h3>
-                                <x-badge :variant="$session->status === 'active' ? 'success' : 'default'">
-                                    {{ ucfirst($session->status) }}
-                                </x-badge>
-                            </div>
-                            @if($session->notes)
-                                <p class="small text-stone-600 mt-1 mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                    {{ Str::limit($session->notes, 100) }}
-                                </p>
-                            @endif
-                            <div class="d-flex align-items-center gap-3 mt-2 small text-stone-500">
-                                <span>{{ $session->created_at->format('M d, Y') }}</span>
-                                <span>{{ $session->days->count() }} day{{ $session->days->count() !== 1 ? 's' : '' }}</span>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-bottom py-3">
+            <h5 class="card-title mb-0 fw-semibold">Recent Activity</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="d-flex flex-column gap-3">
+                @foreach($recentActivity as $session)
+                    <div class="border rounded p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <h6 class="fw-semibold mb-0">{{ $session->title }}</h6>
+                                    <x-badge :variant="$session->status === 'active' ? 'success' : 'default'">
+                                        {{ ucfirst($session->status) }}
+                                    </x-badge>
+                                </div>
+                                @if($session->notes)
+                                    <p class="text-muted small mb-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        {{ Str::limit($session->notes, 100) }}
+                                    </p>
+                                @endif
+                                <div class="d-flex align-items-center gap-3 small text-muted">
+                                    <span><i class="bi bi-calendar me-1"></i>{{ $session->created_at->format('M d, Y') }}</span>
+                                    <span><i class="bi bi-clock me-1"></i>{{ $session->days->count() }} day{{ $session->days->count() !== 1 ? 's' : '' }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
-    </x-card>
+    </div>
     @endif
 </div>
 @endsection

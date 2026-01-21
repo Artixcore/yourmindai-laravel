@@ -1,101 +1,120 @@
 @extends('layouts.app')
 
-@section('title', 'Analytics - Your Mind Aid')
+@section('title', 'Analytics')
 
 @section('content')
-<div class="mb-4">
-    <h1 class="h2 fw-bold text-stone-900">Analytics Dashboard</h1>
-    <p class="text-stone-600 mt-2 mb-0">Clinic-wide statistics and insights</p>
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <x-breadcrumb :items="[
+            ['label' => 'Home', 'url' => route('admin.dashboard')],
+            ['label' => 'Analytics']
+        ]" />
+        <h1 class="h3 mb-1 fw-semibold">Analytics Dashboard</h1>
+        <p class="text-muted mb-0">Clinic-wide statistics and insights</p>
+    </div>
 </div>
 
 <!-- KPIs -->
-<div class="row g-4 mb-5">
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Total Doctors</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ $totalDoctors }}</p>
-                </div>
-                <div class="bg-teal-100 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Total Doctors</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ $totalDoctors }}</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-person-badge text-primary fs-4"></i>
+                    </div>
                 </div>
             </div>
-        </x-card>
+        </div>
     </div>
     
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Total Patients</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ $totalPatients }}</p>
-                </div>
-                <div class="bg-primary bg-opacity-25 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Total Patients</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ $totalPatients }}</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-people text-success fs-4"></i>
+                    </div>
                 </div>
             </div>
-        </x-card>
+        </div>
     </div>
     
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Active Sessions</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ $activeSessions }}</p>
-                </div>
-                <div class="bg-emerald-100 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Active Sessions</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ $activeSessions }}</h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-calendar-check text-info fs-4"></i>
+                    </div>
                 </div>
             </div>
-        </x-card>
+        </div>
     </div>
     
-    <div class="col-12 col-md-6 col-lg-3">
-        <x-card>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="small text-stone-600 mb-0">Attention Flags</p>
-                    <p class="h3 fw-bold text-stone-900 mt-2 mb-0">{{ $attentionFlags }}</p>
-                </div>
-                <div class="bg-red-100 rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                    <svg style="width: 24px; height: 24px;" class="text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Attention Flags</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ $attentionFlags }}</h3>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 rounded-3 p-3">
+                        <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
+                    </div>
                 </div>
             </div>
-        </x-card>
+        </div>
     </div>
 </div>
 
 <!-- Charts -->
-<div class="row g-4 mb-5">
+<div class="row g-3 mb-4">
     <div class="col-12 col-lg-6">
-        <x-card>
-            <h2 class="h5 font-semibold text-stone-900 mb-3">Sessions Over Time</h2>
-            <canvas id="sessionsChart" height="100"></canvas>
-        </x-card>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom py-3">
+                <h5 class="card-title mb-0 fw-semibold">Sessions Over Time</h5>
+            </div>
+            <div class="card-body p-4">
+                <canvas id="sessionsChart" height="100"></canvas>
+            </div>
+        </div>
     </div>
     
     <div class="col-12 col-lg-6">
-        <x-card>
-            <h2 class="h5 font-semibold text-stone-900 mb-3">Active vs Closed Sessions</h2>
-            <canvas id="sessionsRatioChart" height="100"></canvas>
-        </x-card>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom py-3">
+                <h5 class="card-title mb-0 fw-semibold">Active vs Closed Sessions</h5>
+            </div>
+            <div class="card-body p-4">
+                <canvas id="sessionsRatioChart" height="100"></canvas>
+            </div>
+        </div>
     </div>
 </div>
 
-<x-card>
-    <h2 class="h5 font-semibold text-stone-900 mb-3">Per-Doctor Caseload Distribution</h2>
-    <canvas id="caseloadChart" height="50"></canvas>
-</x-card>
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-bottom py-3">
+        <h5 class="card-title mb-0 fw-semibold">Per-Doctor Caseload Distribution</h5>
+    </div>
+    <div class="card-body p-4">
+        <canvas id="caseloadChart" height="50"></canvas>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>

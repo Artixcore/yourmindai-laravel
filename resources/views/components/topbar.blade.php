@@ -1,36 +1,48 @@
-@props(['user'])
+@props(['user', 'showSearch' => false])
 
-<div class="h-16 bg-white border-bottom border-stone-200 position-fixed top-0 start-0 end-0" style="z-index: 1050;">
+<div class="topbar position-fixed top-0 start-0 end-0" style="z-index: 1050;">
     <div class="d-flex align-items-center justify-content-between px-4 px-md-5 h-100">
-        <div class="d-flex align-items-center">
-            <button @click="sidebarOpen = !sidebarOpen" class="btn btn-link d-md-none text-stone-700 hover-text-teal-700 p-2 border-0">
-                <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+        <div class="d-flex align-items-center gap-3">
+            <!-- Mobile Menu Toggle -->
+            <button @click="sidebarOpen = !sidebarOpen" class="btn btn-link d-md-none text-muted p-2 border-0" type="button">
+                <i class="bi bi-list" style="font-size: 1.5rem;"></i>
             </button>
+            
+            <!-- Search (Optional, Desktop Only) -->
+            @if($showSearch)
+                <div class="topbar-search d-none d-md-block">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" placeholder="Search..." aria-label="Search">
+                    </div>
+                </div>
+            @endif
         </div>
         
-        <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2">
             <!-- Notifications -->
-            <button class="btn btn-link position-relative p-2 text-stone-700 hover-text-teal-700 border-0">
-                <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+            <button class="btn btn-link position-relative p-2 text-muted border-0" type="button" title="Notifications">
+                <i class="bi bi-bell" style="font-size: 1.25rem;"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.5rem; padding: 0.125rem 0.25rem;">
                     <span class="visually-hidden">New alerts</span>
                 </span>
             </button>
             
             <!-- Profile Dropdown -->
             <div class="dropdown" x-data="dropdown(false)">
-                <button @click="toggle()" class="btn btn-link d-flex align-items-center gap-2 text-stone-700 hover-text-teal-700 border-0 text-decoration-none" type="button">
-                    <div class="rounded-circle bg-teal-700 d-flex align-items-center justify-content-center text-white fw-semibold" style="width: 32px; height: 32px;">
+                <button 
+                    @click="toggle()" 
+                    class="btn btn-link d-flex align-items-center gap-2 text-decoration-none border-0 p-2" 
+                    type="button"
+                    aria-expanded="false"
+                >
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-semibold" style="width: 32px; height: 32px; font-size: 0.875rem;">
                         {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                     </div>
-                    <span class="d-none d-md-inline">{{ $user->name ?? 'User' }}</span>
-                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <span class="d-none d-lg-inline text-muted small">{{ $user->name ?? 'User' }}</span>
+                    <i class="bi bi-chevron-down text-muted d-none d-lg-inline" style="font-size: 0.75rem;"></i>
                 </button>
                 
                 <div 
@@ -43,15 +55,25 @@
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-95"
                     @click.away="close()"
-                    class="dropdown-menu dropdown-menu-end shadow border border-stone-200"
-                    style="display: none; min-width: 192px;"
+                    class="dropdown-menu dropdown-menu-end shadow-sm border"
+                    style="display: none; min-width: 200px; margin-top: 0.5rem;"
                 >
-                    <a href="#" class="dropdown-item text-stone-700 hover-bg-teal-50 hover-text-teal-700">Profile</a>
-                    <a href="#" class="dropdown-item text-stone-700 hover-bg-teal-50 hover-text-teal-700">Settings</a>
+                    <div class="px-3 py-2 border-bottom">
+                        <div class="fw-semibold small">{{ $user->name ?? 'User' }}</div>
+                        <div class="text-muted small">{{ $user->email ?? '' }}</div>
+                    </div>
+                    <a href="#" class="dropdown-item">
+                        <i class="bi bi-person me-2"></i>Profile
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </a>
                     <hr class="dropdown-divider">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="dropdown-item text-stone-700 hover-bg-teal-50 hover-text-teal-700 w-100 text-start border-0 bg-transparent">Logout</button>
+                        <button type="submit" class="dropdown-item text-danger w-100 text-start border-0 bg-transparent">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </button>
                     </form>
                 </div>
             </div>

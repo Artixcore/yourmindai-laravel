@@ -19,6 +19,14 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AiReportController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\PatientDashboardController;
+use App\Http\Controllers\PatientSessionController;
+use App\Http\Controllers\PatientResourceController;
+use App\Http\Controllers\PatientAppointmentController;
+use App\Http\Controllers\PatientAssessmentController;
+use App\Http\Controllers\PatientProgressController;
+use App\Http\Controllers\PatientMessageController;
+use App\Http\Controllers\PatientMedicationController;
+use App\Http\Controllers\PatientJournalController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -45,36 +53,16 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     Route::get('/profile', function () {
         return view('patient.profile');
     })->name('profile');
-    Route::get('/sessions', function () {
-        return view('patient.sessions.index');
-    })->name('sessions.index');
-    Route::get('/sessions/{id}', function ($id) {
-        return view('patient.sessions.show', compact('id'));
-    })->name('sessions.show');
-    Route::get('/resources', function () {
-        return view('patient.resources.index');
-    })->name('resources.index');
-    Route::get('/appointments', function () {
-        return view('patient.appointments.index');
-    })->name('appointments.index');
-    Route::get('/assessments', function () {
-        return view('patient.assessments.index');
-    })->name('assessments.index');
-    Route::get('/assessments/{id}', function ($id) {
-        return view('patient.assessments.show', compact('id'));
-    })->name('assessments.show');
-    Route::get('/progress', function () {
-        return view('patient.progress.index');
-    })->name('progress.index');
-    Route::get('/messages', function () {
-        return view('patient.messages.index');
-    })->name('messages.index');
-    Route::get('/medications', function () {
-        return view('patient.medications.index');
-    })->name('medications.index');
-    Route::get('/journal', function () {
-        return view('patient.journal.index');
-    })->name('journal.index');
+    Route::get('/sessions', [PatientSessionController::class, 'index'])->name('sessions.index');
+    Route::get('/sessions/{id}', [PatientSessionController::class, 'show'])->name('sessions.show');
+    Route::get('/resources', [PatientResourceController::class, 'index'])->name('resources.index');
+    Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments.index');
+    Route::get('/assessments', [PatientAssessmentController::class, 'index'])->name('assessments.index');
+    Route::get('/assessments/{id}', [PatientAssessmentController::class, 'show'])->name('assessments.show');
+    Route::get('/progress', [PatientProgressController::class, 'index'])->name('progress.index');
+    Route::get('/messages', [PatientMessageController::class, 'index'])->name('messages.index');
+    Route::get('/medications', [PatientMedicationController::class, 'index'])->name('medications.index');
+    Route::get('/journal', [PatientJournalController::class, 'index'])->name('journal.index');
     Route::get('/journal/create', function () {
         return view('patient.journal.create');
     })->name('journal.create');

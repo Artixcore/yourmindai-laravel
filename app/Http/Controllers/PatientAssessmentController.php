@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\PatientProfile;
 use App\Models\Patient;
-use App\Models\PatientJournalEntry;
+use App\Models\Assessment;
 use Illuminate\Http\Request;
 
-class PatientJournalController extends Controller
+class PatientAssessmentController extends Controller
 {
     /**
      * Get patient ID from authenticated user
@@ -31,7 +31,7 @@ class PatientJournalController extends Controller
     }
 
     /**
-     * Display a listing of journal entries for the authenticated patient
+     * Display a listing of assessments for the authenticated patient
      */
     public function index()
     {
@@ -42,18 +42,17 @@ class PatientJournalController extends Controller
                 ->with('error', 'Patient profile not found.');
         }
         
-        $journalEntries = PatientJournalEntry::where('patient_id', $patientId)
-            ->orderBy('entry_date', 'desc')
+        $assessments = Assessment::where('patient_id', $patientId)
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return view('patient.journal.index', compact('journalEntries'));
+        return view('patient.assessments.index', compact('assessments'));
     }
 
     /**
-     * Store a newly created journal entry
+     * Display the specified assessment
      */
-    public function store(Request $request)
+    public function show($id)
     {
         $patientId = $this->getPatientId();
         
@@ -62,19 +61,10 @@ class PatientJournalController extends Controller
                 ->with('error', 'Patient profile not found.');
         }
         
-        $request->validate([
-            'mood_score' => 'required|integer|min:1|max:10',
-            'notes' => 'nullable|string|max:5000',
-        ]);
+        $assessment = Assessment::where('id', $id)
+            ->where('patient_id', $patientId)
+            ->firstOrFail();
         
-        PatientJournalEntry::create([
-            'patient_id' => $patientId,
-            'mood_score' => $request->mood_score,
-            'notes' => $request->notes,
-            'entry_date' => now(),
-        ]);
-        
-        return redirect()->route('patient.journal.index')
-            ->with('success', 'Journal entry created successfully.');
+        return view('patient.assessments.show', compact('assessment'));
     }
 }

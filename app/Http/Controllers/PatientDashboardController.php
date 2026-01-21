@@ -64,8 +64,8 @@ class PatientDashboardController extends Controller
         
         // Get upcoming appointments
         $upcomingAppointments = Appointment::where('patient_id', $patientId)
-            ->where('appointment_date', '>=', now())
-            ->orderBy('appointment_date', 'asc')
+            ->where('date', '>=', now())
+            ->orderBy('date', 'asc')
             ->take(3)
             ->get();
         

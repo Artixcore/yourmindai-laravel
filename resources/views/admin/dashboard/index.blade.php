@@ -18,14 +18,14 @@
 <!-- Stats Cards -->
 <div class="row g-3 mb-4">
     <div class="col-12 col-sm-6 col-lg-3">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card stat-card border-0 shadow-sm h-100">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Total Doctors</p>
                         <h3 class="h4 mb-0 fw-bold">{{ \App\Models\User::where('role', 'doctor')->where('status', 'active')->count() }}</h3>
                     </div>
-                    <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-person-badge text-primary fs-4"></i>
                     </div>
                 </div>
@@ -34,14 +34,14 @@
     </div>
     
     <div class="col-12 col-sm-6 col-lg-3">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card stat-card border-0 shadow-sm h-100">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Total Patients</p>
                         <h3 class="h4 mb-0 fw-bold">{{ \App\Models\Patient::where('status', 'active')->count() }}</h3>
                     </div>
-                    <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                    <div class="bg-success bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-people text-success fs-4"></i>
                     </div>
                 </div>
@@ -50,14 +50,14 @@
     </div>
     
     <div class="col-12 col-sm-6 col-lg-3">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card stat-card border-0 shadow-sm h-100">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Active Sessions</p>
                         <h3 class="h4 mb-0 fw-bold">{{ \App\Models\Session::where('status', 'active')->count() }}</h3>
                     </div>
-                    <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                    <div class="bg-info bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-calendar-check text-info fs-4"></i>
                     </div>
                 </div>
@@ -66,14 +66,14 @@
     </div>
     
     <div class="col-12 col-sm-6 col-lg-3">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card stat-card border-0 shadow-sm h-100">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Pending Messages</p>
                         <h3 class="h4 mb-0 fw-bold">{{ \App\Models\ContactMessage::where('status', 'new')->count() }}</h3>
                     </div>
-                    <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+                    <div class="bg-warning bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-chat-dots text-warning fs-4"></i>
                     </div>
                 </div>

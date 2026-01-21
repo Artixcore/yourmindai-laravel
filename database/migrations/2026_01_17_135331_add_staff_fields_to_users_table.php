@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -14,10 +15,16 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Add username unique index if column exists but no unique constraint
             if (Schema::hasColumn('users', 'username')) {
-                // Check if unique index doesn't exist
-                $sm = Schema::getConnection()->getDoctrineSchemaManager();
-                $indexesFound = $sm->listTableIndexes('users');
-                if (!isset($indexesFound['users_username_unique'])) {
+                // Check if unique index doesn't exist using raw SQL
+                $indexExists = DB::select("
+                    SELECT COUNT(*) as count
+                    FROM information_schema.STATISTICS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'users'
+                    AND INDEX_NAME = 'users_username_unique'
+                ");
+                
+                if (empty($indexExists) || $indexExists[0]->count == 0) {
                     $table->unique('username');
                 }
             } else {

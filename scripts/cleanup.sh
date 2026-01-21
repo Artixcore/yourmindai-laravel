@@ -2,6 +2,10 @@
 
 set -e
 
+# Set ownership (replace www-data with your web server user if different)
+
+
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'

@@ -20,7 +20,6 @@ use App\Http\Controllers\Admin\AiReportController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\PatientDashboardController;
 use App\Http\Controllers\PatientSessionController;
-use App\Http\Controllers\PatientResourceController;
 use App\Http\Controllers\PatientAppointmentController;
 use App\Http\Controllers\PatientAssessmentController;
 use App\Http\Controllers\PatientProgressController;

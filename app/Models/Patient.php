@@ -57,6 +57,30 @@ class Patient extends Model implements AuthenticatableContract
     }
 
     /**
+     * Get the messages for the patient.
+     */
+    public function messages()
+    {
+        return $this->hasMany(PatientMessage::class, 'patient_id');
+    }
+
+    /**
+     * Get the medications for the patient.
+     */
+    public function medications()
+    {
+        return $this->hasMany(PatientMedication::class, 'patient_id');
+    }
+
+    /**
+     * Get the journal entries for the patient.
+     */
+    public function journalEntries()
+    {
+        return $this->hasMany(PatientJournalEntry::class, 'patient_id');
+    }
+
+    /**
      * Get the photo URL attribute.
      */
     public function getPhotoUrlAttribute()

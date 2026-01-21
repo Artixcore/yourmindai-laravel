@@ -15,6 +15,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\ClientIntakeController;
+use App\Http\Controllers\PatientMessageController;
+use App\Http\Controllers\PatientMedicationController;
+use App\Http\Controllers\PatientJournalController;
+use App\Http\Controllers\PatientProgressController;
 
 // Health check
 Route::get('/health', function () {
@@ -66,6 +70,26 @@ Route::middleware('jwt.auth')->group(function () {
     Route::put('/patients/me/reminders/{id}', [PatientController::class, 'updateReminder']);
     Route::delete('/patients/me/reminders/{id}', [PatientController::class, 'deleteReminder']);
     Route::get('/patients/me/instructions', [PatientController::class, 'getInstructions']);
+    
+    // Patient Messages (JWT)
+    Route::get('/patients/me/messages', [PatientMessageController::class, 'index']);
+    Route::post('/patients/me/messages', [PatientMessageController::class, 'store']);
+    Route::put('/patients/me/messages/{id}/read', [PatientMessageController::class, 'markAsRead']);
+    
+    // Patient Medications (JWT)
+    Route::get('/patients/me/medications', [PatientMedicationController::class, 'index']);
+    Route::post('/patients/me/medications/{id}/log', [PatientMedicationController::class, 'logIntake']);
+    Route::get('/patients/me/medications/{id}/history', [PatientMedicationController::class, 'history']);
+    
+    // Patient Journal (JWT)
+    Route::get('/patients/me/journal', [PatientJournalController::class, 'index']);
+    Route::post('/patients/me/journal', [PatientJournalController::class, 'store']);
+    Route::put('/patients/me/journal/{id}', [PatientJournalController::class, 'update']);
+    Route::delete('/patients/me/journal/{id}', [PatientJournalController::class, 'destroy']);
+    
+    // Patient Progress (JWT)
+    Route::get('/patients/me/progress', [PatientProgressController::class, 'index']);
+    Route::get('/patients/me/stats', [PatientProgressController::class, 'index']);
 });
 
 // AI routes (DOCTOR/THERAPIST only)
@@ -129,6 +153,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/patient/sessions/{session}', [PatientSessionController::class, 'show']);
     Route::get('/patient/sessions/{session}/days/{day}', [PatientSessionController::class, 'showDay']);
     Route::get('/patient/resources', [PatientResourceController::class, 'index']);
+    
+    // Patient Messages
+    Route::get('/patient/messages', [PatientMessageController::class, 'index']);
+    Route::post('/patient/messages', [PatientMessageController::class, 'store']);
+    Route::put('/patient/messages/{id}/read', [PatientMessageController::class, 'markAsRead']);
+    
+    // Patient Medications
+    Route::get('/patient/medications', [PatientMedicationController::class, 'index']);
+    Route::post('/patient/medications/{id}/log', [PatientMedicationController::class, 'logIntake']);
+    Route::get('/patient/medications/{id}/history', [PatientMedicationController::class, 'history']);
+    
+    // Patient Journal
+    Route::get('/patient/journal', [PatientJournalController::class, 'index']);
+    Route::post('/patient/journal', [PatientJournalController::class, 'store']);
+    Route::put('/patient/journal/{id}', [PatientJournalController::class, 'update']);
+    Route::delete('/patient/journal/{id}', [PatientJournalController::class, 'destroy']);
+    
+    // Patient Progress
+    Route::get('/patient/progress', [PatientProgressController::class, 'index']);
 });
 
 // Webhook routes (no authentication required, but signature verification is done in controller)

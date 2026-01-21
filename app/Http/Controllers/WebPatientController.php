@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patient;
+use App\Models\User;
+use App\Models\PatientProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class WebPatientController extends Controller
@@ -60,7 +63,7 @@ class WebPatientController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:patients,email',
+            'email' => 'required|email|unique:patients,email|unique:users,email',
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
         ]);
@@ -69,6 +72,14 @@ class WebPatientController extends Controller
         $doctorId = $user->role === 'admin' && $request->doctor_id 
             ? $request->doctor_id 
             : $user->id;
+
+        // Generate username from name
+        $username = $this->generateUsername($validated['name']);
+        
+        // Ensure username is unique
+        while (User::where('username', $username)->exists()) {
+            $username = $this->generateUsername($validated['name']);
+        }
 
         // Generate strong random password
         $password = $this->generateStrongPassword();
@@ -82,24 +93,55 @@ class WebPatientController extends Controller
             $photoPath = $file->storeAs("patients/{$doctorId}/photos", $filename, 'public');
         }
 
-        // Create patient (password will be hashed by mutator)
-        $patient = Patient::create([
-            'doctor_id' => $doctorId,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'password' => $password, // Will be hashed by mutator
-            'photo_path' => $photoPath,
-            'status' => 'active',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        // Flash plain password to session (only once)
-        session()->flash('patient_password', $password);
-        session()->flash('patient_created', true);
+            // Create User account with PATIENT role
+            $userAccount = User::create([
+                'email' => $validated['email'],
+                'username' => $username,
+                'password_hash' => Hash::make($password),
+                'role' => 'PATIENT',
+                'status' => 'active',
+            ]);
 
-        return redirect()
-            ->route('patients.show', $patient)
-            ->with('success', 'Patient created successfully!');
+            // Create patient (password will be hashed by mutator)
+            $patient = Patient::create([
+                'doctor_id' => $doctorId,
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'password' => $password, // Will be hashed by mutator
+                'photo_path' => $photoPath,
+                'status' => 'active',
+            ]);
+
+            // Optionally create PatientProfile for consistency with API flow
+            $patientNumber = $this->generatePatientNumber();
+            PatientProfile::create([
+                'patient_number' => $patientNumber,
+                'user_id' => $userAccount->id,
+                'doctor_id' => $doctorId,
+                'full_name' => $validated['name'],
+                'status' => 'ACTIVE',
+            ]);
+
+            DB::commit();
+
+            // Flash credentials to session (only once)
+            session()->flash('patient_username', $username);
+            session()->flash('patient_password', $password);
+            session()->flash('patient_created', true);
+
+            return redirect()
+                ->route('patients.show', $patient)
+                ->with('success', 'Patient created successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to create patient. Please try again.']);
+        }
     }
 
     /**
@@ -110,17 +152,20 @@ class WebPatientController extends Controller
         $this->authorize('view', $patient);
 
         $patient->load('doctor');
+        $username = session()->get('patient_username');
         $password = session()->get('patient_password');
         $patientCreated = session()->get('patient_created', false);
 
-        // Clear password from session after showing
+        // Clear credentials from session after showing
         if ($password) {
+            session()->forget('patient_username');
             session()->forget('patient_password');
             session()->forget('patient_created');
         }
 
         return view('patients.show', [
             'patient' => $patient,
+            'username' => $username,
             'password' => $password,
             'patientCreated' => $patientCreated,
         ]);
@@ -204,5 +249,37 @@ class WebPatientController extends Controller
         $random = Str::random($length);
         
         return $random . $numbers . $uppercase . $symbol;
+    }
+
+    /**
+     * Generate username from full name.
+     * Format: firstname + first letter of last name + 3 random digits
+     */
+    private function generateUsername(string $fullName): string
+    {
+        $parts = explode(' ', strtolower(trim($fullName)));
+        $username = $parts[0];
+        if (count($parts) > 1) {
+            $username .= substr($parts[1], 0, 1);
+        }
+        $username .= rand(100, 999);
+        return $username;
+    }
+
+    /**
+     * Generate a sequential patient number (PAT-0001, PAT-0002, etc.)
+     */
+    private function generatePatientNumber(): string
+    {
+        $lastPatient = PatientProfile::orderBy('patient_number', 'desc')->first();
+
+        $nextNumber = 1;
+        if ($lastPatient && $lastPatient->patient_number) {
+            if (preg_match('/PAT-(\d+)/', $lastPatient->patient_number, $matches)) {
+                $nextNumber = (int) $matches[1] + 1;
+            }
+        }
+
+        return 'PAT-' . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }

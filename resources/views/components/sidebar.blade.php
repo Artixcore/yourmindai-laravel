@@ -92,12 +92,55 @@
                 </a>
             @endif
             
-            <a href="#" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none">
-                <svg class="flex-shrink-0" style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-                <span>Messages</span>
-            </a>
+            @if(strtolower($role) === 'patient' || $role === 'PATIENT')
+                <a href="{{ route('patient.dashboard') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.dashboard') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-house-door flex-shrink-0"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('patient.profile') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.profile') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-person flex-shrink-0"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ route('patient.sessions.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.sessions.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-calendar-check flex-shrink-0"></i>
+                    <span>Sessions</span>
+                </a>
+                <a href="{{ route('patient.resources.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.resources.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-folder-fill flex-shrink-0"></i>
+                    <span>Resources</span>
+                </a>
+                <a href="{{ route('patient.appointments.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.appointments.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-calendar-event flex-shrink-0"></i>
+                    <span>Appointments</span>
+                </a>
+                <a href="{{ route('patient.assessments.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.assessments.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-clipboard-check flex-shrink-0"></i>
+                    <span>Assessments</span>
+                </a>
+                <a href="{{ route('patient.progress.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.progress.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-graph-up flex-shrink-0"></i>
+                    <span>Progress</span>
+                </a>
+                <a href="{{ route('patient.messages.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.messages.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-chat-dots flex-shrink-0"></i>
+                    <span>Messages</span>
+                </a>
+                <a href="{{ route('patient.medications.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.medications.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-capsule flex-shrink-0"></i>
+                    <span>Medications</span>
+                </a>
+                <a href="{{ route('patient.journal.index') }}" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none {{ request()->routeIs('patient.journal.*') ? 'bg-teal-50 text-teal-700' : '' }}">
+                    <i class="bi bi-journal-text flex-shrink-0"></i>
+                    <span>Mood Journal</span>
+                </a>
+            @else
+                <a href="#" class="d-flex align-items-center gap-3 px-3 py-2 rounded hover-bg-teal-50 text-stone-700 hover-text-teal-700 text-decoration-none">
+                    <svg class="flex-shrink-0" style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    <span>Messages</span>
+                </a>
+            @endif
         </div>
     </nav>
 </div>

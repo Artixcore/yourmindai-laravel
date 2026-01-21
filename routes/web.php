@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AdminSessionController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AiReportController;
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\PatientDashboardController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -30,8 +31,56 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
+// Client login routes (for patients)
+Route::get('/client', [\App\Http\Controllers\ClientLoginController::class, 'showLoginForm'])->name('client.login')->middleware('guest');
+Route::post('/client', [\App\Http\Controllers\ClientLoginController::class, 'login'])->middleware('guest');
+Route::post('/client/logout', [\App\Http\Controllers\ClientLoginController::class, 'logout'])->name('client.logout')->middleware('auth');
+
 // Dashboard (protected)
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+
+// Patient routes (for patients logged in via web)
+Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [PatientDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', function () {
+        return view('patient.profile');
+    })->name('profile');
+    Route::get('/sessions', function () {
+        return view('patient.sessions.index');
+    })->name('sessions.index');
+    Route::get('/sessions/{id}', function ($id) {
+        return view('patient.sessions.show', compact('id'));
+    })->name('sessions.show');
+    Route::get('/resources', function () {
+        return view('patient.resources.index');
+    })->name('resources.index');
+    Route::get('/appointments', function () {
+        return view('patient.appointments.index');
+    })->name('appointments.index');
+    Route::get('/assessments', function () {
+        return view('patient.assessments.index');
+    })->name('assessments.index');
+    Route::get('/assessments/{id}', function ($id) {
+        return view('patient.assessments.show', compact('id'));
+    })->name('assessments.show');
+    Route::get('/progress', function () {
+        return view('patient.progress.index');
+    })->name('progress.index');
+    Route::get('/messages', function () {
+        return view('patient.messages.index');
+    })->name('messages.index');
+    Route::get('/medications', function () {
+        return view('patient.medications.index');
+    })->name('medications.index');
+    Route::get('/journal', function () {
+        return view('patient.journal.index');
+    })->name('journal.index');
+    Route::get('/journal/create', function () {
+        return view('patient.journal.create');
+    })->name('journal.create');
+    Route::post('/journal', [\App\Http\Controllers\PatientJournalController::class, 'store'])->name('journal.store');
+    Route::put('/profile', [\App\Http\Controllers\PatientDashboardController::class, 'updateProfile'])->name('profile.update');
+});
 
 // Doctor profile and papers routes
 Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {

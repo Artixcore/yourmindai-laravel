@@ -66,4 +66,14 @@ class PatientProfile extends Model
     {
         return $this->hasMany(DoctorInstruction::class, 'patient_id');
     }
+
+    public function sessions()
+    {
+        return $this->hasMany(Session::class, 'patient_id');
+    }
+
+    public function resources()
+    {
+        return $this->hasMany(PatientResource::class, 'patient_id');
+    }
 }

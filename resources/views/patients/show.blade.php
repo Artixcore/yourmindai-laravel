@@ -60,7 +60,7 @@
         </div>
     @endif
 
-    <!-- Password Display (Only shown once after creation) -->
+    <!-- Credentials Display (Only shown once after creation) -->
     @if($password && $patientCreated)
         <x-card class="mb-4 bg-yellow-50 border-yellow-200">
             <div class="d-flex align-items-start gap-3">
@@ -70,23 +70,51 @@
                     </svg>
                 </div>
                 <div class="flex-grow-1">
-                    <h3 class="h5 font-semibold text-yellow-900 mb-2">Patient Password</h3>
-                    <p class="text-yellow-800 mb-3">This password will not be shown again. Please save it securely.</p>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="flex-grow-1 px-3 py-2 bg-white border border-yellow-300 rounded font-monospace fw-bold text-stone-900" x-data="{ copied: false }">
-                            <span id="password-text">{{ $password }}</span>
+                    <h3 class="h5 font-semibold text-yellow-900 mb-2">Patient Login Credentials</h3>
+                    <p class="text-yellow-800 mb-3">These credentials will not be shown again. Please save them securely. The patient can use these to log in at <strong>/client</strong>.</p>
+                    
+                    <!-- Username -->
+                    @if(isset($username) && $username)
+                    <div class="mb-3">
+                        <label class="small font-medium text-yellow-900 mb-1 d-block">Username</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="flex-grow-1 px-3 py-2 bg-white border border-yellow-300 rounded font-monospace fw-bold text-stone-900">
+                                <span id="username-text">{{ $username }}</span>
+                            </div>
+                            <button
+                                type="button"
+                                onclick="copyUsername()"
+                                class="btn btn-warning btn-sm d-flex align-items-center gap-2"
+                                id="copy-username-btn"
+                            >
+                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span id="copy-username-text">Copy</span>
+                            </button>
                         </div>
-                        <button
-                            type="button"
-                            onclick="copyPassword()"
-                            class="btn btn-warning d-flex align-items-center gap-2"
-                            id="copy-btn"
-                        >
-                            <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            <span id="copy-text">Copy</span>
-                        </button>
+                    </div>
+                    @endif
+
+                    <!-- Password -->
+                    <div>
+                        <label class="small font-medium text-yellow-900 mb-1 d-block">Password</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="flex-grow-1 px-3 py-2 bg-white border border-yellow-300 rounded font-monospace fw-bold text-stone-900">
+                                <span id="password-text">{{ $password }}</span>
+                            </div>
+                            <button
+                                type="button"
+                                onclick="copyPassword()"
+                                class="btn btn-warning btn-sm d-flex align-items-center gap-2"
+                                id="copy-password-btn"
+                            >
+                                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span id="copy-password-text">Copy</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -318,11 +346,29 @@
 </div>
 
 <script>
+function copyUsername() {
+    const usernameText = document.getElementById('username-text').textContent;
+    navigator.clipboard.writeText(usernameText).then(() => {
+        const copyBtn = document.getElementById('copy-username-btn');
+        const copyText = document.getElementById('copy-username-text');
+        const originalText = copyText.textContent;
+        copyText.textContent = 'Copied!';
+        copyBtn.classList.remove('btn-warning');
+        copyBtn.classList.add('btn-success');
+        
+        setTimeout(() => {
+            copyText.textContent = originalText;
+            copyBtn.classList.remove('btn-success');
+            copyBtn.classList.add('btn-warning');
+        }, 2000);
+    });
+}
+
 function copyPassword() {
     const passwordText = document.getElementById('password-text').textContent;
     navigator.clipboard.writeText(passwordText).then(() => {
-        const copyBtn = document.getElementById('copy-btn');
-        const copyText = document.getElementById('copy-text');
+        const copyBtn = document.getElementById('copy-password-btn');
+        const copyText = document.getElementById('copy-password-text');
         const originalText = copyText.textContent;
         copyText.textContent = 'Copied!';
         copyBtn.classList.remove('btn-warning');

@@ -1,0 +1,257 @@
+/* Patient Dashboard Custom Styles */
+
+/* Patient-specific color overrides */
+.patient-primary {
+    color: #14b8a6;
+}
+
+.bg-patient-primary {
+    background-color: #14b8a6;
+}
+
+.border-patient-primary {
+    border-color: #14b8a6;
+}
+
+/* Profile Card Styles */
+.profile-card {
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 4px solid #14b8a6;
+}
+
+.profile-avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    color: white;
+    font-size: 3rem;
+    font-weight: 600;
+    border-radius: 50%;
+}
+
+/* Stats Card Styles */
+.stats-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.stats-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+}
+
+/* Session Card Styles */
+.session-card {
+    border-left: 4px solid #14b8a6;
+    transition: all 0.2s ease;
+}
+
+.session-card:hover {
+    border-left-color: #0d9488;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Resource Card Styles */
+.resource-card-pdf {
+    border-left: 4px solid #dc2626;
+}
+
+.resource-card-video {
+    border-left: 4px solid #dc2626;
+}
+
+/* Quick Actions */
+.quick-action-btn {
+    min-height: 44px;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e7e5e4;
+}
+
+.activity-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.activity-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.25rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #14b8a6;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #14b8a6;
+}
+
+/* Mobile Responsive */
+@media (max-width: 767.98px) {
+    .profile-avatar,
+    .profile-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .chart-container {
+        height: 400px;
+    }
+}
+
+/* Medication Card */
+.medication-card {
+    border-left: 4px solid #3b82f6;
+}
+
+.medication-card.taken {
+    border-left-color: #10b981;
+    opacity: 0.7;
+}
+
+/* Journal Entry Card */
+.journal-entry-card {
+    border-left: 4px solid #8b5cf6;
+}
+
+/* Message Thread */
+.message-bubble {
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    max-width: 75%;
+}
+
+.message-bubble.sent {
+    background-color: #14b8a6;
+    color: white;
+    margin-left: auto;
+}
+
+.message-bubble.received {
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+/* Progress Badge */
+.progress-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Loading States */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Form Styles */
+.patient-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.patient-form-label {
+    font-weight: 500;
+    color: #57534e;
+    margin-bottom: 0.5rem;
+}
+
+/* Tab Navigation */
+.patient-tabs .nav-link {
+    color: #78716c;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.patient-tabs .nav-link:hover {
+    color: #14b8a6;
+    border-bottom-color: #14b8a6;
+}
+
+.patient-tabs .nav-link.active {
+    color: #14b8a6;
+    border-bottom-color: #14b8a6;
+    background: transparent;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #78716c;
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    opacity: 0.5;
+}

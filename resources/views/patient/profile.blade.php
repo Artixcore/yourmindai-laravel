@@ -9,6 +9,12 @@
         <p class="text-stone-600 mb-0">Manage your personal information</p>
     </div>
 
+
+    # Set ownership (replace www-data with your web server user if different)
+
+
+
+
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
             <form method="POST" action="{{ route('patient.profile.update') }}" enctype="multipart/form-data">

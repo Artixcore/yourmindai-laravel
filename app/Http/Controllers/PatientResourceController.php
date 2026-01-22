@@ -13,7 +13,71 @@ use Illuminate\Support\Str;
 class PatientResourceController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get patient ID from authenticated user
+     */
+    private function getPatientId()
+    {
+        $user = auth()->user();
+        
+        $patientProfile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
+        $patient = Patient::where('email', $user->email)->first();
+        
+        if ($patientProfile) {
+            return $patientProfile->id;
+        }
+        
+        if ($patient) {
+            return $patient->id;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Display a listing of resources for the authenticated patient
+     */
+    public function patientIndex(Request $request)
+    {
+        $patientId = $this->getPatientId();
+        
+        if (!$patientId) {
+            return redirect()->route('patient.dashboard')
+                ->with('error', 'Patient profile not found.');
+        }
+        
+        $query = PatientResource::where('patient_id', $patientId)
+            ->with(['doctor', 'session', 'sessionDay'])
+            ->orderBy('created_at', 'desc');
+
+        // Filter by session
+        if ($request->has('session_id') && $request->session_id) {
+            $query->where('session_id', $request->session_id);
+        }
+
+        // Filter by session day
+        if ($request->has('session_day_id') && $request->session_day_id) {
+            $query->where('session_day_id', $request->session_day_id);
+        }
+
+        $resources = $query->get();
+
+        // Get sessions for filters (if patient has sessions)
+        $sessions = \App\Models\Session::where('patient_id', $patientId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        $sessionDays = collect();
+        if ($request->session_id) {
+            $sessionDays = \App\Models\SessionDay::where('session_id', $request->session_id)
+                ->orderBy('day_date', 'desc')
+                ->get();
+        }
+
+        return view('patient.resources.index', compact('resources', 'sessions', 'sessionDays'));
+    }
+
+    /**
+     * Display a listing of the resource (for doctors).
      */
     public function index(Patient $patient, Request $request)
     {

@@ -45,7 +45,7 @@ class ClientPsychometricController extends Controller
         )
         ->where('status', 'pending')
         ->with('scale', 'assignedByDoctor')
-        ->orderBy('assigned_at', 'desc')
+        ->orderBy('created_at', 'desc')
         ->get();
 
         $completedAssessments = PsychometricAssessment::where(

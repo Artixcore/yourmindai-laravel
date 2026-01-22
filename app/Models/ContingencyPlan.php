@@ -64,6 +64,50 @@ class ContingencyPlan extends Model
     }
 
     /**
+     * Get the user (patient) through patient profile.
+     */
+    public function getUser()
+    {
+        if ($this->patient_profile_id && $this->patientProfile) {
+            return $this->patientProfile->user;
+        }
+        if ($this->patient_id && $this->patient) {
+            // Try to find user by email
+            return \App\Models\User::where('email', $this->patient->email)->first();
+        }
+        return null;
+    }
+
+    /**
+     * Get the user_id through patient profile.
+     */
+    public function getUserId()
+    {
+        $user = $this->getUser();
+        return $user ? $user->id : null;
+    }
+
+    /**
+     * Get the doctor_id through patient profile or created doctor.
+     */
+    public function getDoctorId()
+    {
+        // First try through created doctor
+        if ($this->created_by_doctor_id) {
+            return $this->created_by_doctor_id;
+        }
+        // Then try through patient profile
+        if ($this->patient_profile_id && $this->patientProfile && $this->patientProfile->doctor_id) {
+            return $this->patientProfile->doctor_id;
+        }
+        // Finally try through patient model
+        if ($this->patient_id && $this->patient && $this->patient->doctor_id) {
+            return $this->patient->doctor_id;
+        }
+        return null;
+    }
+
+    /**
      * Activate the contingency plan.
      */
     public function activate(string $triggeredBy, string $reason): ContingencyActivation

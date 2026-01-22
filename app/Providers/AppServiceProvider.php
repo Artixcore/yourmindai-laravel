@@ -9,10 +9,12 @@ use App\Models\Patient;
 use App\Models\Session;
 use App\Models\SessionDay;
 use App\Models\PatientResource;
+use App\Models\AppointmentRequest;
 use App\Policies\PatientPolicy;
 use App\Policies\SessionPolicy;
 use App\Policies\SessionDayPolicy;
 use App\Policies\PatientResourcePolicy;
+use App\Policies\AppointmentRequestPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Session::class, SessionPolicy::class);
         Gate::policy(SessionDay::class, SessionDayPolicy::class);
         Gate::policy(PatientResource::class, PatientResourcePolicy::class);
+        Gate::policy(AppointmentRequest::class, AppointmentRequestPolicy::class);
 
         // Force HTTPS in production or when APP_FORCE_HTTPS is set
         if (config('app.env') === 'production' || env('APP_FORCE_HTTPS', false)) {

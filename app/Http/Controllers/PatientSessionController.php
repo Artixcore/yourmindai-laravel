@@ -31,6 +31,22 @@ class PatientSessionController extends Controller
     }
 
     /**
+     * Check if called from client route
+     */
+    private function isClientRoute()
+    {
+        return request()->routeIs('client.*');
+    }
+
+    /**
+     * Get appropriate dashboard route
+     */
+    private function getDashboardRoute()
+    {
+        return $this->isClientRoute() ? 'client.dashboard' : 'patient.dashboard';
+    }
+
+    /**
      * Display a listing of sessions for the authenticated patient
      */
     public function index()
@@ -38,7 +54,7 @@ class PatientSessionController extends Controller
         $patientId = $this->getPatientId();
         
         if (!$patientId) {
-            return redirect()->route('patient.dashboard')
+            return redirect()->route($this->getDashboardRoute())
                 ->with('error', 'Patient profile not found.');
         }
         
@@ -47,7 +63,8 @@ class PatientSessionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return view('patient.sessions.index', compact('sessions'));
+        $view = $this->isClientRoute() ? 'client.sessions.index' : 'patient.sessions.index';
+        return view($view, compact('sessions'));
     }
 
     /**
@@ -58,7 +75,7 @@ class PatientSessionController extends Controller
         $patientId = $this->getPatientId();
         
         if (!$patientId) {
-            return redirect()->route('patient.dashboard')
+            return redirect()->route($this->getDashboardRoute())
                 ->with('error', 'Patient profile not found.');
         }
         
@@ -69,6 +86,7 @@ class PatientSessionController extends Controller
             }])
             ->firstOrFail();
         
-        return view('patient.sessions.show', compact('session'));
+        $view = $this->isClientRoute() ? 'client.sessions.show' : 'patient.sessions.show';
+        return view($view, compact('session'));
     }
 }

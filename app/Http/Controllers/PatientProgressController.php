@@ -13,6 +13,22 @@ use Illuminate\Support\Facades\DB;
 class PatientProgressController extends Controller
 {
     /**
+     * Check if called from client route
+     */
+    private function isClientRoute()
+    {
+        return request()->routeIs('client.*');
+    }
+
+    /**
+     * Get appropriate dashboard route
+     */
+    private function getDashboardRoute()
+    {
+        return $this->isClientRoute() ? 'client.dashboard' : 'patient.dashboard';
+    }
+
+    /**
      * Get progress data for authenticated patient
      */
     public function index(Request $request)
@@ -32,7 +48,7 @@ class PatientProgressController extends Controller
                 ], 404);
             }
             
-            return redirect()->route('patient.dashboard')
+            return redirect()->route($this->getDashboardRoute())
                 ->with('error', 'Patient profile not found.');
         }
         
@@ -87,7 +103,8 @@ class PatientProgressController extends Controller
             ]);
         }
         
-        // Return view for web requests
-        return view('patient.progress.index', compact('stats'));
+        // Return appropriate view based on route
+        $view = $this->isClientRoute() ? 'client.progress.index' : 'patient.progress.index';
+        return view($view, compact('stats'));
     }
 }

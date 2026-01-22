@@ -6,7 +6,6 @@ use App\Models\PatientProfile;
 use App\Models\Patient;
 use App\Models\PatientDevice;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class ClientDeviceController extends Controller
 {

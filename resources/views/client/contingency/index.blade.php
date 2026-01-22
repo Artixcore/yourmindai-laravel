@@ -8,7 +8,7 @@
     <p class="text-muted mb-0 small">Your contingency plans for emergency situations</p>
 </div>
 
-@if($contingencyPlans->isEmpty())
+@if(!$contingencyPlans || $contingencyPlans->isEmpty())
 <div class="card">
     <div class="card-body text-center py-5">
         <i class="bi bi-shield-exclamation display-1 text-muted mb-3"></i>

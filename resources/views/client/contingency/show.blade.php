@@ -39,7 +39,7 @@
         </div>
         @endif
         
-        @if($plan->emergency_contacts && count($plan->emergency_contacts) > 0)
+        @if($plan->emergency_contacts && is_array($plan->emergency_contacts) && count($plan->emergency_contacts) > 0)
         <div>
             <h6 class="fw-semibold mb-3">Emergency Contacts:</h6>
             @foreach($plan->emergency_contacts as $contact)

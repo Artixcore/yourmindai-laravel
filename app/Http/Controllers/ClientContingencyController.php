@@ -7,6 +7,7 @@ use App\Models\Patient;
 use App\Models\ContingencyPlan;
 use App\Models\ContingencyActivation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ClientContingencyController extends Controller
 {
@@ -100,7 +101,12 @@ class ClientContingencyController extends Controller
         }
 
         if (!$plan->isActive()) {
-            return back()->with('error', 'This contingency plan is not active.');
+            return back()->with('error', 'This contingency plan is not active and cannot be activated.');
+        }
+
+        // Verify plan still exists and belongs to patient
+        if (!$plan->exists) {
+            return back()->with('error', 'Contingency plan not found.');
         }
 
         $request->validate([
@@ -114,8 +120,12 @@ class ClientContingencyController extends Controller
             $actions = $plan->actions ?? [];
             
             return redirect()->route('client.contingency.show', $plan)
-                ->with('success', 'Contingency plan activated. Your healthcare provider has been notified.');
+                ->with('success', 'Contingency plan activated successfully. Your healthcare provider has been notified.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Database error activating contingency plan: ' . $e->getMessage());
+            return back()->with('error', 'Failed to activate plan due to a database error. Please try again or contact support.');
         } catch (\Exception $e) {
+            \Log::error('Error activating contingency plan: ' . $e->getMessage());
             return back()->with('error', 'Failed to activate plan: ' . $e->getMessage());
         }
     }

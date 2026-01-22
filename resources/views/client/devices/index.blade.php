@@ -129,18 +129,229 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/client-device-detection.js') }}"></script>
 <script>
+(function() {
+    'use strict';
+    
+    /**
+     * Device Detection and Registration
+     * Auto-detects device information for client device registration
+     */
+    
+    /**
+     * Generate a unique device identifier (UUID)
+     */
+    function generateDeviceIdentifier() {
+        try {
+            // Check if we already have a device ID in localStorage
+            let deviceId = localStorage.getItem('mindAidDeviceId');
+            
+            if (!deviceId) {
+                // Generate a new UUID v4
+                deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+                
+                // Store in localStorage
+                localStorage.setItem('mindAidDeviceId', deviceId);
+            }
+            
+            return deviceId;
+        } catch (e) {
+            // Fallback if localStorage is not available
+            return 'device-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+    }
+    
+    /**
+     * Detect device type (mobile, tablet, desktop)
+     */
+    function detectDeviceType() {
+        try {
+            const width = window.innerWidth;
+            const userAgent = navigator.userAgent.toLowerCase();
+            
+            // Check for mobile devices
+            if (/mobile|android|iphone|ipod|blackberry|iemobile|opera mini/i.test(userAgent)) {
+                return 'mobile';
+            }
+            
+            // Check for tablets
+            if (/tablet|ipad|playbook|silk/i.test(userAgent) || (width >= 600 && width < 1024)) {
+                return 'tablet';
+            }
+            
+            // Default to desktop
+            return 'desktop';
+        } catch (e) {
+            return 'desktop';
+        }
+    }
+    
+    /**
+     * Detect operating system
+     */
+    function detectOS() {
+        try {
+            const userAgent = navigator.userAgent;
+            const platform = navigator.platform.toLowerCase();
+            
+            if (/iphone|ipad|ipod/i.test(userAgent)) {
+                return 'iOS';
+            }
+            
+            if (/android/i.test(userAgent)) {
+                return 'Android';
+            }
+            
+            if (/win/i.test(platform)) {
+                return 'Windows';
+            }
+            
+            if (/mac/i.test(platform)) {
+                return 'macOS';
+            }
+            
+            if (/linux/i.test(platform)) {
+                return 'Linux';
+            }
+            
+            return 'Unknown';
+        } catch (e) {
+            return 'Unknown';
+        }
+    }
+    
+    /**
+     * Detect OS version
+     */
+    function detectOSVersion() {
+        try {
+            const userAgent = navigator.userAgent;
+            
+            // iOS version
+            const iosMatch = userAgent.match(/OS (\d+)_(\d+)_?(\d+)?/);
+            if (iosMatch) {
+                return iosMatch[1] + '.' + iosMatch[2] + (iosMatch[3] ? '.' + iosMatch[3] : '');
+            }
+            
+            // Android version
+            const androidMatch = userAgent.match(/Android (\d+(\.\d+)?)/);
+            if (androidMatch) {
+                return androidMatch[1];
+            }
+            
+            // Windows version
+            const windowsMatch = userAgent.match(/Windows NT (\d+\.\d+)/);
+            if (windowsMatch) {
+                return windowsMatch[1];
+            }
+            
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Detect browser name
+     */
+    function detectBrowser() {
+        try {
+            const userAgent = navigator.userAgent;
+            
+            if (userAgent.indexOf('Chrome') > -1 && userAgent.indexOf('Edg') === -1) {
+                return 'Chrome';
+            }
+            
+            if (userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1) {
+                return 'Safari';
+            }
+            
+            if (userAgent.indexOf('Firefox') > -1) {
+                return 'Firefox';
+            }
+            
+            if (userAgent.indexOf('Edg') > -1) {
+                return 'Edge';
+            }
+            
+            return 'Unknown';
+        } catch (e) {
+            return 'Unknown';
+        }
+    }
+    
+    /**
+     * Generate device name based on detected information
+     */
+    function generateDeviceName() {
+        try {
+            const deviceType = detectDeviceType();
+            const os = detectOS();
+            const browser = detectBrowser();
+            
+            return `${os} ${deviceType.charAt(0).toUpperCase() + deviceType.slice(1)} (${browser})`;
+        } catch (e) {
+            return 'Unknown Device';
+        }
+    }
+    
+    /**
+     * Main function to detect all device information
+     */
+    function detectDeviceInfo() {
+        try {
+            return {
+                identifier: generateDeviceIdentifier(),
+                name: generateDeviceName(),
+                type: detectDeviceType(),
+                osType: detectOS(),
+                osVersion: detectOSVersion(),
+                browser: detectBrowser(),
+                screenWidth: window.innerWidth || 0,
+                screenHeight: window.innerHeight || 0,
+            };
+        } catch (e) {
+            return {
+                identifier: generateDeviceIdentifier(),
+                name: 'Unknown Device',
+                type: 'desktop',
+                osType: 'Unknown',
+                osVersion: null,
+                browser: 'Unknown',
+                screenWidth: 0,
+                screenHeight: 0,
+            };
+        }
+    }
+    
     // Auto-detect device info when modal opens
-    document.getElementById('registerDeviceModal').addEventListener('show.bs.modal', function() {
-        if (typeof detectDeviceInfo === 'function') {
-            const deviceInfo = detectDeviceInfo();
-            document.getElementById('device_name').value = deviceInfo.name;
-            document.getElementById('device_type').value = deviceInfo.type;
-            document.getElementById('os_type').value = deviceInfo.osType;
-            document.getElementById('os_version').value = deviceInfo.osVersion;
-            document.getElementById('device_identifier').value = deviceInfo.identifier;
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('registerDeviceModal');
+        if (modal) {
+            modal.addEventListener('show.bs.modal', function() {
+                try {
+                    const deviceInfo = detectDeviceInfo();
+                    const nameField = document.getElementById('device_name');
+                    const typeField = document.getElementById('device_type');
+                    const osTypeField = document.getElementById('os_type');
+                    const osVersionField = document.getElementById('os_version');
+                    const identifierField = document.getElementById('device_identifier');
+                    
+                    if (nameField) nameField.value = deviceInfo.name || '';
+                    if (typeField) typeField.value = deviceInfo.type || 'mobile';
+                    if (osTypeField) osTypeField.value = deviceInfo.osType || '';
+                    if (osVersionField) osVersionField.value = deviceInfo.osVersion || '';
+                    if (identifierField) identifierField.value = deviceInfo.identifier || '';
+                } catch (e) {
+                    // Silently fail - user can manually enter device info
+                }
+            });
         }
     });
+})();
 </script>
 @endpush

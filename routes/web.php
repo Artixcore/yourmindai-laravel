@@ -38,6 +38,9 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 // Contact form
 Route::post('/contact', [LandingController::class, 'storeContact'])->name('contact.store');
 
+// Public appointment request (no auth required)
+Route::post('/appointment-request', [\App\Http\Controllers\AppointmentRequestController::class, 'store'])->name('appointment-request.store');
+
 // Authentication routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
@@ -210,4 +213,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     Route::get('contact/{contact}', [ContactController::class, 'show'])->name('contact.show');
     Route::post('contact/{contact}/resolve', [ContactController::class, 'resolve'])->name('contact.resolve');
     Route::post('contact/{contact}/notes', [ContactController::class, 'addNotes'])->name('contact.notes');
+    
+    // Appointment Requests
+    Route::get('appointment-requests', [\App\Http\Controllers\AppointmentRequestController::class, 'index'])->name('appointment-requests.index');
+    Route::get('appointment-requests/{appointmentRequest}', [\App\Http\Controllers\AppointmentRequestController::class, 'show'])->name('appointment-requests.show');
+    Route::post('appointment-requests/{appointmentRequest}/approve', [\App\Http\Controllers\AppointmentRequestController::class, 'approve'])->name('appointment-requests.approve');
+    Route::post('appointment-requests/{appointmentRequest}/reject', [\App\Http\Controllers\AppointmentRequestController::class, 'reject'])->name('appointment-requests.reject');
+    Route::get('appointment-requests/{appointmentRequest}/create-patient', [\App\Http\Controllers\AppointmentRequestController::class, 'createPatient'])->name('appointment-requests.create-patient');
+    Route::post('appointment-requests/{appointmentRequest}/create-patient', [\App\Http\Controllers\AppointmentRequestController::class, 'storePatient'])->name('appointment-requests.store-patient');
 });

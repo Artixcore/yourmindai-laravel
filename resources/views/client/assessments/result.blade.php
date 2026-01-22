@@ -58,7 +58,7 @@
         <div class="d-flex align-items-center">
             <i class="bi bi-person-circle fs-3 text-muted me-3"></i>
             <div>
-                <strong>{{ $assessment->assignedByDoctor->name ?? 'Doctor' }}</strong>
+                <strong>{{ $assessment->assignedByDoctor->name ?? $assessment->assignedByDoctor->email ?? 'Doctor' }}</strong>
                 <div class="small text-muted">
                     Assigned on {{ $assessment->assigned_at ? $assessment->assigned_at->format('M d, Y') : 'Recently' }}
                 </div>

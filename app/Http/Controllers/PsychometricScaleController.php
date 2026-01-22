@@ -44,11 +44,23 @@ class PsychometricScaleController extends Controller
             'interpretation_rules' => 'required|array|min:1',
         ]);
 
+        // Process questions - handle options_text for multiple_choice
+        $questions = collect($request->questions)->map(function($question, $index) {
+            if (isset($question['options_text']) && !empty($question['options_text'])) {
+                $options = array_filter(array_map('trim', explode("\n", $question['options_text'])));
+                $question['options'] = array_map(function($opt, $idx) {
+                    return ['text' => $opt, 'value' => $idx];
+                }, $options, array_keys($options));
+                unset($question['options_text']);
+            }
+            return $question;
+        })->toArray();
+
         $scale = PsychometricScale::create([
             'name' => $request->name,
             'description' => $request->description,
             'category' => $request->category,
-            'questions' => $request->questions,
+            'questions' => $questions,
             'scoring_rules' => $request->scoring_rules,
             'interpretation_rules' => $request->interpretation_rules,
             'is_active' => $request->boolean('is_active', true),
@@ -93,11 +105,23 @@ class PsychometricScaleController extends Controller
             'interpretation_rules' => 'required|array|min:1',
         ]);
 
+        // Process questions - handle options_text for multiple_choice
+        $questions = collect($request->questions)->map(function($question, $index) {
+            if (isset($question['options_text']) && !empty($question['options_text'])) {
+                $options = array_filter(array_map('trim', explode("\n", $question['options_text'])));
+                $question['options'] = array_map(function($opt, $idx) {
+                    return ['text' => $opt, 'value' => $idx];
+                }, $options, array_keys($options));
+                unset($question['options_text']);
+            }
+            return $question;
+        })->toArray();
+
         $psychometricScale->update([
             'name' => $request->name,
             'description' => $request->description,
             'category' => $request->category,
-            'questions' => $request->questions,
+            'questions' => $questions,
             'scoring_rules' => $request->scoring_rules,
             'interpretation_rules' => $request->interpretation_rules,
             'is_active' => $request->boolean('is_active', true),

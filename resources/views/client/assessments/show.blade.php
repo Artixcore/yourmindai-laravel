@@ -8,7 +8,7 @@
 @else
 <div class="mb-4">
     <h4 class="fw-bold mb-1">{{ $assessment->scale->name ?? 'Assessment' }}</h4>
-    @if($assessment->scale->description)
+    @if($assessment->scale && $assessment->scale->description)
     <p class="text-muted mb-0 small">{{ $assessment->scale->description }}</p>
     @endif
 </div>
@@ -26,7 +26,7 @@
             </div>
             
             <div id="questionsContainer">
-                @if($assessment->scale && $assessment->scale->questions)
+                @if($assessment->scale && $assessment->scale->questions && is_array($assessment->scale->questions) && count($assessment->scale->questions) > 0)
                     @foreach($assessment->scale->questions as $index => $question)
                     <div class="question-item mb-4 pb-4 border-bottom" data-question-id="{{ $question['id'] ?? $index }}">
                         <h6 class="fw-semibold mb-3">
@@ -145,37 +145,258 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/psychometric-assessment.js') }}"></script>
 <script>
+(function() {
+    'use strict';
+    
+    /**
+     * Psychometric Assessment Form Handler
+     * Handles dynamic form rendering, validation, and draft saving
+     */
+    
+    let formInitialized = false;
+    
+    /**
+     * Debounce function
+     */
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    /**
+     * Update Likert scale value display
+     */
     function updateLikertValue(input, questionId) {
-        document.getElementById('value-' + questionId).textContent = input.value;
-        updateProgress();
-    }
-    
-    function updateProgress() {
-        const form = document.getElementById('assessmentForm');
-        const formData = new FormData(form);
-        const responses = {};
-        
-        for (let [key, value] of formData.entries()) {
-            if (key.startsWith('responses[')) {
-                responses[key] = value;
+        try {
+            const valueElement = document.getElementById('value-' + questionId);
+            if (valueElement && input) {
+                valueElement.textContent = input.value;
+                updateProgress();
             }
+        } catch (e) {
+            // Silently fail
         }
-        
-        const totalQuestions = document.querySelectorAll('.question-item').length;
-        const answered = Object.keys(responses).length;
-        const percentage = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
-        
-        document.getElementById('progressBar').style.width = percentage + '%';
-        document.getElementById('progressText').textContent = answered + ' of ' + totalQuestions + ' questions answered';
     }
     
-    // Update progress on input
-    document.getElementById('assessmentForm').addEventListener('input', updateProgress);
-    document.getElementById('assessmentForm').addEventListener('change', updateProgress);
+    /**
+     * Update progress bar and text
+     */
+    function updateProgress() {
+        try {
+            const form = document.getElementById('assessmentForm');
+            if (!form) return;
+            
+            const formData = new FormData(form);
+            const responses = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('responses[')) {
+                    responses[key] = value;
+                }
+            }
+            
+            const totalQuestions = document.querySelectorAll('.question-item').length;
+            const answered = Object.keys(responses).length;
+            const percentage = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+            }
+            if (progressText) {
+                progressText.textContent = answered + ' of ' + totalQuestions + ' questions answered';
+            }
+        } catch (e) {
+            // Silently fail
+        }
+    }
     
-    // Initial progress update
-    updateProgress();
+    /**
+     * Save draft responses to localStorage
+     */
+    function saveDraft(assessmentId) {
+        try {
+            const form = document.getElementById('assessmentForm');
+            if (!form || !assessmentId) return;
+            
+            const formData = new FormData(form);
+            const responses = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('responses[')) {
+                    responses[key] = value;
+                }
+            }
+            
+            localStorage.setItem(`assessment_draft_${assessmentId}`, JSON.stringify(responses));
+        } catch (e) {
+            // Silently fail if localStorage is not available
+        }
+    }
+    
+    /**
+     * Load draft responses from localStorage
+     */
+    function loadDraft(assessmentId) {
+        try {
+            if (!assessmentId) return;
+            
+            const draftData = localStorage.getItem(`assessment_draft_${assessmentId}`);
+            if (!draftData) return;
+            
+            const responses = JSON.parse(draftData);
+            const form = document.getElementById('assessmentForm');
+            if (!form) return;
+            
+            for (let [key, value] of Object.entries(responses)) {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    if (input.type === 'radio') {
+                        const radio = form.querySelector(`[name="${key}"][value="${value}"]`);
+                        if (radio) radio.checked = true;
+                    } else {
+                        input.value = value;
+                    }
+                }
+            }
+            
+            // Update progress after loading draft
+            updateProgress();
+        } catch (e) {
+            // Silently fail - corrupted or invalid draft data
+        }
+    }
+    
+    /**
+     * Clear draft responses
+     */
+    function clearDraft(assessmentId) {
+        try {
+            if (assessmentId) {
+                localStorage.removeItem(`assessment_draft_${assessmentId}`);
+            }
+        } catch (e) {
+            // Silently fail
+        }
+    }
+    
+    /**
+     * Validate assessment form before submission
+     */
+    function validateAssessmentForm() {
+        try {
+            const form = document.getElementById('assessmentForm');
+            if (!form) return false;
+            
+            const questions = form.querySelectorAll('.question-item');
+            let allAnswered = true;
+            
+            questions.forEach((question) => {
+                const inputs = question.querySelectorAll('input[required], textarea[required]');
+                let questionAnswered = false;
+                
+                inputs.forEach(input => {
+                    if (input.type === 'radio') {
+                        if (input.checked) questionAnswered = true;
+                    } else if (input.type === 'checkbox') {
+                        if (input.checked) questionAnswered = true;
+                    } else {
+                        if (input.value.trim() !== '') questionAnswered = true;
+                    }
+                });
+                
+                if (!questionAnswered) {
+                    allAnswered = false;
+                    question.classList.add('border-danger');
+                } else {
+                    question.classList.remove('border-danger');
+                }
+            });
+            
+            return allAnswered;
+        } catch (e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Initialize assessment form
+     */
+    function initAssessmentForm() {
+        if (formInitialized) return;
+        
+        try {
+            const form = document.getElementById('assessmentForm');
+            if (!form) return;
+            
+            // Get assessment ID from form action
+            const actionMatch = form.getAttribute('action');
+            const assessmentId = actionMatch ? actionMatch.match(/\/(\d+)\/complete/)?.[1] : null;
+            
+            if (assessmentId) {
+                // Load saved draft
+                loadDraft(assessmentId);
+                
+                // Save draft on input (debounced)
+                form.addEventListener('input', debounce(() => {
+                    saveDraft(assessmentId);
+                }, 1000));
+                
+                // Clear draft on successful submission
+                form.addEventListener('submit', function(e) {
+                    if (validateAssessmentForm()) {
+                        clearDraft(assessmentId);
+                    } else {
+                        e.preventDefault();
+                        // Show error message using Bootstrap alert
+                        const errorAlert = document.createElement('div');
+                        errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+                        errorAlert.innerHTML = `
+                            <strong>Please complete all questions:</strong> You must answer all questions before submitting the assessment.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        const form = document.getElementById('assessmentForm');
+                        if (form) {
+                            form.insertBefore(errorAlert, form.firstChild);
+                            // Scroll to top to show error
+                            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    }
+                });
+            }
+            
+            // Update progress on input and change
+            form.addEventListener('input', updateProgress);
+            form.addEventListener('change', updateProgress);
+            
+            // Initial progress update
+            updateProgress();
+            
+            formInitialized = true;
+        } catch (e) {
+            // Silently fail
+        }
+    }
+    
+    // Make updateLikertValue globally accessible for inline oninput handlers
+    window.updateLikertValue = updateLikertValue;
+    
+    // Initialize on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAssessmentForm);
+    } else {
+        initAssessmentForm();
+    }
+})();
 </script>
 @endpush

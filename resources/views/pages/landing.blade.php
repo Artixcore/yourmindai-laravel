@@ -11,8 +11,8 @@
                 Compassionate mental health care for your journey to wellness
             </p>
             <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                <a href="#contact" class="btn btn-primary btn-lg px-5 py-3 shadow hover-shadow-xl">
-                    Get Started
+                <a href="#appointment" class="btn btn-primary btn-lg px-5 py-3 shadow hover-shadow-xl">
+                    Book Appointment
                 </a>
                 <a href="#about" class="btn btn-outline-primary btn-lg px-5 py-3 hover-bg-teal-50">
                     Learn More
@@ -88,6 +88,180 @@
                     </div>
                 @endfor
             </div>
+        </div>
+    </section>
+
+    <!-- Appointment Booking Section -->
+    <section id="appointment" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-guest">
+        <div class="container-fluid" style="max-width: 896px;">
+            <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+                <h2 class="h1 fw-bold text-stone-900 mb-3">Book an Appointment</h2>
+                <p class="h5 text-stone-600">
+                    Request an appointment with our mental health professionals. We'll contact you to confirm your preferred date and time.
+                </p>
+            </div>
+            
+            <x-card data-aos="fade-up">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
+                <form method="POST" action="{{ route('appointment-request.store') }}">
+                    @csrf
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6">
+                            <x-input 
+                                type="text" 
+                                name="first_name" 
+                                label="First Name" 
+                                value="{{ old('first_name') }}"
+                                required
+                                :error="$errors->first('first_name')"
+                            />
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <x-input 
+                                type="text" 
+                                name="last_name" 
+                                label="Last Name" 
+                                value="{{ old('last_name') }}"
+                                required
+                                :error="$errors->first('last_name')"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6">
+                            <x-input 
+                                type="email" 
+                                name="email" 
+                                label="Email Address" 
+                                value="{{ old('email') }}"
+                                required
+                                :error="$errors->first('email')"
+                            />
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <x-input 
+                                type="tel" 
+                                name="phone" 
+                                label="Phone Number" 
+                                value="{{ old('phone') }}"
+                                :error="$errors->first('phone')"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="address" class="form-label text-stone-700">
+                            Address
+                        </label>
+                        <textarea 
+                            id="address" 
+                            name="address" 
+                            rows="3" 
+                            class="form-control @error('address') is-invalid @enderror"
+                            placeholder="Your address (optional)"
+                        >{{ old('address') }}</textarea>
+                        @error('address')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6">
+                            <label for="preferred_date" class="form-label text-stone-700">
+                                Preferred Date <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="date" 
+                                id="preferred_date" 
+                                name="preferred_date" 
+                                value="{{ old('preferred_date') }}"
+                                min="{{ date('Y-m-d') }}"
+                                required
+                                class="form-control @error('preferred_date') is-invalid @enderror"
+                            />
+                            @error('preferred_date')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        
+                        <div class="col-12 col-md-6">
+                            <label for="preferred_time" class="form-label text-stone-700">
+                                Preferred Time
+                            </label>
+                            <select 
+                                id="preferred_time" 
+                                name="preferred_time" 
+                                class="form-select @error('preferred_time') is-invalid @enderror"
+                            >
+                                <option value="">Select a time</option>
+                                <option value="09:00" {{ old('preferred_time') == '09:00' ? 'selected' : '' }}>9:00 AM</option>
+                                <option value="10:00" {{ old('preferred_time') == '10:00' ? 'selected' : '' }}>10:00 AM</option>
+                                <option value="11:00" {{ old('preferred_time') == '11:00' ? 'selected' : '' }}>11:00 AM</option>
+                                <option value="12:00" {{ old('preferred_time') == '12:00' ? 'selected' : '' }}>12:00 PM</option>
+                                <option value="13:00" {{ old('preferred_time') == '13:00' ? 'selected' : '' }}>1:00 PM</option>
+                                <option value="14:00" {{ old('preferred_time') == '14:00' ? 'selected' : '' }}>2:00 PM</option>
+                                <option value="15:00" {{ old('preferred_time') == '15:00' ? 'selected' : '' }}>3:00 PM</option>
+                                <option value="16:00" {{ old('preferred_time') == '16:00' ? 'selected' : '' }}>4:00 PM</option>
+                                <option value="17:00" {{ old('preferred_time') == '17:00' ? 'selected' : '' }}>5:00 PM</option>
+                            </select>
+                            @error('preferred_time')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="notes" class="form-label text-stone-700">
+                            Additional Notes
+                        </label>
+                        <textarea 
+                            id="notes" 
+                            name="notes" 
+                            rows="4" 
+                            class="form-control @error('notes') is-invalid @enderror"
+                            placeholder="Any additional information you'd like to share (optional)"
+                        >{{ old('notes') }}</textarea>
+                        @error('notes')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    
+                    <div class="text-center">
+                        <x-button type="submit" variant="primary" size="lg" class="w-100 w-md-auto px-5">
+                            Submit Appointment Request
+                        </x-button>
+                    </div>
+                </form>
+            </x-card>
         </div>
     </section>
 

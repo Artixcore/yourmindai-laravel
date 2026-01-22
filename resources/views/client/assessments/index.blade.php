@@ -81,7 +81,7 @@
 </div>
 @endif
 
-@if($pendingAssessments->isEmpty() && $completedAssessments->isEmpty())
+@if((!$pendingAssessments || $pendingAssessments->isEmpty()) && (!$completedAssessments || $completedAssessments->isEmpty()))
 <div class="card">
     <div class="card-body text-center py-5">
         <i class="bi bi-clipboard-check display-1 text-muted mb-3"></i>

@@ -24,10 +24,16 @@ class PatientProgressController extends Controller
         $patientData = $patientProfile ?? $patient;
         
         if (!$patientData) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Patient profile not found.',
-            ], 404);
+            // Check if this is an API request
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Patient profile not found.',
+                ], 404);
+            }
+            
+            return redirect()->route('patient.dashboard')
+                ->with('error', 'Patient profile not found.');
         }
         
         $patientId = $patientProfile ? $patientProfile->id : $patient->id;
@@ -73,9 +79,15 @@ class PatientProgressController extends Controller
                 ->avg('mood_score'),
         ];
         
-        return response()->json([
-            'success' => true,
-            'data' => $stats,
-        ]);
+        // Return JSON for API requests
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'data' => $stats,
+            ]);
+        }
+        
+        // Return view for web requests
+        return view('patient.progress.index', compact('stats'));
     }
 }

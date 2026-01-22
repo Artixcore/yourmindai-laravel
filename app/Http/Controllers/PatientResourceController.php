@@ -15,20 +15,22 @@ class PatientResourceController extends Controller
 {
     /**
      * Get patient ID from authenticated user
+     * Prioritizes patients table since PatientResource uses Patient::class relationship
      */
     private function getPatientId()
     {
         $user = auth()->user();
         
-        $patientProfile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
+        // Prioritize patients table since PatientResource belongsTo Patient::class
         $patient = Patient::where('email', $user->email)->first();
-        
-        if ($patientProfile) {
-            return $patientProfile->id;
-        }
-        
         if ($patient) {
             return $patient->id;
+        }
+        
+        // Fallback to patient_profiles if patients record doesn't exist
+        $patientProfile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
+        if ($patientProfile) {
+            return $patientProfile->id;
         }
         
         return null;
@@ -154,12 +156,34 @@ class PatientResourceController extends Controller
                 $path = $file->storeAs("patients/{$patient->id}/resources", $filename, 'public');
                 
                 if (!$path) {
+                    Log::error('Failed to store patient resource file', [
+                        'patient_id' => $patient->id,
+                        'filename' => $filename,
+                        'user_id' => $user->id,
+                    ]);
                     return back()
                         ->withInput()
                         ->withErrors(['file' => 'Failed to upload file. Please try again.']);
                 }
                 
+                // Verify file was actually saved
+                if (!Storage::disk('public')->exists($path)) {
+                    Log::error('Patient resource file not found after upload', [
+                        'patient_id' => $patient->id,
+                        'file_path' => $path,
+                        'user_id' => $user->id,
+                    ]);
+                    return back()
+                        ->withInput()
+                        ->withErrors(['file' => 'File upload verification failed. Please try again.']);
+                }
+                
                 $data['file_path'] = $path;
+                Log::info('Patient resource file uploaded successfully', [
+                    'patient_id' => $patient->id,
+                    'file_path' => $path,
+                    'user_id' => $user->id,
+                ]);
             }
 
             // Normalize YouTube URL if provided
@@ -177,7 +201,16 @@ class PatientResourceController extends Controller
             $data['doctor_id'] = $user->id;
             $data['patient_id'] = $patient->id;
 
-            PatientResource::create($data);
+            $resource = PatientResource::create($data);
+            
+            // Log successful creation
+            Log::info('Patient resource created successfully', [
+                'resource_id' => $resource->id,
+                'patient_id' => $patient->id,
+                'type' => $data['type'],
+                'file_path' => $resource->file_path ?? null,
+                'user_id' => $user->id,
+            ]);
 
             return redirect()
                 ->route('patients.resources.index', $patient)
@@ -224,12 +257,34 @@ class PatientResourceController extends Controller
                 $path = $file->storeAs("patients/{$patient->id}/resources", $filename, 'public');
                 
                 if (!$path) {
+                    Log::error('Failed to store patient resource file during update', [
+                        'patient_id' => $patient->id,
+                        'resource_id' => $resource->id,
+                        'filename' => $filename,
+                    ]);
                     return back()
                         ->withInput()
                         ->withErrors(['file' => 'Failed to upload file. Please try again.']);
                 }
                 
+                // Verify file was actually saved
+                if (!Storage::disk('public')->exists($path)) {
+                    Log::error('Patient resource file not found after upload during update', [
+                        'patient_id' => $patient->id,
+                        'resource_id' => $resource->id,
+                        'file_path' => $path,
+                    ]);
+                    return back()
+                        ->withInput()
+                        ->withErrors(['file' => 'File upload verification failed. Please try again.']);
+                }
+                
                 $data['file_path'] = $path;
+                Log::info('Patient resource file updated successfully', [
+                    'patient_id' => $patient->id,
+                    'resource_id' => $resource->id,
+                    'file_path' => $path,
+                ]);
             } elseif ($data['type'] === 'youtube') {
                 // If changing to YouTube, delete old file
                 if ($resource->file_path) {
@@ -295,14 +350,70 @@ class PatientResourceController extends Controller
     }
 
     /**
-     * Download the resource file.
+     * Download the resource file for patients.
+     */
+    public function patientDownload(PatientResource $resource)
+    {
+        $user = auth()->user();
+        $patientId = $this->getPatientId();
+        
+        if (!$patientId) {
+            abort(403, 'Patient profile not found.');
+        }
+        
+        // Verify resource belongs to the authenticated patient
+        if ($resource->patient_id != $patientId) {
+            abort(403, 'You do not have permission to download this resource.');
+        }
+        
+        // Check if file exists
+        if (!$resource->file_path) {
+            Log::error('Patient resource download failed: file_path is null', [
+                'resource_id' => $resource->id,
+                'patient_id' => $patientId,
+                'user_id' => $user->id,
+            ]);
+            abort(404, 'File not found. The file may have been deleted.');
+        }
+        
+        if (!Storage::disk('public')->exists($resource->file_path)) {
+            Log::error('Patient resource download failed: file does not exist in storage', [
+                'resource_id' => $resource->id,
+                'file_path' => $resource->file_path,
+                'patient_id' => $patientId,
+                'user_id' => $user->id,
+            ]);
+            abort(404, 'File not found. The file may have been deleted.');
+        }
+
+        $path = Storage::disk('public')->path($resource->file_path);
+        $filename = Str::slug($resource->title) . '.' . pathinfo($resource->file_path, PATHINFO_EXTENSION);
+
+        return response()->download($path, $filename);
+    }
+
+    /**
+     * Download the resource file (for doctors/admins).
      */
     public function download(Patient $patient, PatientResource $resource)
     {
         $this->authorize('view', $resource);
 
-        if (!$resource->file_path || !Storage::disk('public')->exists($resource->file_path)) {
-            abort(404, 'File not found');
+        if (!$resource->file_path) {
+            Log::error('Resource download failed: file_path is null', [
+                'resource_id' => $resource->id,
+                'patient_id' => $patient->id,
+            ]);
+            abort(404, 'File not found. The file may have been deleted.');
+        }
+        
+        if (!Storage::disk('public')->exists($resource->file_path)) {
+            Log::error('Resource download failed: file does not exist in storage', [
+                'resource_id' => $resource->id,
+                'file_path' => $resource->file_path,
+                'patient_id' => $patient->id,
+            ]);
+            abort(404, 'File not found. The file may have been deleted.');
         }
 
         $path = Storage::disk('public')->path($resource->file_path);

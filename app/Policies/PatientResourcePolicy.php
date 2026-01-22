@@ -20,8 +20,23 @@ class PatientResourcePolicy
      */
     public function view(User $user, PatientResource $resource): bool
     {
-        // Admin can view any resource, doctor can only view resources for their patients
-        return $user->role === 'admin' || $resource->patient->doctor_id === $user->id;
+        // Admin can view any resource
+        if ($user->role === 'admin') {
+            return true;
+        }
+        
+        // Doctor can only view resources for their patients
+        if ($user->role === 'doctor' && $resource->patient->doctor_id === $user->id) {
+            return true;
+        }
+        
+        // Patient (User with role 'PATIENT') can view their own resources
+        if ($user->role === 'PATIENT') {
+            // Check if resource's patient email matches user's email
+            return $resource->patient && $resource->patient->email === $user->email;
+        }
+        
+        return false;
     }
 
     /**

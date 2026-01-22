@@ -57,13 +57,22 @@ class PatientResource extends Model
 
     /**
      * Get the file download URL.
+     * Uses patient route if user is a patient, otherwise uses doctor/admin route.
      */
     public function getFileUrlAttribute()
     {
-        if ($this->file_path) {
-            return route('patients.resources.download', ['patient' => $this->patient_id, 'resource' => $this->id]);
+        if (!$this->file_path) {
+            return null;
         }
-        return null;
+        
+        // Check if current user is a patient (User with role 'PATIENT')
+        if (auth()->check() && auth()->user()->role === 'PATIENT') {
+            // Use patient download route
+            return route('patient.resources.download', ['resource' => $this->id]);
+        }
+        
+        // Use doctor/admin download route
+        return route('patients.resources.download', ['patient' => $this->patient_id, 'resource' => $this->id]);
     }
 
     /**
@@ -128,15 +137,37 @@ class PatientResource extends Model
     }
 
     /**
-     * Resolve route binding with scoped query to ensure doctor ownership.
+     * Resolve route binding with scoped query to ensure proper access.
      */
     public function resolveRouteBinding($value, $field = null)
     {
         $query = $this->where('id', $value);
 
-        // If user is authenticated and not admin, scope by doctor ownership
-        if (auth()->check() && auth()->user()->role !== 'admin') {
-            $query->where('doctor_id', auth()->id());
+        // If user is authenticated
+        if (auth()->check()) {
+            $user = auth()->user();
+            
+            // Admin can access any resource
+            if ($user->role === 'admin') {
+                return $query->firstOrFail();
+            }
+            
+            // Doctor can only access resources they created
+            if ($user->role === 'doctor') {
+                $query->where('doctor_id', $user->id);
+            }
+            
+            // Patient (User with role 'PATIENT') can access their own resources
+            if ($user->role === 'PATIENT') {
+                // Find patient by email
+                $patient = \App\Models\Patient::where('email', $user->email)->first();
+                if ($patient) {
+                    $query->where('patient_id', $patient->id);
+                } else {
+                    // If no patient found, return 404
+                    abort(404);
+                }
+            }
         }
 
         return $query->firstOrFail();

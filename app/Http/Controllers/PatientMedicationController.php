@@ -11,20 +11,22 @@ class PatientMedicationController extends Controller
 {
     /**
      * Get patient ID from authenticated user
+     * Prioritizes patients table ID since PatientMedication model uses Patient::class relationship
      */
     private function getPatientId()
     {
         $user = auth()->user();
         
-        $patientProfile = PatientProfile::where('user_id', $user->id)->first();
+        // Prioritize patients table since PatientMedication belongsTo Patient::class
         $patient = Patient::where('email', $user->email)->first();
-        
-        if ($patientProfile) {
-            return $patientProfile->id;
-        }
-        
         if ($patient) {
             return $patient->id;
+        }
+        
+        // Fallback to patient_profiles if patients record doesn't exist
+        $patientProfile = PatientProfile::where('user_id', $user->id)->first();
+        if ($patientProfile) {
+            return $patientProfile->id;
         }
         
         return null;

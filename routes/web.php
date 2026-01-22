@@ -57,6 +57,7 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     Route::get('/sessions', [PatientSessionController::class, 'index'])->name('sessions.index');
     Route::get('/sessions/{id}', [PatientSessionController::class, 'show'])->name('sessions.show');
     Route::get('/resources', [PatientResourceController::class, 'patientIndex'])->name('resources.index');
+    Route::get('/resources/{resource}/download', [PatientResourceController::class, 'patientDownload'])->name('resources.download');
     Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments.index');
     Route::get('/assessments', [PatientAssessmentController::class, 'index'])->name('assessments.index');
     Route::get('/assessments/{id}', [PatientAssessmentController::class, 'show'])->name('assessments.show');

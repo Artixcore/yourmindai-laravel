@@ -76,4 +76,24 @@ class PatientProfile extends Model
     {
         return $this->hasMany(PatientResource::class, 'patient_id');
     }
+
+    public function devices()
+    {
+        return $this->hasMany(PatientDevice::class, 'patient_profile_id');
+    }
+
+    public function psychometricAssessments()
+    {
+        return $this->hasMany(PsychometricAssessment::class, 'patient_profile_id');
+    }
+
+    public function contingencyPlans()
+    {
+        return $this->hasMany(ContingencyPlan::class, 'patient_profile_id');
+    }
+
+    public function contingencyActivations()
+    {
+        return $this->hasMany(ContingencyActivation::class, 'patient_profile_id');
+    }
 }

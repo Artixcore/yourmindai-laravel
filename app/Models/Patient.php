@@ -81,6 +81,38 @@ class Patient extends Model implements AuthenticatableContract
     }
 
     /**
+     * Get the devices for the patient.
+     */
+    public function devices()
+    {
+        return $this->hasMany(PatientDevice::class, 'patient_id');
+    }
+
+    /**
+     * Get the psychometric assessments for the patient.
+     */
+    public function psychometricAssessments()
+    {
+        return $this->hasMany(PsychometricAssessment::class, 'patient_id');
+    }
+
+    /**
+     * Get the contingency plans for the patient.
+     */
+    public function contingencyPlans()
+    {
+        return $this->hasMany(ContingencyPlan::class, 'patient_id');
+    }
+
+    /**
+     * Get the contingency activations for the patient.
+     */
+    public function contingencyActivations()
+    {
+        return $this->hasMany(ContingencyActivation::class, 'patient_id');
+    }
+
+    /**
      * Get the photo URL attribute.
      */
     public function getPhotoUrlAttribute()

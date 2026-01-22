@@ -17,7 +17,7 @@ class ClientLoginController extends Controller
     {
         // Redirect if already authenticated as PATIENT
         if (Auth::check() && Auth::user()->role === 'PATIENT') {
-            return redirect()->route('patient.dashboard');
+            return redirect()->route('client.dashboard');
         }
 
         return view('client.login');
@@ -71,7 +71,7 @@ class ClientLoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('patient.dashboard'));
+        return redirect()->intended(route('client.dashboard'));
     }
 
     /**

@@ -1,0 +1,122 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\PatientProfile;
+use App\Models\Patient;
+use App\Models\ContingencyPlan;
+use App\Models\ContingencyActivation;
+use Illuminate\Http\Request;
+
+class ClientContingencyController extends Controller
+{
+    /**
+     * Get patient ID helper
+     */
+    private function getPatientId()
+    {
+        $user = auth()->user();
+        $patientProfile = PatientProfile::where('user_id', $user->id)->first();
+        $patient = Patient::where('email', $user->email)->first();
+        
+        if ($patientProfile) {
+            return ['id' => $patientProfile->id, 'is_profile' => true];
+        } elseif ($patient) {
+            return ['id' => $patient->id, 'is_profile' => false];
+        }
+        
+        return null;
+    }
+
+    /**
+     * Display a listing of contingency plans.
+     */
+    public function index()
+    {
+        $patientInfo = $this->getPatientId();
+        
+        if (!$patientInfo) {
+            return redirect()->route('client.dashboard')
+                ->with('error', 'Patient profile not found.');
+        }
+
+        $contingencyPlans = ContingencyPlan::where(
+            $patientInfo['is_profile'] ? 'patient_profile_id' : 'patient_id',
+            $patientInfo['id']
+        )
+        ->where('status', 'active')
+        ->with('createdByDoctor', 'activations')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return view('client.contingency.index', compact('contingencyPlans'));
+    }
+
+    /**
+     * Display the contingency plan details.
+     */
+    public function show(ContingencyPlan $plan)
+    {
+        $patientInfo = $this->getPatientId();
+        
+        if (!$patientInfo) {
+            return redirect()->route('client.dashboard')
+                ->with('error', 'Patient profile not found.');
+        }
+
+        // Verify plan belongs to patient
+        $planPatientId = $patientInfo['is_profile'] 
+            ? $plan->patient_profile_id 
+            : $plan->patient_id;
+
+        if ($planPatientId != $patientInfo['id']) {
+            return redirect()->route('client.contingency.index')
+                ->with('error', 'Unauthorized access.');
+        }
+
+        $plan->load('createdByDoctor', 'activations');
+
+        return view('client.contingency.show', compact('plan'));
+    }
+
+    /**
+     * Activate a contingency plan.
+     */
+    public function activate(Request $request, ContingencyPlan $plan)
+    {
+        $patientInfo = $this->getPatientId();
+        
+        if (!$patientInfo) {
+            return back()->with('error', 'Patient profile not found.');
+        }
+
+        // Verify plan belongs to patient
+        $planPatientId = $patientInfo['is_profile'] 
+            ? $plan->patient_profile_id 
+            : $plan->patient_id;
+
+        if ($planPatientId != $patientInfo['id']) {
+            return back()->with('error', 'Unauthorized action.');
+        }
+
+        if (!$plan->isActive()) {
+            return back()->with('error', 'This contingency plan is not active.');
+        }
+
+        $request->validate([
+            'trigger_reason' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $activation = $plan->activate('self', $request->trigger_reason);
+            
+            // Execute actions (in a real system, this would trigger notifications, etc.)
+            $actions = $plan->actions ?? [];
+            
+            return redirect()->route('client.contingency.show', $plan)
+                ->with('success', 'Contingency plan activated. Your healthcare provider has been notified.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to activate plan: ' . $e->getMessage());
+        }
+    }
+}

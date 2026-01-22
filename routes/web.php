@@ -28,6 +28,9 @@ use App\Http\Controllers\PatientMedicationController;
 use App\Http\Controllers\PatientJournalController;
 use App\Http\Controllers\DoctorAppointmentController;
 use App\Http\Controllers\DoctorMessageController;
+use App\Http\Controllers\PsychometricScaleController;
+use App\Http\Controllers\PsychometricAssessmentController;
+use App\Http\Controllers\ContingencyPlanController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -44,6 +47,33 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 Route::get('/client', [\App\Http\Controllers\ClientLoginController::class, 'showLoginForm'])->name('client.login')->middleware('guest');
 Route::post('/client', [\App\Http\Controllers\ClientLoginController::class, 'login'])->middleware('guest');
 Route::post('/client/logout', [\App\Http\Controllers\ClientLoginController::class, 'logout'])->name('client.logout')->middleware('auth');
+
+// Client dashboard routes (for webview app)
+Route::prefix('client')->name('client.')->middleware(['auth'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\ClientDashboardController::class, 'index'])->name('dashboard');
+    
+    // Device Management
+    Route::get('/devices', [\App\Http\Controllers\ClientDeviceController::class, 'index'])->name('devices.index');
+    Route::post('/devices', [\App\Http\Controllers\ClientDeviceController::class, 'store'])->name('devices.store');
+    Route::delete('/devices/{device}', [\App\Http\Controllers\ClientDeviceController::class, 'destroy'])->name('devices.destroy');
+    
+    // Psychometric Assessments
+    Route::get('/assessments', [\App\Http\Controllers\ClientPsychometricController::class, 'index'])->name('assessments.index');
+    Route::get('/assessments/{assessment}', [\App\Http\Controllers\ClientPsychometricController::class, 'show'])->name('assessments.show');
+    Route::post('/assessments/{assessment}/complete', [\App\Http\Controllers\ClientPsychometricController::class, 'complete'])->name('assessments.complete');
+    
+    // Contingency Management
+    Route::get('/contingency', [\App\Http\Controllers\ClientContingencyController::class, 'index'])->name('contingency.index');
+    Route::get('/contingency/{plan}', [\App\Http\Controllers\ClientContingencyController::class, 'show'])->name('contingency.show');
+    Route::post('/contingency/{plan}/activate', [\App\Http\Controllers\ClientContingencyController::class, 'activate'])->name('contingency.activate');
+    
+    // Session Details (enhanced)
+    Route::get('/sessions/{session}', [\App\Http\Controllers\PatientSessionController::class, 'show'])->name('sessions.show');
+    
+    // Progress Tracking
+    Route::get('/progress', [\App\Http\Controllers\PatientProgressController::class, 'index'])->name('progress.index');
+});
 
 // Dashboard (protected)
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
@@ -128,6 +158,20 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     // Doctor messages
     Route::get('/doctors/messages', [DoctorMessageController::class, 'index'])
         ->name('doctors.messages.index');
+    
+    // Psychometric Scales Management
+    Route::resource('psychometric-scales', PsychometricScaleController::class);
+    Route::post('patients/{patient}/psychometric-assessments', [PsychometricAssessmentController::class, 'assign'])
+        ->name('patients.psychometric.assign');
+    Route::get('patients/{patient}/psychometric-assessments', [PsychometricAssessmentController::class, 'index'])
+        ->name('patients.psychometric.index');
+    Route::get('patients/{patient}/psychometric-assessments/{assessment}', [PsychometricAssessmentController::class, 'show'])
+        ->name('patients.psychometric.show');
+    
+    // Contingency Management
+    Route::resource('patients.contingency-plans', ContingencyPlanController::class);
+    Route::post('patients/{patient}/contingency-plans/{contingencyPlan}/activate', [ContingencyPlanController::class, 'activate'])
+        ->name('patients.contingency.activate');
 });
 
 // Admin routes

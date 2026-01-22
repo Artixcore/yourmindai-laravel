@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}Setting up webhook endpoint for automatic deployment...${NC}"
-
+# before we do anything, we need to check if the webhook is already set up.
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 cd "$SCRIPT_DIR"

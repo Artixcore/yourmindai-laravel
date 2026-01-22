@@ -75,10 +75,6 @@
             @endif
             
             @if($role === 'doctor')
-                <a href="#" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none" :class="collapsed ? 'justify-content-center' : ''">
-                    <i class="bi bi-file-earmark-text flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
-                    <span x-show="!collapsed">Notes</span>
-                </a>
                 <a href="{{ route('doctors.settings') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.settings*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-gear flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Settings</span>

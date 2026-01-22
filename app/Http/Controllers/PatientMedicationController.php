@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PatientProfile;
 use App\Models\Patient;
+use App\Models\PatientMedication;
 use Illuminate\Http\Request;
 
 class PatientMedicationController extends Controller
@@ -41,14 +42,10 @@ class PatientMedicationController extends Controller
                 ->with('error', 'Patient profile not found.');
         }
         
-        // If Medication model exists, use it. Otherwise return empty collection
-        $medications = collect([]);
-        
-        if (class_exists(\App\Models\Medication::class)) {
-            $medications = \App\Models\Medication::where('patient_id', $patientId)
-                ->orderBy('created_at', 'desc')
-                ->get();
-        }
+        // Get medications for the patient
+        $medications = \App\Models\PatientMedication::where('patient_id', $patientId)
+            ->orderBy('created_at', 'desc')
+            ->get();
         
         return view('patient.medications.index', compact('medications'));
     }

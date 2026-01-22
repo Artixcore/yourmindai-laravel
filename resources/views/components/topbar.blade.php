@@ -31,7 +31,7 @@
             </button>
             
             <!-- Profile Dropdown -->
-            <div class="dropdown" x-data="dropdown(false)">
+            <div class="dropdown position-relative" x-data="dropdown(false)">
                 <button 
                     @click="toggle()" 
                     class="btn btn-link d-flex align-items-center gap-2 text-decoration-none border-0 p-2" 
@@ -55,8 +55,8 @@
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-95"
                     @click.away="close()"
-                    class="dropdown-menu dropdown-menu-end shadow-sm border"
-                    style="display: none; min-width: 200px; margin-top: 0.5rem;"
+                    class="dropdown-menu dropdown-menu-end shadow-sm border position-absolute"
+                    style="display: none; min-width: 200px; margin-top: 0.5rem; z-index: 1060; top: 100%; right: 0;"
                 >
                     <div class="px-3 py-2 border-bottom">
                         <div class="fw-semibold small">{{ $user->name ?? 'User' }}</div>

@@ -109,6 +109,8 @@
             document.body.setAttribute('data-sidebar-collapsed', collapsed);
         });
 
+        // Register Alpine components - this will run before Alpine processes the page
+        // because Alpine.js is loaded with 'defer' attribute
         document.addEventListener('alpine:init', () => {
             Alpine.data('modal', (initialOpen = false) => ({
                 open: initialOpen,
@@ -140,6 +142,39 @@
                 },
             }));
         });
+
+        // Fallback: If Alpine is already loaded, register components immediately
+        if (window.Alpine) {
+            Alpine.data('modal', (initialOpen = false) => ({
+                open: initialOpen,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                },
+            }));
+
+            Alpine.data('dropdown', (initialOpen = false) => ({
+                open: initialOpen,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                },
+            }));
+
+            Alpine.data('sidebar', (initialOpen = false) => ({
+                open: initialOpen,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                },
+            }));
+        }
         
         // Initialize AOS
         if (document.readyState === 'loading') {

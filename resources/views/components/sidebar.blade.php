@@ -68,7 +68,7 @@
                     <i class="bi bi-person-badge flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Patients</span>
                 </a>
-                <a href="#" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none" :class="collapsed ? 'justify-content-center' : ''">
+                <a href="{{ route('doctors.appointments.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.appointments.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-calendar-event flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Appointments</span>
                 </a>
@@ -131,7 +131,7 @@
                     <span x-show="!collapsed">Mood Journal</span>
                 </a>
             @else
-                <a href="#" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none" :class="collapsed ? 'justify-content-center' : ''">
+                <a href="{{ route('doctors.messages.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.messages.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-chat-dots flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Messages</span>
                 </a>

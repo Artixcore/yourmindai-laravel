@@ -52,6 +52,34 @@
         </div>
     @endif
 
+    <!-- Error Messages -->
+    @if(session('error') || $errors->any())
+        <div 
+            x-data="{ show: true }"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="alert alert-danger alert-dismissible fade show mb-4"
+            x-init="setTimeout(() => show = false, 8000)"
+        >
+            @if(session('error'))
+                <div>{{ session('error') }}</div>
+            @endif
+            @if($errors->any())
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            @endif
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Filters -->
     <x-card class="mb-4">
         <div class="d-flex flex-wrap align-items-center gap-3">

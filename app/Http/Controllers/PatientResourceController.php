@@ -8,6 +8,7 @@ use App\Http\Requests\StorePatientResourceRequest;
 use App\Http\Requests\UpdatePatientResourceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PatientResourceController extends Controller
@@ -138,42 +139,65 @@ class PatientResourceController extends Controller
      */
     public function store(StorePatientResourceRequest $request, Patient $patient)
     {
-        $this->authorize('create', PatientResource::class);
-        $this->authorize('view', $patient);
+        try {
+            $this->authorize('create', PatientResource::class);
+            $this->authorize('view', $patient);
 
-        $data = $request->validated();
-        $user = $request->user();
+            $data = $request->validated();
+            $user = $request->user();
 
-        // Handle file upload if PDF
-        if ($request->hasFile('file') && $data['type'] === 'pdf') {
-            $file = $request->file('file');
-            $extension = $file->getClientOriginalExtension();
-            $filename = 'resource_' . time() . '_' . Str::random(10) . '.' . $extension;
-            $path = $file->storeAs("patients/{$patient->id}/resources", $filename, 'public');
-            
-            $data['file_path'] = $path;
+            // Handle file upload if PDF
+            if ($request->hasFile('file') && $data['type'] === 'pdf') {
+                $file = $request->file('file');
+                $extension = $file->getClientOriginalExtension();
+                $filename = 'resource_' . time() . '_' . Str::random(10) . '.' . $extension;
+                $path = $file->storeAs("patients/{$patient->id}/resources", $filename, 'public');
+                
+                if (!$path) {
+                    return back()
+                        ->withInput()
+                        ->withErrors(['file' => 'Failed to upload file. Please try again.']);
+                }
+                
+                $data['file_path'] = $path;
+            }
+
+            // Normalize YouTube URL if provided
+            if ($data['type'] === 'youtube' && isset($data['youtube_url'])) {
+                $data['youtube_url'] = $this->normalizeYouTubeUrl($data['youtube_url']);
+            } else {
+                $data['youtube_url'] = null;
+            }
+
+            // Ensure file_path is null for YouTube resources
+            if ($data['type'] === 'youtube') {
+                $data['file_path'] = null;
+            }
+
+            $data['doctor_id'] = $user->id;
+            $data['patient_id'] = $patient->id;
+
+            PatientResource::create($data);
+
+            return redirect()
+                ->route('patients.resources.index', $patient)
+                ->with('success', 'Resource created successfully!');
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'You do not have permission to perform this action.']);
+        } catch (\Exception $e) {
+            Log::error('Failed to create patient resource', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'patient_id' => $patient->id,
+                'user_id' => $request->user()->id ?? null,
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'An error occurred while saving the resource. Please try again.']);
         }
-
-        // Normalize YouTube URL if provided
-        if ($data['type'] === 'youtube' && isset($data['youtube_url'])) {
-            $data['youtube_url'] = $this->normalizeYouTubeUrl($data['youtube_url']);
-        } else {
-            $data['youtube_url'] = null;
-        }
-
-        // Ensure file_path is null for YouTube resources
-        if ($data['type'] === 'youtube') {
-            $data['file_path'] = null;
-        }
-
-        $data['doctor_id'] = $user->id;
-        $data['patient_id'] = $patient->id;
-
-        PatientResource::create($data);
-
-        return redirect()
-            ->route('patients.resources.index', $patient)
-            ->with('success', 'Resource created successfully!');
     }
 
     /**
@@ -181,50 +205,74 @@ class PatientResourceController extends Controller
      */
     public function update(UpdatePatientResourceRequest $request, Patient $patient, PatientResource $resource)
     {
-        $this->authorize('update', $resource);
+        try {
+            $this->authorize('update', $resource);
 
-        $data = $request->validated();
+            $data = $request->validated();
 
-        // Handle file upload/replacement if PDF
-        if ($request->hasFile('file') && $data['type'] === 'pdf') {
-            // Delete old file if exists
-            if ($resource->file_path) {
-                Storage::disk('public')->delete($resource->file_path);
+            // Handle file upload/replacement if PDF
+            if ($request->hasFile('file') && $data['type'] === 'pdf') {
+                // Delete old file if exists
+                if ($resource->file_path) {
+                    Storage::disk('public')->delete($resource->file_path);
+                }
+
+                // Store new file
+                $file = $request->file('file');
+                $extension = $file->getClientOriginalExtension();
+                $filename = 'resource_' . time() . '_' . Str::random(10) . '.' . $extension;
+                $path = $file->storeAs("patients/{$patient->id}/resources", $filename, 'public');
+                
+                if (!$path) {
+                    return back()
+                        ->withInput()
+                        ->withErrors(['file' => 'Failed to upload file. Please try again.']);
+                }
+                
+                $data['file_path'] = $path;
+            } elseif ($data['type'] === 'youtube') {
+                // If changing to YouTube, delete old file
+                if ($resource->file_path) {
+                    Storage::disk('public')->delete($resource->file_path);
+                }
+                $data['file_path'] = null;
+            } elseif ($data['type'] === 'pdf' && !$request->hasFile('file')) {
+                // Keep existing file_path if not uploading new file
+                $data['file_path'] = $resource->file_path;
             }
 
-            // Store new file
-            $file = $request->file('file');
-            $extension = $file->getClientOriginalExtension();
-            $filename = 'resource_' . time() . '_' . Str::random(10) . '.' . $extension;
-            $path = $file->storeAs("patients/{$patient->id}/resources", $filename, 'public');
-            
-            $data['file_path'] = $path;
-        } elseif ($data['type'] === 'youtube') {
-            // If changing to YouTube, delete old file
-            if ($resource->file_path) {
-                Storage::disk('public')->delete($resource->file_path);
+            // Normalize YouTube URL if provided
+            if ($data['type'] === 'youtube' && isset($data['youtube_url'])) {
+                $data['youtube_url'] = $this->normalizeYouTubeUrl($data['youtube_url']);
+            } elseif ($data['type'] === 'pdf') {
+                $data['youtube_url'] = null;
+            } elseif ($data['type'] === 'youtube' && !isset($data['youtube_url'])) {
+                // Keep existing youtube_url if not changing
+                $data['youtube_url'] = $resource->youtube_url;
             }
-            $data['file_path'] = null;
-        } elseif ($data['type'] === 'pdf' && !$request->hasFile('file')) {
-            // Keep existing file_path if not uploading new file
-            $data['file_path'] = $resource->file_path;
+
+            $resource->update($data);
+
+            return redirect()
+                ->route('patients.resources.index', $patient)
+                ->with('success', 'Resource updated successfully!');
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'You do not have permission to perform this action.']);
+        } catch (\Exception $e) {
+            Log::error('Failed to update patient resource', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'resource_id' => $resource->id ?? null,
+                'patient_id' => $patient->id,
+                'user_id' => $request->user()->id ?? null,
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'An error occurred while saving the resource. Please try again.']);
         }
-
-        // Normalize YouTube URL if provided
-        if ($data['type'] === 'youtube' && isset($data['youtube_url'])) {
-            $data['youtube_url'] = $this->normalizeYouTubeUrl($data['youtube_url']);
-        } elseif ($data['type'] === 'pdf') {
-            $data['youtube_url'] = null;
-        } elseif ($data['type'] === 'youtube' && !isset($data['youtube_url'])) {
-            // Keep existing youtube_url if not changing
-            $data['youtube_url'] = $resource->youtube_url;
-        }
-
-        $resource->update($data);
-
-        return redirect()
-            ->route('patients.resources.index', $patient)
-            ->with('success', 'Resource updated successfully!');
     }
 
     /**

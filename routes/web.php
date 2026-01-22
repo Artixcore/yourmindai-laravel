@@ -26,6 +26,8 @@ use App\Http\Controllers\PatientProgressController;
 use App\Http\Controllers\PatientMessageController;
 use App\Http\Controllers\PatientMedicationController;
 use App\Http\Controllers\PatientJournalController;
+use App\Http\Controllers\DoctorAppointmentController;
+use App\Http\Controllers\DoctorMessageController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -117,6 +119,14 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('patients.resources.destroy');
     Route::get('patients/{patient}/resources/{resource}/download', [PatientResourceController::class, 'download'])
         ->name('patients.resources.download');
+    
+    // Doctor appointments
+    Route::get('/doctors/appointments', [DoctorAppointmentController::class, 'index'])
+        ->name('doctors.appointments.index');
+    
+    // Doctor messages
+    Route::get('/doctors/messages', [DoctorMessageController::class, 'index'])
+        ->name('doctors.messages.index');
 });
 
 // Admin routes

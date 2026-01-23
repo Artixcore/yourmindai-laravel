@@ -119,30 +119,83 @@
 
     <!-- Sessions Summary -->
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-transparent border-bottom py-3">
-            <h5 class="card-title mb-0 fw-semibold">Therapy Sessions Summary</h5>
+        <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-semibold">Therapy Sessions</h5>
+            <a href="{{ route('patients.sessions.index', $patient) }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-calendar-check me-1"></i>Manage Sessions
+            </a>
         </div>
         <div class="card-body p-4">
-            <div class="row g-3">
+            <div class="row g-3 mb-3">
                 <div class="col-12 col-md-4">
-                    <div class="border rounded p-3">
+                    <div class="border rounded p-3 text-center">
                         <p class="text-muted small mb-1">Total Sessions</p>
                         <h4 class="fw-bold mb-0">{{ $sessionsSummary['total'] }}</h4>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="border rounded p-3">
+                    <div class="border rounded p-3 text-center">
                         <p class="text-muted small mb-1">Active Sessions</p>
                         <h4 class="fw-bold text-success mb-0">{{ $sessionsSummary['active'] }}</h4>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="border rounded p-3">
+                    <div class="border rounded p-3 text-center">
                         <p class="text-muted small mb-1">Closed Sessions</p>
                         <h4 class="fw-bold text-muted mb-0">{{ $sessionsSummary['closed'] }}</h4>
                     </div>
                 </div>
             </div>
+            
+            @php
+                $recentSessions = $patient->sessions()->with('doctor')->orderBy('created_at', 'desc')->take(3)->get();
+            @endphp
+            
+            @if($recentSessions->isEmpty())
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-check display-6 mb-3 d-block"></i>
+                    <p class="mb-0">No sessions created yet.</p>
+                    <a href="{{ route('patients.sessions.create', $patient) }}" class="btn btn-sm btn-primary mt-2">
+                        <i class="bi bi-plus-circle me-1"></i>Create First Session
+                    </a>
+                </div>
+            @else
+                <div class="d-flex flex-column gap-2">
+                    @foreach($recentSessions as $session)
+                        <div class="border rounded p-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h6 class="fw-semibold mb-0">{{ $session->title }}</h6>
+                                        @if($session->status === 'active')
+                                            <span class="badge bg-success">Active</span>
+                                        @else
+                                            <span class="badge bg-secondary">Closed</span>
+                                        @endif
+                                    </div>
+                                    <div class="small text-muted">
+                                        Created: {{ $session->created_at->format('M d, Y') }}
+                                        @if($session->doctor)
+                                            | Doctor: {{ $session->doctor->name ?? 'Doctor' }}
+                                        @endif
+                                        | Days: {{ $session->days->count() }}
+                                    </div>
+                                </div>
+                                <a href="{{ route('patients.sessions.show', [$patient, $session]) }}" class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                    @if($patient->sessions()->count() > 3)
+                        <div class="text-center mt-2">
+                            <a href="{{ route('patients.sessions.index', $patient) }}" class="btn btn-sm btn-link">
+                                View all {{ $patient->sessions()->count() }} sessions
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endif
         </div>
     </div>
 

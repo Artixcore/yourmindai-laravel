@@ -168,6 +168,10 @@
             <i class="bi bi-clipboard-check"></i>
             <span>Assessments</span>
         </a>
+        <a href="{{ route('client.tasks.index') }}" class="nav-item {{ request()->routeIs('client.tasks.*') ? 'active' : '' }}">
+            <i class="bi bi-list-check"></i>
+            <span>Tasks</span>
+        </a>
         <a href="{{ route('client.devices.index') }}" class="nav-item {{ request()->routeIs('client.devices.*') ? 'active' : '' }}">
             <i class="bi bi-phone"></i>
             <span>Devices</span>

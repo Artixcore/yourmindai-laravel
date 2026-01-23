@@ -83,6 +83,10 @@
                     <i class="bi bi-calendar-event flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Appointments</span>
                 </a>
+                <a href="{{ route('doctors.sessions.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.sessions.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-calendar-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Sessions</span>
+                </a>
                 <a href="{{ route('doctors.appointment-requests.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.appointment-requests.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-calendar-plus flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Appointment Requests</span>
@@ -126,6 +130,10 @@
                 <a href="{{ route('patient.assessments.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('patient.assessments.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-clipboard-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Assessments</span>
+                </a>
+                <a href="{{ route('patient.tasks.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('patient.tasks.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-list-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Tasks</span>
                 </a>
                 <a href="{{ route('patient.progress.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('patient.progress.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-graph-up flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>

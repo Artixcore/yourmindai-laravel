@@ -76,6 +76,11 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     
     // Progress Tracking
     Route::get('/progress', [\App\Http\Controllers\PatientProgressController::class, 'index'])->name('progress.index');
+    
+    // Tasks/Todos
+    Route::get('/tasks', [\App\Http\Controllers\PatientTaskController::class, 'index'])->name('tasks.index');
+    Route::get('/tasks/{task}', [\App\Http\Controllers\PatientTaskController::class, 'show'])->name('tasks.show');
+    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\PatientTaskController::class, 'complete'])->name('tasks.complete');
 });
 
 // Dashboard (protected)
@@ -103,6 +108,11 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     })->name('journal.create');
     Route::post('/journal', [\App\Http\Controllers\PatientJournalController::class, 'store'])->name('journal.store');
     Route::put('/profile', [\App\Http\Controllers\PatientDashboardController::class, 'updateProfile'])->name('profile.update');
+    
+    // Tasks/Todos
+    Route::get('/tasks', [\App\Http\Controllers\PatientTaskController::class, 'index'])->name('tasks.index');
+    Route::get('/tasks/{task}', [\App\Http\Controllers\PatientTaskController::class, 'show'])->name('tasks.show');
+    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\PatientTaskController::class, 'complete'])->name('tasks.complete');
 });
 
 // Doctor profile and papers routes
@@ -158,6 +168,10 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::get('doctors/appointments', [DoctorAppointmentController::class, 'index'])
         ->name('doctors.appointments.index');
     
+    // Doctor sessions
+    Route::get('doctors/sessions', [\App\Http\Controllers\DoctorSessionController::class, 'index'])
+        ->name('doctors.sessions.index');
+    
     // Doctor messages
     Route::get('doctors/messages', [DoctorMessageController::class, 'index'])
         ->name('doctors.messages.index');
@@ -198,6 +212,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     // Patient Oversight
     Route::get('patients', [AdminPatientController::class, 'index'])->name('patients.index');
     Route::get('patients/{patient}', [AdminPatientController::class, 'show'])->name('patients.show');
+    
+    // Note: Admin can access patient sessions through shared routes in the admin/doctor middleware group
+    // Routes: patients.sessions.index, patients.sessions.create, etc. (accessible to both admin and doctor)
     
     // Psychometric Assessments (Admin)
     Route::get('patients/{patient}/psychometric-assessments', [\App\Http\Controllers\PsychometricAssessmentController::class, 'index'])

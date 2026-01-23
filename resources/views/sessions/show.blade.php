@@ -215,9 +215,12 @@ function sessionTimeline() {
             this.saving = true;
             clearTimeout(this.saveTimeout);
 
+            // Extract path from route to ensure same protocol (HTTPS) as current page
+            const updateUrl = `{{ route('patients.sessions.days.update', [$patient, $session, 'DAY_ID']) }}`.replace('DAY_ID', this.editingDayId);
+            const storeUrl = `{{ route('patients.sessions.days.store', [$patient, $session]) }}`;
             const url = this.editingDayId
-                ? `{{ route('patients.sessions.days.update', [$patient, $session, 'DAY_ID']) }}`.replace('DAY_ID', this.editingDayId)
-                : `{{ route('patients.sessions.days.store', [$patient, $session]) }}`;
+                ? updateUrl.replace(/^https?:\/\/[^\/]+/, '')
+                : storeUrl.replace(/^https?:\/\/[^\/]+/, '');
 
             const method = this.editingDayId ? 'PUT' : 'POST';
             const formData = new FormData();

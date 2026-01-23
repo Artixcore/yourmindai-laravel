@@ -6,10 +6,10 @@
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
         <x-breadcrumb :items="[
-            ['label' => 'Home', 'url' => route('dashboard')],
-            ['label' => 'Patients', 'url' => route('patients.index')],
-            ['label' => $patient->name, 'url' => route('patients.show', $patient)],
-            ['label' => 'Assessments']
+            ['label' => 'Home', 'url' => route('admin.dashboard')],
+            ['label' => 'Patients', 'url' => route('admin.patients.index')],
+            ['label' => $patient->name, 'url' => route('admin.patients.show', $patient)],
+            ['label' => 'Psychometric Assessments']
         ]" />
         <h1 class="h3 mb-1 fw-semibold">Psychometric Assessments</h1>
         <p class="text-muted mb-0">Manage assessments for {{ $patient->name }}</p>
@@ -37,7 +37,7 @@
         <h5 class="mb-0 fw-semibold">Assign New Assessment</h5>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('patients.psychometric.assign', $patient) }}">
+        <form method="POST" action="{{ route('admin.patients.psychometric.assign', $patient) }}">
             @csrf
             <div class="row g-3">
                 <div class="col-12 col-md-8">
@@ -83,6 +83,7 @@
                         <th class="border-0">Category</th>
                         <th class="border-0">Status</th>
                         <th class="border-0">Score</th>
+                        <th class="border-0">Assigned By</th>
                         <th class="border-0">Assigned Date</th>
                         <th class="border-0">Completed Date</th>
                         <th class="border-0 text-end pe-4">Actions</th>
@@ -118,6 +119,13 @@
                             @endif
                         </td>
                         <td>
+                            @if($assessment->assignedByDoctor)
+                            {{ $assessment->assignedByDoctor->name ?? $assessment->assignedByDoctor->email ?? 'Doctor' }}
+                            @else
+                            <span class="text-muted">-</span>
+                            @endif
+                        </td>
+                        <td>
                             {{ $assessment->assigned_at ? $assessment->assigned_at->format('M d, Y') : '-' }}
                         </td>
                         <td>
@@ -128,8 +136,8 @@
                             @endif
                         </td>
                         <td class="text-end pe-4">
-                            <a href="{{ route('patients.psychometric.show', ['patient' => $patient, 'assessment' => $assessment]) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye me-1"></i>View
+                            <a href="{{ route('admin.patients.psychometric.show', ['patient' => $patient, 'assessment' => $assessment]) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
                             </a>
                         </td>
                     </tr>
@@ -142,7 +150,7 @@
 </div>
 
 <div class="mt-4">
-    <a href="{{ route('patients.show', $patient) }}" class="btn btn-outline-secondary">
+    <a href="{{ route('admin.patients.show', $patient) }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-2"></i>Back to Patient
     </a>
 </div>

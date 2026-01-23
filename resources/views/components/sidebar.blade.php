@@ -27,10 +27,12 @@
         </div>
 
         <div class="d-flex flex-column gap-2">
+            @if($role !== 'admin')
             <a href="{{ route('dashboard') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('dashboard') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                 <i class="bi bi-house-door flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                 <span x-show="!collapsed">Dashboard</span>
             </a>
+            @endif
             
             @if($role === 'admin')
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
@@ -71,7 +73,8 @@
                 </a>
             @endif
             
-            @if(in_array($role, ['admin', 'doctor']))
+            @if($role === 'doctor')
+                <div class="sidebar-section-divider"></div>
                 <a href="{{ route('patients.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('patients.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-person-badge flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Patients</span>
@@ -80,9 +83,6 @@
                     <i class="bi bi-calendar-event flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Appointments</span>
                 </a>
-            @endif
-            
-            @if($role === 'doctor')
                 <a href="{{ route('doctors.appointment-requests.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.appointment-requests.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-calendar-plus flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Appointment Requests</span>
@@ -102,6 +102,7 @@
             @endif
             
             @if(strtolower($role) === 'patient' || $role === 'PATIENT')
+                <div class="sidebar-section-divider"></div>
                 <a href="{{ route('patient.dashboard') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('patient.dashboard') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-house-door flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Dashboard</span>

@@ -146,6 +146,124 @@
         </div>
     </div>
 
+    <!-- Psychometric Assessments Summary -->
+    @php
+        $patientProfile = \App\Models\PatientProfile::where('doctor_id', $patient->doctor_id)
+            ->where(function($query) use ($patient) {
+                $query->where('full_name', $patient->name)
+                      ->orWhere('phone', $patient->phone);
+            })
+            ->first();
+        
+        if ($patient->email) {
+            $user = \App\Models\User::where('email', $patient->email)->first();
+            if ($user && !$patientProfile) {
+                $patientProfile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
+            }
+        }
+        
+        $allAssessments = \App\Models\PsychometricAssessment::where(function($query) use ($patientProfile, $patient) {
+            if ($patientProfile) {
+                $query->where('patient_profile_id', $patientProfile->id);
+            }
+            $query->orWhere('patient_id', $patient->id);
+        })
+        ->with('scale', 'assignedByDoctor')
+        ->orderBy('created_at', 'desc')
+        ->get();
+        
+        $assessmentStats = [
+            'total' => $allAssessments->count(),
+            'pending' => $allAssessments->where('status', 'pending')->count(),
+            'completed' => $allAssessments->where('status', 'completed')->count(),
+            'in_progress' => $allAssessments->where('status', 'in_progress')->count(),
+        ];
+    @endphp
+    
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-semibold">Psychometric Assessments</h5>
+            <a href="{{ route('admin.patients.psychometric.index', $patient) }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-clipboard-check me-1"></i>View All Assessments
+            </a>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-3">
+                    <div class="border rounded p-3 text-center">
+                        <p class="text-muted small mb-1">Total</p>
+                        <h4 class="fw-bold mb-0">{{ $assessmentStats['total'] }}</h4>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <div class="border rounded p-3 text-center">
+                        <p class="text-muted small mb-1">Pending</p>
+                        <h4 class="fw-bold text-warning mb-0">{{ $assessmentStats['pending'] }}</h4>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <div class="border rounded p-3 text-center">
+                        <p class="text-muted small mb-1">In Progress</p>
+                        <h4 class="fw-bold text-info mb-0">{{ $assessmentStats['in_progress'] }}</h4>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <div class="border rounded p-3 text-center">
+                        <p class="text-muted small mb-1">Completed</p>
+                        <h4 class="fw-bold text-success mb-0">{{ $assessmentStats['completed'] }}</h4>
+                    </div>
+                </div>
+            </div>
+            
+            @if($allAssessments->isEmpty())
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-clipboard-check display-6 mb-3 d-block"></i>
+                    <p class="mb-0">No assessments assigned yet.</p>
+                </div>
+            @else
+                <div class="d-flex flex-column gap-2">
+                    @foreach($allAssessments->take(3) as $assessment)
+                        <div class="border rounded p-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h6 class="fw-semibold mb-0">{{ $assessment->scale->name ?? 'Assessment' }}</h6>
+                                        @if($assessment->status === 'completed')
+                                            <span class="badge bg-success">Completed</span>
+                                        @elseif($assessment->status === 'in_progress')
+                                            <span class="badge bg-warning">In Progress</span>
+                                        @else
+                                            <span class="badge bg-secondary">Pending</span>
+                                        @endif
+                                    </div>
+                                    <div class="small text-muted">
+                                        Assigned: {{ $assessment->assigned_at ? $assessment->assigned_at->format('M d, Y') : 'Recently' }}
+                                        @if($assessment->assignedByDoctor)
+                                            | By: {{ $assessment->assignedByDoctor->name ?? 'Doctor' }}
+                                        @endif
+                                        @if($assessment->status === 'completed' && $assessment->total_score !== null)
+                                            | Score: {{ $assessment->total_score }}
+                                        @endif
+                                    </div>
+                                </div>
+                                <a href="{{ route('admin.patients.psychometric.show', [$patient, $assessment]) }}" class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                    @if($allAssessments->count() > 3)
+                        <div class="text-center mt-2">
+                            <a href="{{ route('admin.patients.psychometric.index', $patient) }}" class="btn btn-sm btn-link">
+                                View all {{ $allAssessments->count() }} assessments
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endif
+        </div>
+    </div>
+
     <!-- Recent Activity -->
     @if($recentActivity->count() > 0)
     <div class="card border-0 shadow-sm">

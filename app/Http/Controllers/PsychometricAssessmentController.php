@@ -48,14 +48,20 @@ class PsychometricAssessmentController extends Controller
             return back()->with('error', 'Patient profile not found. Please ensure the patient has a profile.');
         }
         
-        // Ensure doctor can only see assessments for their patients
-        $doctorId = auth()->id();
-        $assessments = PsychometricAssessment::where(function($query) use ($patientProfile, $patient) {
+        $user = auth()->user();
+        
+        // Build query for assessments
+        $assessmentsQuery = PsychometricAssessment::where(function($query) use ($patientProfile, $patient) {
                 $query->where('patient_profile_id', $patientProfile->id)
                       ->orWhere('patient_id', $patient->id);
-            })
-            ->where('assigned_by_doctor_id', $doctorId)
-            ->with('scale', 'assignedByDoctor')
+            });
+        
+        // Only filter by doctor if not admin - admins can see all assessments
+        if ($user->role !== 'admin') {
+            $assessmentsQuery->where('assigned_by_doctor_id', $user->id);
+        }
+        
+        $assessments = $assessmentsQuery->with('scale', 'assignedByDoctor')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -64,7 +70,11 @@ class PsychometricAssessmentController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('doctor.patients.psychometric.index', compact('patient', 'patientProfile', 'assessments', 'availableScales'));
+        // Determine if we're in admin context
+        $isAdmin = $user->role === 'admin';
+        $viewPath = $isAdmin ? 'admin.patients.psychometric.index' : 'doctor.patients.psychometric.index';
+
+        return view($viewPath, compact('patient', 'patientProfile', 'assessments', 'availableScales', 'isAdmin'));
     }
 
     /**
@@ -103,6 +113,12 @@ class PsychometricAssessmentController extends Controller
     {
         $patientProfile = $this->getPatientProfile($patient);
         $assessment->load('scale', 'patientProfile', 'assignedByDoctor');
-        return view('doctor.patients.psychometric.show', compact('patient', 'patientProfile', 'assessment'));
+        
+        // Determine if we're in admin context
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
+        $viewPath = $isAdmin ? 'admin.patients.psychometric.show' : 'doctor.patients.psychometric.show';
+        
+        return view($viewPath, compact('patient', 'patientProfile', 'assessment', 'isAdmin'));
     }
 }

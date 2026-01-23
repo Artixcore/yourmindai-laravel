@@ -258,6 +258,119 @@
         @endif
     </x-card>
 
+    <!-- Psychometric Assessments Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">Psychometric Assessments</h2>
+            <a
+                href="{{ route('patients.psychometric.index', $patient) }}"
+                class="btn btn-primary d-flex align-items-center gap-2"
+            >
+                <i class="bi bi-clipboard-check"></i>
+                <span>Manage Assessments</span>
+            </a>
+        </div>
+
+        @php
+            $patientProfile = \App\Models\PatientProfile::where('doctor_id', $patient->doctor_id)
+                ->where(function($query) use ($patient) {
+                    $query->where('full_name', $patient->name)
+                          ->orWhere('phone', $patient->phone);
+                })
+                ->first();
+            
+            if ($patient->email) {
+                $user = \App\Models\User::where('email', $patient->email)->first();
+                if ($user && !$patientProfile) {
+                    $patientProfile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
+                }
+            }
+            
+            $assessments = \App\Models\PsychometricAssessment::where(function($query) use ($patientProfile, $patient) {
+                if ($patientProfile) {
+                    $query->where('patient_profile_id', $patientProfile->id);
+                }
+                $query->orWhere('patient_id', $patient->id);
+            })
+            ->where('assigned_by_doctor_id', auth()->id())
+            ->with('scale')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+            $pendingCount = $assessments->where('status', 'pending')->count();
+            $completedCount = $assessments->where('status', 'completed')->count();
+        @endphp
+
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <p class="text-muted small mb-1">Total Assessments</p>
+                    <h4 class="fw-bold mb-0">{{ $assessments->count() }}</h4>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <p class="text-muted small mb-1">Pending</p>
+                    <h4 class="fw-bold text-warning mb-0">{{ $pendingCount }}</h4>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="border rounded p-3 text-center">
+                    <p class="text-muted small mb-1">Completed</p>
+                    <h4 class="fw-bold text-success mb-0">{{ $completedCount }}</h4>
+                </div>
+            </div>
+        </div>
+
+        @if($assessments->isEmpty())
+            <div class="text-center py-4 text-stone-500">
+                <i class="bi bi-clipboard-check display-6 mb-3 d-block"></i>
+                <p class="mb-0">No assessments assigned yet.</p>
+                <p class="small mt-2 mb-0">Assign psychometric assessments to track patient progress.</p>
+            </div>
+        @else
+            <div class="d-flex flex-column gap-2">
+                @foreach($assessments->take(3) as $assessment)
+                    <div class="border border-stone-200 rounded p-3 hover-bg-stone-50">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h6 class="font-semibold text-stone-900 mb-0">{{ $assessment->scale->name ?? 'Assessment' }}</h6>
+                                    @if($assessment->status === 'completed')
+                                        <span class="badge bg-success">Completed</span>
+                                    @elseif($assessment->status === 'in_progress')
+                                        <span class="badge bg-warning">In Progress</span>
+                                    @else
+                                        <span class="badge bg-secondary">Pending</span>
+                                    @endif
+                                </div>
+                                <div class="small text-stone-500">
+                                    Assigned: {{ $assessment->assigned_at ? $assessment->assigned_at->format('M d, Y') : 'Recently' }}
+                                    @if($assessment->status === 'completed' && $assessment->total_score !== null)
+                                        | Score: {{ $assessment->total_score }}
+                                    @endif
+                                </div>
+                            </div>
+                            <a
+                                href="{{ route('patients.psychometric.show', [$patient, $assessment]) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                View
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+                @if($assessments->count() > 3)
+                    <div class="text-center mt-2">
+                        <a href="{{ route('patients.psychometric.index', $patient) }}" class="btn btn-sm btn-link">
+                            View all {{ $assessments->count() }} assessments
+                        </a>
+                    </div>
+                @endif
+            </div>
+        @endif
+    </x-card>
+
     <!-- Resources Section -->
     <x-card class="mt-4">
         <div class="d-flex align-items-center justify-content-between mb-3">

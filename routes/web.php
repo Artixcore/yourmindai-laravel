@@ -107,25 +107,25 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
 
 // Doctor profile and papers routes
 Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
-    Route::get('/doctors/{doctor?}/settings', [DoctorProfileController::class, 'edit'])
+    Route::get('doctors/{doctor?}/settings', [DoctorProfileController::class, 'edit'])
         ->name('doctors.settings');
-    Route::put('/doctors/{doctor?}/settings', [DoctorProfileController::class, 'update'])
+    Route::put('doctors/{doctor?}/settings', [DoctorProfileController::class, 'update'])
         ->name('doctors.settings.update');
     
     // Doctor papers routes
-    Route::get('/doctors/{doctor?}/papers', [DoctorPaperController::class, 'index'])
+    Route::get('doctors/{doctor?}/papers', [DoctorPaperController::class, 'index'])
         ->name('doctors.papers.index');
-    Route::post('/doctors/papers', [DoctorPaperController::class, 'store'])
+    Route::post('doctors/papers', [DoctorPaperController::class, 'store'])
         ->name('doctors.papers.store');
-    Route::get('/doctors/papers/{paper}', [DoctorPaperController::class, 'show'])
+    Route::get('doctors/papers/{paper}', [DoctorPaperController::class, 'show'])
         ->name('doctors.papers.show');
-    Route::get('/doctors/papers/{paper}/edit', [DoctorPaperController::class, 'edit'])
+    Route::get('doctors/papers/{paper}/edit', [DoctorPaperController::class, 'edit'])
         ->name('doctors.papers.edit');
-    Route::put('/doctors/papers/{paper}', [DoctorPaperController::class, 'update'])
+    Route::put('doctors/papers/{paper}', [DoctorPaperController::class, 'update'])
         ->name('doctors.papers.update');
-    Route::delete('/doctors/papers/{paper}', [DoctorPaperController::class, 'destroy'])
+    Route::delete('doctors/papers/{paper}', [DoctorPaperController::class, 'destroy'])
         ->name('doctors.papers.destroy');
-    Route::get('/doctors/papers/{paper}/download', [DoctorPaperController::class, 'download'])
+    Route::get('doctors/papers/{paper}/download', [DoctorPaperController::class, 'download'])
         ->name('doctors.papers.download');
     
     // Patient management routes
@@ -155,17 +155,17 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('patients.resources.download');
     
     // Doctor appointments
-    Route::get('/doctors/appointments', [DoctorAppointmentController::class, 'index'])
+    Route::get('doctors/appointments', [DoctorAppointmentController::class, 'index'])
         ->name('doctors.appointments.index');
     
     // Doctor messages
-    Route::get('/doctors/messages', [DoctorMessageController::class, 'index'])
+    Route::get('doctors/messages', [DoctorMessageController::class, 'index'])
         ->name('doctors.messages.index');
     
     // Doctor Appointment Requests (requests assigned to them)
-    Route::get('/doctors/appointment-requests', [\App\Http\Controllers\AppointmentRequestController::class, 'index'])
+    Route::get('doctors/appointment-requests', [\App\Http\Controllers\AppointmentRequestController::class, 'index'])
         ->name('doctors.appointment-requests.index');
-    Route::get('/doctors/appointment-requests/{appointmentRequest}', [\App\Http\Controllers\AppointmentRequestController::class, 'show'])
+    Route::get('doctors/appointment-requests/{appointmentRequest}', [\App\Http\Controllers\AppointmentRequestController::class, 'show'])
         ->name('doctors.appointment-requests.show');
     
     // Psychometric Scales Management
@@ -198,6 +198,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     // Patient Oversight
     Route::get('patients', [AdminPatientController::class, 'index'])->name('patients.index');
     Route::get('patients/{patient}', [AdminPatientController::class, 'show'])->name('patients.show');
+    
+    // Psychometric Assessments (Admin)
+    Route::get('patients/{patient}/psychometric-assessments', [\App\Http\Controllers\PsychometricAssessmentController::class, 'index'])
+        ->name('patients.psychometric.index');
+    Route::post('patients/{patient}/psychometric-assessments', [\App\Http\Controllers\PsychometricAssessmentController::class, 'assign'])
+        ->name('patients.psychometric.assign');
+    Route::get('patients/{patient}/psychometric-assessments/{assessment}', [\App\Http\Controllers\PsychometricAssessmentController::class, 'show'])
+        ->name('patients.psychometric.show');
     
     // Sessions Explorer
     Route::get('sessions', [AdminSessionController::class, 'index'])->name('sessions.index');

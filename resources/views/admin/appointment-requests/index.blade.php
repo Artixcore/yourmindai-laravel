@@ -7,18 +7,24 @@
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
         <x-breadcrumb :items="[
-            ['label' => 'Home', 'url' => route('admin.dashboard')],
+            ['label' => 'Home', 'url' => ($isAdmin ?? true) ? route('admin.dashboard') : route('dashboard')],
             ['label' => 'Appointment Requests']
         ]" />
         <h1 class="h3 mb-1 fw-semibold">Appointment Requests</h1>
-        <p class="text-muted mb-0">Manage public appointment booking requests</p>
+        <p class="text-muted mb-0">
+            @if($isAdmin ?? true)
+                Manage public appointment booking requests
+            @else
+                View appointment requests assigned to you
+            @endif
+        </p>
     </div>
 </div>
 
 <!-- Filters -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body p-4">
-        <form method="GET" action="{{ route('admin.appointment-requests.index') }}" class="row g-3">
+        <form method="GET" action="{{ ($isAdmin ?? true) ? route('admin.appointment-requests.index') : route('doctors.appointment-requests.index') }}" class="row g-3">
             <div class="col-12 col-md-3">
                 <label class="form-label small text-muted">Search</label>
                 <input type="text" name="search" value="{{ request('search') }}" 
@@ -99,7 +105,7 @@
                         </td>
                         <td>{{ $request->created_at->format('M d, Y') }}</td>
                         <td class="text-end pe-4">
-                            <a href="{{ route('admin.appointment-requests.show', $request) }}" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ ($isAdmin ?? true) ? route('admin.appointment-requests.show', $request) : route('doctors.appointment-requests.show', $request) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-eye"></i> View
                             </a>
                         </td>

@@ -6,9 +6,9 @@
 <!-- Page Header -->
 <div class="mb-4">
     <x-breadcrumb :items="[
-        ['label' => 'Home', 'url' => route('admin.dashboard')],
-        ['label' => 'Appointment Requests', 'url' => route('admin.appointment-requests.index')],
-        ['label' => 'Request #' . $appointmentRequest->id, 'url' => route('admin.appointment-requests.show', $appointmentRequest)],
+        ['label' => 'Home', 'url' => (auth()->user()->role === 'admin') ? route('admin.dashboard') : route('dashboard')],
+        ['label' => 'Appointment Requests', 'url' => (auth()->user()->role === 'admin') ? route('admin.appointment-requests.index') : route('doctors.appointment-requests.index')],
+        ['label' => 'Request #' . $appointmentRequest->id, 'url' => (auth()->user()->role === 'admin') ? route('admin.appointment-requests.show', $appointmentRequest) : route('doctors.appointment-requests.show', $appointmentRequest)],
         ['label' => 'Create Patient']
     ]" />
     <h1 class="h3 mb-1 fw-semibold">Create Patient from Request</h1>
@@ -38,7 +38,7 @@
         <h5 class="mb-0 fw-semibold">Patient Information</h5>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('admin.appointment-requests.store-patient', $appointmentRequest) }}">
+        <form method="POST" action="{{ (auth()->user()->role === 'admin') ? route('admin.appointment-requests.store-patient', $appointmentRequest) : route('doctors.appointment-requests.store-patient', $appointmentRequest) }}">
             @csrf
             
             <!-- Pre-filled Information Display -->
@@ -97,7 +97,7 @@
             </div>
             
             <div class="d-flex justify-content-end gap-2">
-                <a href="{{ route('admin.appointment-requests.show', $appointmentRequest) }}" class="btn btn-outline-secondary">Cancel</a>
+                <a href="{{ (auth()->user()->role === 'admin') ? route('admin.appointment-requests.show', $appointmentRequest) : route('doctors.appointment-requests.show', $appointmentRequest) }}" class="btn btn-outline-secondary">Cancel</a>
                 <button type="submit" class="btn btn-primary">Create Patient</button>
             </div>
         </form>

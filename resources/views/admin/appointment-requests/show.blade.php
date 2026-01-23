@@ -7,8 +7,8 @@
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
         <x-breadcrumb :items="[
-            ['label' => 'Home', 'url' => route('admin.dashboard')],
-            ['label' => 'Appointment Requests', 'url' => route('admin.appointment-requests.index')],
+            ['label' => 'Home', 'url' => ($isAdmin ?? true) ? route('admin.dashboard') : route('dashboard')],
+            ['label' => 'Appointment Requests', 'url' => ($isAdmin ?? true) ? route('admin.appointment-requests.index') : route('doctors.appointment-requests.index')],
             ['label' => 'Details']
         ]" />
         <h1 class="h3 mb-1 fw-semibold">Appointment Request Details</h1>
@@ -125,8 +125,8 @@
                 <h5 class="mb-0 fw-semibold">Actions</h5>
             </div>
             <div class="card-body">
-                @if($appointmentRequest->isPending())
-                <form method="POST" action="{{ route('admin.appointment-requests.approve', $appointmentRequest) }}" class="mb-3">
+                @if(($isAdmin ?? true) && $appointmentRequest->isPending())
+                <form method="POST" action="{{ ($isAdmin ?? true) ? route('admin.appointment-requests.approve', $appointmentRequest) : route('doctors.appointment-requests.approve', $appointmentRequest) }}" class="mb-3">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label small">Assign Doctor (Optional)</label>
@@ -145,7 +145,7 @@
                     </button>
                 </form>
                 
-                <form method="POST" action="{{ route('admin.appointment-requests.reject', $appointmentRequest) }}" class="mb-3">
+                <form method="POST" action="{{ ($isAdmin ?? true) ? route('admin.appointment-requests.reject', $appointmentRequest) : route('doctors.appointment-requests.reject', $appointmentRequest) }}" class="mb-3">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label small">Rejection Reason (Optional)</label>
@@ -157,8 +157,8 @@
                 </form>
                 @endif
                 
-                @if($appointmentRequest->isPending() || $appointmentRequest->isApproved())
-                <a href="{{ route('admin.appointment-requests.create-patient', $appointmentRequest) }}" class="btn btn-primary w-100">
+                @if(($isAdmin ?? true) && ($appointmentRequest->isPending() || $appointmentRequest->isApproved()))
+                <a href="{{ ($isAdmin ?? true) ? route('admin.appointment-requests.create-patient', $appointmentRequest) : route('doctors.appointment-requests.create-patient', $appointmentRequest) }}" class="btn btn-primary w-100">
                     <i class="bi bi-person-plus me-2"></i>Create Patient
                 </a>
                 @endif
@@ -188,7 +188,7 @@
 </div>
 
 <div class="mt-4">
-    <a href="{{ route('admin.appointment-requests.index') }}" class="btn btn-outline-secondary">
+    <a href="{{ ($isAdmin ?? true) ? route('admin.appointment-requests.index') : route('doctors.appointment-requests.index') }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-2"></i>Back to Requests
     </a>
 </div>

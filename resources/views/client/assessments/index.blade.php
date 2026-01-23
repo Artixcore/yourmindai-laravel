@@ -24,7 +24,7 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6 class="fw-bold mb-1">{{ $assessment->scale->name ?? 'Assessment' }}</h6>
-                        @if($assessment->scale->description)
+                        @if($assessment->scale && $assessment->scale->description)
                         <p class="small text-muted mb-2">{{ Str::limit($assessment->scale->description, 100) }}</p>
                         @endif
                         <div class="small text-muted">

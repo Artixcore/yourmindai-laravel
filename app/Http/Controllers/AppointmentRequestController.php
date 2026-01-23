@@ -10,6 +10,7 @@ use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AppointmentRequestController extends Controller
@@ -31,7 +32,7 @@ class AppointmentRequestController extends Controller
         ]);
 
         try {
-            AppointmentRequest::create([
+            $appointmentRequest = AppointmentRequest::create([
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'email' => $validated['email'],
@@ -43,8 +44,26 @@ class AppointmentRequestController extends Controller
                 'status' => 'pending',
             ]);
 
+            Log::info('Appointment request created', [
+                'id' => $appointmentRequest->id,
+                'email' => $appointmentRequest->email,
+                'name' => $appointmentRequest->first_name . ' ' . $appointmentRequest->last_name,
+            ]);
+
             return back()->with('success', 'Your appointment request has been submitted successfully! We will contact you soon to confirm your appointment.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database error creating appointment request', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to submit appointment request due to a database error. Please try again or contact support.']);
         } catch (\Exception $e) {
+            Log::error('Error creating appointment request', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return back()
                 ->withInput()
                 ->withErrors(['error' => 'Failed to submit appointment request. Please try again.']);
@@ -52,13 +71,19 @@ class AppointmentRequestController extends Controller
     }
 
     /**
-     * Display a listing of appointment requests (admin only).
+     * Display a listing of appointment requests (admin and doctor).
      */
     public function index(Request $request)
     {
         $this->authorize('viewAny', AppointmentRequest::class);
 
+        $user = auth()->user();
         $query = AppointmentRequest::with(['doctor', 'patient', 'patientProfile']);
+
+        // If doctor, only show requests assigned to them
+        if ($user->role === 'doctor') {
+            $query->where('doctor_id', $user->id);
+        }
 
         // Filter by status
         if ($request->filled('status')) {
@@ -88,11 +113,14 @@ class AppointmentRequestController extends Controller
         $appointmentRequests = $query->orderBy('created_at', 'desc')->paginate(20);
         $doctors = User::where('role', 'doctor')->where('status', 'active')->get();
 
-        return view('admin.appointment-requests.index', compact('appointmentRequests', 'doctors'));
+        // Determine if we're in admin or doctor context
+        $isAdmin = $user->role === 'admin';
+
+        return view('admin.appointment-requests.index', compact('appointmentRequests', 'doctors', 'isAdmin'));
     }
 
     /**
-     * Display the specified appointment request (admin only).
+     * Display the specified appointment request (admin and doctor).
      */
     public function show(AppointmentRequest $appointmentRequest)
     {
@@ -101,7 +129,12 @@ class AppointmentRequestController extends Controller
         $appointmentRequest->load(['doctor', 'patient', 'patientProfile']);
         $doctors = User::where('role', 'doctor')->where('status', 'active')->get();
 
-        return view('admin.appointment-requests.show', compact('appointmentRequest', 'doctors'));
+        // Determine if we're in admin or doctor context
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
+        
+        // Use admin view for both admin and doctor (they can share the same view)
+        return view('admin.appointment-requests.show', compact('appointmentRequest', 'doctors', 'isAdmin'));
     }
 
     /**

@@ -162,6 +162,12 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::get('/doctors/messages', [DoctorMessageController::class, 'index'])
         ->name('doctors.messages.index');
     
+    // Doctor Appointment Requests (requests assigned to them)
+    Route::get('/doctors/appointment-requests', [\App\Http\Controllers\AppointmentRequestController::class, 'index'])
+        ->name('doctors.appointment-requests.index');
+    Route::get('/doctors/appointment-requests/{appointmentRequest}', [\App\Http\Controllers\AppointmentRequestController::class, 'show'])
+        ->name('doctors.appointment-requests.show');
+    
     // Psychometric Scales Management
     Route::resource('psychometric-scales', PsychometricScaleController::class);
     Route::post('patients/{patient}/psychometric-assessments', [PsychometricAssessmentController::class, 'assign'])

@@ -12,7 +12,7 @@ class AppointmentRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'admin';
+        return in_array($user->role, ['admin', 'doctor']);
     }
 
     /**
@@ -20,7 +20,17 @@ class AppointmentRequestPolicy
      */
     public function view(User $user, AppointmentRequest $appointmentRequest): bool
     {
-        return $user->role === 'admin';
+        // Admin can view all requests
+        if ($user->role === 'admin') {
+            return true;
+        }
+        
+        // Doctor can view requests assigned to them
+        if ($user->role === 'doctor') {
+            return $appointmentRequest->doctor_id === $user->id;
+        }
+        
+        return false;
     }
 
     /**
@@ -37,6 +47,7 @@ class AppointmentRequestPolicy
      */
     public function update(User $user, AppointmentRequest $appointmentRequest): bool
     {
+        // Only admin can update (approve/reject/create patient)
         return $user->role === 'admin';
     }
 

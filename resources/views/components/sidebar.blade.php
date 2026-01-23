@@ -61,6 +61,14 @@
                     <i class="bi bi-chat-dots flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Contact Inbox</span>
                 </a>
+                <a href="{{ route('admin.appointment-requests.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.appointment-requests.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-calendar-plus flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Appointment Requests</span>
+                </a>
+                <a href="{{ route('psychometric-scales.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('psychometric-scales.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-clipboard-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Psychometric Scales</span>
+                </a>
             @endif
             
             @if(in_array($role, ['admin', 'doctor']))
@@ -75,6 +83,14 @@
             @endif
             
             @if($role === 'doctor')
+                <a href="{{ route('doctors.appointment-requests.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.appointment-requests.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-calendar-plus flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Appointment Requests</span>
+                </a>
+                <a href="{{ route('psychometric-scales.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('psychometric-scales.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-clipboard-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Assessment Scales</span>
+                </a>
                 <a href="{{ route('doctors.settings') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.settings*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-gear flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Settings</span>

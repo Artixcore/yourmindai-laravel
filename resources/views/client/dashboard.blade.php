@@ -65,7 +65,6 @@
 @endif
 
 <!-- Pending Assessments -->
-@if($pendingAssessments->isNotEmpty())
 <div class="card mb-3">
     <div class="card-header bg-white border-0">
         <h6 class="mb-0 fw-semibold">
@@ -74,25 +73,35 @@
         </h6>
     </div>
     <div class="card-body">
-        @foreach($pendingAssessments as $assessment)
-        <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
-            <div>
-                <h6 class="mb-1 fw-semibold">{{ $assessment->scale->name ?? 'Assessment' }}</h6>
-                <small class="text-muted">
-                    Assigned: {{ $assessment->assigned_at ? $assessment->assigned_at->format('M d, Y') : 'Recently' }}
-                </small>
+        @if($pendingAssessments->isNotEmpty())
+            @foreach($pendingAssessments as $assessment)
+            <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                <div>
+                    <h6 class="mb-1 fw-semibold">{{ $assessment->scale->name ?? 'Assessment' }}</h6>
+                    <small class="text-muted">
+                        Assigned: {{ $assessment->assigned_at ? $assessment->assigned_at->format('M d, Y') : 'Recently' }}
+                    </small>
+                </div>
+                <a href="{{ route('client.assessments.show', $assessment->id) }}" class="btn btn-sm btn-warning">
+                    Complete
+                </a>
             </div>
-            <a href="{{ route('client.assessments.show', $assessment->id) }}" class="btn btn-sm btn-warning">
-                Complete
+            @endforeach
+            <a href="{{ route('client.assessments.index') }}" class="btn btn-sm btn-outline-primary w-100">
+                View All Assessments
             </a>
-        </div>
-        @endforeach
-        <a href="{{ route('client.assessments.index') }}" class="btn btn-sm btn-outline-primary w-100">
-            View All Assessments
-        </a>
+        @else
+            <div class="text-center py-3">
+                <i class="bi bi-clipboard-check text-muted" style="font-size: 2rem;"></i>
+                <p class="text-muted mb-2 mt-2">No pending assessments</p>
+                <p class="text-muted small mb-0">Your healthcare provider will assign assessments when needed.</p>
+            </div>
+            <a href="{{ route('client.assessments.index') }}" class="btn btn-sm btn-outline-primary w-100 mt-2">
+                View All Assessments
+            </a>
+        @endif
     </div>
 </div>
-@endif
 
 <!-- Active Devices -->
 @if($devices->isNotEmpty())
@@ -128,7 +137,6 @@
 @endif
 
 <!-- Active Contingency Plans -->
-@if($contingencyPlans->isNotEmpty())
 <div class="card mb-3">
     <div class="card-header bg-white border-0">
         <h6 class="mb-0 fw-semibold">
@@ -137,25 +145,35 @@
         </h6>
     </div>
     <div class="card-body">
-        @foreach($contingencyPlans as $plan)
-        <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
-            <div>
-                <h6 class="mb-1 fw-semibold">{{ $plan->title }}</h6>
-                <small class="text-muted">
-                    Created: {{ $plan->created_at->format('M d, Y') }}
-                </small>
+        @if($contingencyPlans->isNotEmpty())
+            @foreach($contingencyPlans as $plan)
+            <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                <div>
+                    <h6 class="mb-1 fw-semibold">{{ $plan->title }}</h6>
+                    <small class="text-muted">
+                        Created: {{ $plan->created_at->format('M d, Y') }}
+                    </small>
+                </div>
+                <a href="{{ route('client.contingency.show', $plan->id) }}" class="btn btn-sm btn-outline-danger">
+                    View
+                </a>
             </div>
-            <a href="{{ route('client.contingency.show', $plan->id) }}" class="btn btn-sm btn-outline-danger">
-                View
+            @endforeach
+            <a href="{{ route('client.contingency.index') }}" class="btn btn-sm btn-outline-primary w-100">
+                View All Plans
             </a>
-        </div>
-        @endforeach
-        <a href="{{ route('client.contingency.index') }}" class="btn btn-sm btn-outline-primary w-100">
-            View All Plans
-        </a>
+        @else
+            <div class="text-center py-3">
+                <i class="bi bi-shield-exclamation text-muted" style="font-size: 2rem;"></i>
+                <p class="text-muted mb-2 mt-2">No emergency plans available</p>
+                <p class="text-muted small mb-0">Your healthcare provider will create plans for you when needed.</p>
+            </div>
+            <a href="{{ route('client.contingency.index') }}" class="btn btn-sm btn-outline-primary w-100 mt-2">
+                View All Plans
+            </a>
+        @endif
     </div>
 </div>
-@endif
 
 <!-- Quick Actions -->
 <div class="card">

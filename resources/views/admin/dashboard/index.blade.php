@@ -80,6 +80,22 @@
             </div>
         </div>
     </div>
+    
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted small mb-1">Pending Requests</p>
+                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\AppointmentRequest::where('status', 'pending')->count() }}</h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 rounded-3 p-3 stat-icon">
+                        <i class="bi bi-calendar-plus text-info fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Quick Actions & Recent Activity -->
@@ -93,6 +109,12 @@
                 <div class="d-grid gap-2">
                     <a href="{{ route('admin.staff.create') }}" class="btn btn-primary">
                         <i class="bi bi-person-plus me-2"></i>Add New Staff Member
+                    </a>
+                    <a href="{{ route('admin.appointment-requests.index') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-calendar-plus me-2"></i>View Appointment Requests
+                    </a>
+                    <a href="{{ route('psychometric-scales.index') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-clipboard-check me-2"></i>Manage Psychometric Scales
                     </a>
                     <a href="{{ route('admin.ai-reports.index') }}" class="btn btn-outline-primary">
                         <i class="bi bi-file-earmark-text me-2"></i>Generate AI Report

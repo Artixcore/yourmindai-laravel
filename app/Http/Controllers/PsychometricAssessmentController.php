@@ -59,7 +59,12 @@ class PsychometricAssessmentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('doctor.patients.psychometric.index', compact('patient', 'patientProfile', 'assessments'));
+        // Get available active scales for assignment
+        $availableScales = PsychometricScale::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('doctor.patients.psychometric.index', compact('patient', 'patientProfile', 'assessments', 'availableScales'));
     }
 
     /**

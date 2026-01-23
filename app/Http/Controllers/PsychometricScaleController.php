@@ -37,15 +37,23 @@ class PsychometricScaleController extends Controller
             'description' => 'nullable|string',
             'category' => 'nullable|string|max:100',
             'questions' => 'required|array|min:1',
-            'questions.*.id' => 'required',
             'questions.*.text' => 'required|string',
             'questions.*.type' => 'required|in:likert,scale,multiple_choice,text,textarea,number',
-            'scoring_rules' => 'required|array',
+            'scoring_rules' => 'nullable|array',
             'interpretation_rules' => 'required|array|min:1',
+            'interpretation_rules.*.min' => 'required|numeric',
+            'interpretation_rules.*.max' => 'required|numeric',
+            'interpretation_rules.*.interpretation' => 'required|string',
         ]);
 
-        // Process questions - handle options_text for multiple_choice
+        // Process questions - handle options_text for multiple_choice and auto-generate IDs
         $questions = collect($request->questions)->map(function($question, $index) {
+            // Auto-generate ID if not provided
+            if (!isset($question['id'])) {
+                $question['id'] = $index;
+            }
+            
+            // Handle options_text for multiple_choice
             if (isset($question['options_text']) && !empty($question['options_text'])) {
                 $options = array_filter(array_map('trim', explode("\n", $question['options_text'])));
                 $question['options'] = array_map(function($opt, $idx) {
@@ -56,13 +64,28 @@ class PsychometricScaleController extends Controller
             return $question;
         })->toArray();
 
+        // Process scoring rules - set default if not provided
+        $scoringRules = $request->scoring_rules ?? [];
+        if (empty($scoringRules) || !isset($scoringRules['type'])) {
+            $scoringRules = ['type' => 'sum'];
+        }
+
+        // Process interpretation rules
+        $interpretationRules = collect($request->interpretation_rules)->map(function($rule) {
+            return [
+                'min' => (int) $rule['min'],
+                'max' => (int) $rule['max'],
+                'interpretation' => $rule['interpretation'],
+            ];
+        })->toArray();
+
         $scale = PsychometricScale::create([
             'name' => $request->name,
             'description' => $request->description,
             'category' => $request->category,
             'questions' => $questions,
-            'scoring_rules' => $request->scoring_rules,
-            'interpretation_rules' => $request->interpretation_rules,
+            'scoring_rules' => $scoringRules,
+            'interpretation_rules' => $interpretationRules,
             'is_active' => $request->boolean('is_active', true),
             'created_by_doctor_id' => auth()->id(),
         ]);
@@ -98,15 +121,23 @@ class PsychometricScaleController extends Controller
             'description' => 'nullable|string',
             'category' => 'nullable|string|max:100',
             'questions' => 'required|array|min:1',
-            'questions.*.id' => 'required',
             'questions.*.text' => 'required|string',
             'questions.*.type' => 'required|in:likert,scale,multiple_choice,text,textarea,number',
-            'scoring_rules' => 'required|array',
+            'scoring_rules' => 'nullable|array',
             'interpretation_rules' => 'required|array|min:1',
+            'interpretation_rules.*.min' => 'required|numeric',
+            'interpretation_rules.*.max' => 'required|numeric',
+            'interpretation_rules.*.interpretation' => 'required|string',
         ]);
 
-        // Process questions - handle options_text for multiple_choice
+        // Process questions - handle options_text for multiple_choice and auto-generate IDs
         $questions = collect($request->questions)->map(function($question, $index) {
+            // Auto-generate ID if not provided
+            if (!isset($question['id'])) {
+                $question['id'] = $index;
+            }
+            
+            // Handle options_text for multiple_choice
             if (isset($question['options_text']) && !empty($question['options_text'])) {
                 $options = array_filter(array_map('trim', explode("\n", $question['options_text'])));
                 $question['options'] = array_map(function($opt, $idx) {
@@ -117,13 +148,28 @@ class PsychometricScaleController extends Controller
             return $question;
         })->toArray();
 
+        // Process scoring rules - set default if not provided
+        $scoringRules = $request->scoring_rules ?? [];
+        if (empty($scoringRules) || !isset($scoringRules['type'])) {
+            $scoringRules = ['type' => 'sum'];
+        }
+
+        // Process interpretation rules
+        $interpretationRules = collect($request->interpretation_rules)->map(function($rule) {
+            return [
+                'min' => (int) $rule['min'],
+                'max' => (int) $rule['max'],
+                'interpretation' => $rule['interpretation'],
+            ];
+        })->toArray();
+
         $psychometricScale->update([
             'name' => $request->name,
             'description' => $request->description,
             'category' => $request->category,
             'questions' => $questions,
-            'scoring_rules' => $request->scoring_rules,
-            'interpretation_rules' => $request->interpretation_rules,
+            'scoring_rules' => $scoringRules,
+            'interpretation_rules' => $interpretationRules,
             'is_active' => $request->boolean('is_active', true),
         ]);
 

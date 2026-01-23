@@ -119,133 +119,150 @@
 
 @push('scripts')
 <script>
-(function() {
-    'use strict';
-    
-    let questionCount = 0;
-    let interpretationRuleCount = 1;
-    
-    function addQuestion() {
-        try {
-            const container = document.getElementById('questionsContainer');
-            if (!container) return;
-            
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'question-item mb-3 p-3 border rounded';
-            questionDiv.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <strong>Question ${questionCount + 1}</strong>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.question-item').remove()">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Question Text <span class="text-danger">*</span></label>
-                    <textarea class="form-control" name="questions[${questionCount}][text]" rows="2" required placeholder="Enter question text"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Question Type <span class="text-danger">*</span></label>
-                    <select class="form-select" name="questions[${questionCount}][type]" required onchange="updateQuestionOptions(this, ${questionCount})">
-                        <option value="likert">Likert Scale</option>
-                        <option value="scale">Numeric Scale</option>
-                        <option value="multiple_choice">Multiple Choice</option>
-                        <option value="text">Text Input</option>
-                        <option value="textarea">Text Area</option>
-                        <option value="number">Number Input</option>
-                    </select>
-                </div>
-                <div class="question-options-${questionCount}">
-                    <!-- Options will be added here based on type -->
-                </div>
-                <input type="hidden" name="questions[${questionCount}][id]" value="${questionCount}">
-            `;
-            container.appendChild(questionDiv);
-            questionCount++;
-        } catch (e) {
-            // Silently fail
+'use strict';
+
+// Initialize counters
+let questionCount = 0;
+let interpretationRuleCount = 1;
+
+// Make functions globally accessible immediately
+window.addQuestion = function() {
+    try {
+        const container = document.getElementById('questionsContainer');
+        if (!container) {
+            console.error('Questions container not found');
+            return;
         }
+        
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item mb-3 p-3 border rounded';
+        questionDiv.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <strong>Question ${questionCount + 1}</strong>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.question-item').remove()">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Question Text <span class="text-danger">*</span></label>
+                <textarea class="form-control" name="questions[${questionCount}][text]" rows="2" required placeholder="Enter question text"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Question Type <span class="text-danger">*</span></label>
+                <select class="form-select" name="questions[${questionCount}][type]" required onchange="updateQuestionOptions(this, ${questionCount})">
+                    <option value="likert">Likert Scale</option>
+                    <option value="scale">Numeric Scale</option>
+                    <option value="multiple_choice">Multiple Choice</option>
+                    <option value="text">Text Input</option>
+                    <option value="textarea">Text Area</option>
+                    <option value="number">Number Input</option>
+                </select>
+            </div>
+            <div class="question-options-${questionCount}">
+                <!-- Options will be added here based on type -->
+            </div>
+            <input type="hidden" name="questions[${questionCount}][id]" value="${questionCount}">
+        `;
+        container.appendChild(questionDiv);
+        questionCount++;
+    } catch (e) {
+        console.error('Error adding question:', e);
     }
-    
-    function updateQuestionOptions(select, index) {
-        try {
-            if (!select) return;
-            
-            const type = select.value;
-            const optionsContainer = document.querySelector(`.question-options-${index}`);
-            if (!optionsContainer) return;
-            
-            if (type === 'likert' || type === 'scale') {
-                optionsContainer.innerHTML = `
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="form-label">Min Value</label>
-                            <input type="number" class="form-control" name="questions[${index}][min]" value="0">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Max Value</label>
-                            <input type="number" class="form-control" name="questions[${index}][max]" value="10">
-                        </div>
-                    </div>
-                `;
-            } else if (type === 'multiple_choice') {
-                optionsContainer.innerHTML = `
-                    <label class="form-label">Options (one per line)</label>
-                    <textarea class="form-control" name="questions[${index}][options_text]" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
-                `;
-            } else {
-                optionsContainer.innerHTML = '';
-            }
-        } catch (e) {
-            // Silently fail
-        }
-    }
-    
-    function addInterpretationRule() {
-        try {
-            const container = document.getElementById('interpretationRulesContainer');
-            if (!container) return;
-            
-            const ruleDiv = document.createElement('div');
-            ruleDiv.className = 'interpretation-rule-item mb-3 p-3 border rounded';
-            ruleDiv.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <strong>Rule ${interpretationRuleCount + 1}</strong>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.interpretation-rule-item').remove()">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
+};
+
+window.updateQuestionOptions = function(select, index) {
+    try {
+        if (!select) return;
+        
+        const type = select.value;
+        const optionsContainer = document.querySelector(`.question-options-${index}`);
+        if (!optionsContainer) return;
+        
+        if (type === 'likert' || type === 'scale') {
+            optionsContainer.innerHTML = `
                 <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <label class="form-label">Min Score</label>
-                        <input type="number" class="form-control" name="interpretation_rules[${interpretationRuleCount}][min]" required>
+                    <div class="col-6">
+                        <label class="form-label">Min Value</label>
+                        <input type="number" class="form-control" name="questions[${index}][min]" value="0">
                     </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label">Max Score</label>
-                        <input type="number" class="form-control" name="interpretation_rules[${interpretationRuleCount}][max]" required>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label">Interpretation</label>
-                        <input type="text" class="form-control" name="interpretation_rules[${interpretationRuleCount}][interpretation]" required>
+                    <div class="col-6">
+                        <label class="form-label">Max Value</label>
+                        <input type="number" class="form-control" name="questions[${index}][max]" value="10">
                     </div>
                 </div>
             `;
-            container.appendChild(ruleDiv);
-            interpretationRuleCount++;
-        } catch (e) {
-            // Silently fail
+        } else if (type === 'multiple_choice') {
+            optionsContainer.innerHTML = `
+                <label class="form-label">Options (one per line)</label>
+                <textarea class="form-control" name="questions[${index}][options_text]" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+            `;
+        } else {
+            optionsContainer.innerHTML = '';
         }
+    } catch (e) {
+        console.error('Error updating question options:', e);
+    }
+};
+
+window.addInterpretationRule = function() {
+    try {
+        const container = document.getElementById('interpretationRulesContainer');
+        if (!container) {
+            console.error('Interpretation rules container not found');
+            return;
+        }
+        
+        const ruleDiv = document.createElement('div');
+        ruleDiv.className = 'interpretation-rule-item mb-3 p-3 border rounded';
+        ruleDiv.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <strong>Rule ${interpretationRuleCount + 1}</strong>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.interpretation-rule-item').remove()">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Min Score</label>
+                    <input type="number" class="form-control" name="interpretation_rules[${interpretationRuleCount}][min]" required>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Max Score</label>
+                    <input type="number" class="form-control" name="interpretation_rules[${interpretationRuleCount}][max]" required>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Interpretation</label>
+                    <input type="text" class="form-control" name="interpretation_rules[${interpretationRuleCount}][interpretation]" required>
+                </div>
+            </div>
+        `;
+        container.appendChild(ruleDiv);
+        interpretationRuleCount++;
+    } catch (e) {
+        console.error('Error adding interpretation rule:', e);
+    }
+};
+
+// Initialize scoring rules on form submit
+document.addEventListener('DOMContentLoaded', function() {
+    // Add first question on page load
+    if (typeof window.addQuestion === 'function') {
+        window.addQuestion();
     }
     
-    // Make functions globally accessible for inline handlers
-    window.addQuestion = addQuestion;
-    window.updateQuestionOptions = updateQuestionOptions;
-    window.addInterpretationRule = addInterpretationRule;
-    
-    // Add first question on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        addQuestion();
-    });
-})();
+    // Ensure scoring rules are set before form submission
+    const form = document.getElementById('scaleForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const scoringType = document.getElementById('scoringType');
+            // Just ensure the select has a value - no need to create hidden input
+            // The select element already has name="scoring_rules[type]" and will submit correctly
+            if (scoringType && !scoringType.value) {
+                scoringType.value = 'sum';
+            }
+        });
+    }
+});
 </script>
 @endpush
 @endsection

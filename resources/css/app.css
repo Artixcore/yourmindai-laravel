@@ -2,18 +2,64 @@
 
 :root {
     /* Bootstrap Variable Overrides */
-    --bs-primary: #0f766e; /* Deep teal */
-    --bs-primary-rgb: 15, 118, 110;
+    --bs-primary: #0d9488; /* Soft teal */
+    --bs-primary-rgb: 13, 148, 136;
     --bs-secondary: #1e40af; /* Indigo */
     --bs-secondary-rgb: 30, 64, 175;
     --bs-success: #10b981; /* Emerald */
     --bs-success-rgb: 16, 185, 129;
-    --bs-info: #3b82f6; /* Indigo light */
-    --bs-info-rgb: 59, 130, 246;
+    --bs-info: #60a5fa; /* Soft blue */
+    --bs-info-rgb: 96, 165, 250;
     --bs-warning: #f59e0b;
     --bs-warning-rgb: 245, 158, 11;
     --bs-danger: #ef4444;
     --bs-danger-rgb: 239, 68, 68;
+    
+    /* Psychological Color Palette - Teal/Cyan */
+    --color-teal-50: #f0fdfa;
+    --color-teal-100: #ccfbf1;
+    --color-teal-200: #99f6e4;
+    --color-teal-300: #5eead4;
+    --color-teal-400: #2dd4bf;
+    --color-teal-500: #14b8a6;
+    --color-teal-600: #0d9488;
+    --color-teal-700: #0f766e;
+    --color-teal-800: #115e59;
+    --color-teal-900: #134e4a;
+    
+    /* Psychological Color Palette - Lavender/Purple */
+    --color-lavender-50: #faf5ff;
+    --color-lavender-100: #f3e8ff;
+    --color-lavender-200: #e9d5ff;
+    --color-lavender-300: #d8b4fe;
+    --color-lavender-400: #c4b5fd;
+    --color-lavender-500: #a78bfa;
+    --color-lavender-600: #9333ea;
+    --color-lavender-700: #7e22ce;
+    
+    /* Psychological Color Palette - Soft Blue */
+    --color-soft-blue-50: #eff6ff;
+    --color-soft-blue-100: #dbeafe;
+    --color-soft-blue-200: #bfdbfe;
+    --color-soft-blue-300: #93c5fd;
+    --color-soft-blue-400: #60a5fa;
+    --color-soft-blue-500: #3b82f6;
+    --color-soft-blue-600: #2563eb;
+    --color-soft-blue-700: #1d4ed8;
+    
+    /* Psychological Color Palette - Mint Green */
+    --color-mint-50: #f0fdf4;
+    --color-mint-100: #dcfce7;
+    --color-mint-200: #bbf7d0;
+    --color-mint-300: #86efac;
+    --color-mint-400: #6ee7b7;
+    --color-mint-500: #34d399;
+    --color-mint-600: #10b981;
+    --color-mint-700: #059669;
+    
+    /* Accent Colors */
+    --color-coral-400: #fb7185;
+    --color-coral-500: #f43f5e;
     
     /* Custom Colors */
     --color-primary-dark: #134e4a;
@@ -26,6 +72,14 @@
     --color-bg-gradient-start: #f8fafc;
     --color-bg-gradient-end: #f0fdfa;
     
+    /* Warm White */
+    --color-warm-white: #fefefe;
+    
+    /* Soft Gray */
+    --color-soft-gray-50: #f8fafc;
+    --color-soft-gray-100: #f1f5f9;
+    --color-soft-gray-200: #e2e8f0;
+    
     /* Font */
     --bs-font-sans-serif: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
@@ -36,11 +90,35 @@
 }
 
 .bg-teal-50 {
-    background-color: #f0fdfa !important;
+    background-color: var(--color-teal-50) !important;
 }
 
 .bg-teal-100 {
-    background-color: #ccfbf1 !important;
+    background-color: var(--color-teal-100) !important;
+}
+
+.bg-lavender-50 {
+    background-color: var(--color-lavender-50) !important;
+}
+
+.bg-lavender-100 {
+    background-color: var(--color-lavender-100) !important;
+}
+
+.bg-soft-blue-50 {
+    background-color: var(--color-soft-blue-50) !important;
+}
+
+.bg-soft-blue-100 {
+    background-color: var(--color-soft-blue-100) !important;
+}
+
+.bg-mint-50 {
+    background-color: var(--color-mint-50) !important;
+}
+
+.bg-mint-100 {
+    background-color: var(--color-mint-100) !important;
 }
 
 .bg-indigo-100 {
@@ -57,6 +135,10 @@
 
 .bg-red-100 {
     background-color: #fee2e2 !important;
+}
+
+.bg-warm-white {
+    background-color: var(--color-warm-white) !important;
 }
 
 /* Custom Text Colors */
@@ -164,13 +246,70 @@
     transition-duration: 150ms;
 }
 
+/* Form Input Focus States */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-teal-500);
+    box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.15);
+    outline: 0;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+    border-color: var(--color-coral-500);
+    box-shadow: 0 0 0 0.2rem rgba(251, 113, 133, 0.15);
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+    border-color: var(--color-mint-500);
+    box-shadow: 0 0 0 0.2rem rgba(110, 231, 183, 0.15);
+}
+
 /* Custom hover effects */
 .hover-bg-teal-50:hover {
-    background-color: #f0fdfa !important;
+    background-color: var(--color-teal-50) !important;
 }
 
 .hover-text-teal-700:hover {
-    color: #0f766e !important;
+    color: var(--color-teal-700) !important;
+}
+
+.hover-text-lavender-600:hover {
+    color: var(--color-lavender-600) !important;
+}
+
+.hover-text-mint-600:hover {
+    color: var(--color-mint-600) !important;
+}
+
+/* Button Gradient Styles */
+.btn-gradient-primary {
+    background: linear-gradient(135deg, var(--color-teal-600) 0%, var(--color-soft-blue-500) 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-primary:hover {
+    background: linear-gradient(135deg, var(--color-teal-700) 0%, var(--color-soft-blue-600) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    color: white;
+}
+
+.btn-gradient-outline {
+    background: transparent;
+    border: 2px solid var(--color-teal-600);
+    color: var(--color-teal-700);
+    transition: all 0.3s ease;
+}
+
+.btn-gradient-outline:hover {
+    background: linear-gradient(135deg, var(--color-teal-50) 0%, var(--color-soft-blue-50) 100%);
+    border-color: var(--color-teal-500);
+    color: var(--color-teal-800);
+    transform: translateY(-2px);
 }
 
 /* Custom spacing for sidebar */
@@ -197,6 +336,66 @@
 /* Gradient backgrounds */
 .bg-gradient-guest {
     background: linear-gradient(to bottom right, #f8fafc, #f0fdfa) !important;
+}
+
+/* Psychological Gradient Backgrounds */
+.bg-gradient-hero {
+    background: linear-gradient(135deg, 
+        var(--color-lavender-100) 0%, 
+        var(--color-teal-100) 50%, 
+        var(--color-mint-100) 100%) !important;
+}
+
+.bg-gradient-section-1 {
+    background: linear-gradient(to bottom, var(--color-warm-white) 0%, var(--color-lavender-50) 100%) !important;
+}
+
+.bg-gradient-section-2 {
+    background: linear-gradient(135deg, var(--color-teal-100) 0%, var(--color-mint-100) 100%) !important;
+}
+
+.bg-gradient-section-3 {
+    background: linear-gradient(to bottom, var(--color-teal-50) 0%, var(--color-soft-blue-50) 100%) !important;
+}
+
+.bg-gradient-footer {
+    background: linear-gradient(135deg, var(--color-teal-800) 0%, var(--color-teal-900) 100%) !important;
+}
+
+/* Card Psychological Styling */
+.card-psychological {
+    background: linear-gradient(to bottom, #ffffff 0%, var(--color-teal-50) 100%);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(13, 148, 136, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card-psychological:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(13, 148, 136, 0.15);
+    border-color: rgba(20, 184, 166, 0.4);
+}
+
+/* Soft Shadows */
+.shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+.shadow-soft-lg {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Psychological Text Colors */
+.text-psychological-primary {
+    color: var(--color-teal-700) !important;
+}
+
+.text-psychological-secondary {
+    color: var(--color-lavender-600) !important;
+}
+
+.text-psychological-accent {
+    color: var(--color-mint-600) !important;
 }
 
 /* Additional hover effects */
@@ -358,6 +557,64 @@
     animation-delay: 4s;
 }
 
+/* New Psychological Animations */
+@keyframes gentleFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-gentle-float {
+    animation: gentleFloat 6s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes pulseSoft {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+}
+
+.animate-pulse-soft {
+    animation: pulseSoft 3s ease-in-out infinite;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in-scale {
+    animation: fadeInScale 0.6s ease-out;
+}
+
 /* Mix blend mode */
 .mix-blend-multiply {
     mix-blend-mode: multiply;
@@ -384,6 +641,11 @@
 
 .gap-4 {
     gap: 1rem !important;
+}
+
+/* Text color utilities */
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Font weight */
@@ -437,6 +699,61 @@
     border-left: 1px solid var(--bs-border-color) !important;
 }
 
+/* Responsive Optimizations */
+@media (max-width: 768px) {
+    .bg-gradient-hero {
+        background: linear-gradient(135deg, 
+            var(--color-lavender-50) 0%, 
+            var(--color-teal-50) 50%, 
+            var(--color-mint-50) 100%) !important;
+    }
+    
+    .animate-blob {
+        width: 12rem !important;
+        height: 12rem !important;
+    }
+    
+    .card-psychological {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-gradient-primary,
+    .btn-gradient-outline {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .display-1 {
+        font-size: 2.5rem !important;
+    }
+    
+    .display-md-2 {
+        font-size: 3rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .bg-gradient-hero {
+        background: linear-gradient(135deg, 
+            var(--color-lavender-50) 0%, 
+            var(--color-teal-50) 100%) !important;
+    }
+    
+    .animate-blob {
+        width: 10rem !important;
+        height: 10rem !important;
+        opacity: 0.15 !important;
+    }
+    
+    .card-psychological {
+        padding: 1rem !important;
+    }
+    
+    .display-1 {
+        font-size: 2rem !important;
+    }
+}
+
 /* Position utilities */
 .start-0 {
     left: 0 !important;
@@ -446,9 +763,42 @@
     right: 0 !important;
 }
 
+.position-sticky {
+    position: sticky !important;
+}
+
+.top-0 {
+    top: 0 !important;
+}
+
 /* Transform utilities */
 .translate-x-50 {
     transform: translateX(-50%) !important;
+}
+
+/* Backdrop blur utilities */
+.backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Rounded corners */
+.rounded-4 {
+    border-radius: 1rem !important;
+}
+
+.rounded-5 {
+    border-radius: 1.5rem !important;
 }
 
 /* Padding utilities */

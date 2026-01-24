@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\GeneralAssessment;
 use App\Models\GeneralAssessmentQuestion;
 use App\Models\PatientProfile;
+use App\Models\User;
 
 class GeneralAssessmentController extends Controller
 {

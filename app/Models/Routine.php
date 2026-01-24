@@ -24,6 +24,7 @@ class Routine extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'custom_schedule' => 'array',
+        'start_time' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

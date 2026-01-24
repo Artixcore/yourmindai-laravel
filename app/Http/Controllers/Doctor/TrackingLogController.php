@@ -8,6 +8,7 @@ use App\Models\MoodLog;
 use App\Models\SleepLog;
 use App\Models\ExerciseLog;
 use App\Models\PatientProfile;
+use App\Models\User;
 use Carbon\Carbon;
 
 class TrackingLogController extends Controller

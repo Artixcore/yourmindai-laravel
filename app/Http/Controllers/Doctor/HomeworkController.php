@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\HomeworkAssignment;
 use App\Models\PatientProfile;
 use App\Models\Session;
+use App\Models\User;
 
 class HomeworkController extends Controller
 {

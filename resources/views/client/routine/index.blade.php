@@ -50,7 +50,7 @@
         <div class="card mb-3">
             <div class="card-header bg-white border-0">
                 <h6 class="mb-0 fw-semibold">
-                    <i class="bi bi-{{ $this->getTimeIcon($timeOfDay) }} me-2"></i>
+                    <i class="bi bi-{{ getTimeIcon($timeOfDay) }} me-2"></i>
                     {{ $label }}
                 </h6>
             </div>
@@ -77,7 +77,7 @@
                                 <div class="fw-semibold {{ $isCompleted ? 'text-decoration-line-through text-success' : '' }}">
                                     {{ $item->title }}
                                     @if($item->is_required)
-                                        <span class="badge bg-danger badge-sm ms-1">Required</span>
+                                        <span class="badge bg-danger ms-1">Required</span>
                                     @endif
                                 </div>
                                 @if($item->description)
@@ -176,4 +176,3 @@ function toggleItem(itemId, isCompleted) {
     height: 1.5rem;
 }
 </style>
-@endsection

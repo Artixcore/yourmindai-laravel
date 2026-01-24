@@ -64,7 +64,7 @@
                 @foreach($stats['by_type'] as $type => $count)
                     <div class="col-md-4 col-lg-3">
                         <div class="d-flex align-items-center p-3 bg-light rounded">
-                            <i class="bi bi-{{ $this->getIcon($type) }} me-3 text-primary" style="font-size: 1.5rem;"></i>
+                            <i class="bi bi-{{ getIcon($type) }} me-3 text-primary" style="font-size: 1.5rem;"></i>
                             <div>
                                 <div class="fw-semibold">{{ ucfirst(str_replace('_', ' ', $type)) }}</div>
                                 <div class="text-muted">{{ $count }} assignments</div>
@@ -204,4 +204,3 @@ function getIcon($type) {
     };
 }
 @endphp
-@endsection

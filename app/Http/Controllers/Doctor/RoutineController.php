@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Routine;
 use App\Models\RoutineItem;
 use App\Models\PatientProfile;
+use App\Models\User;
 
 class RoutineController extends Controller
 {

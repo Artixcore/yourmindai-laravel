@@ -115,7 +115,6 @@ class TrackingOverviewController extends Controller
             ->groupBy('patient_id')
             ->orderByDesc('log_count')
             ->take($limit)
-            ->with('patient.user')
             ->get();
     }
 }

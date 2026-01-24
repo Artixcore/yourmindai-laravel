@@ -180,4 +180,3 @@ function selectYesNo(questionId, value) {
     transform: scale(1.1);
 }
 </style>
-@endsection

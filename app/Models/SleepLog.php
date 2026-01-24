@@ -26,6 +26,8 @@ class SleepLog extends Model
     protected $casts = [
         'sleep_date' => 'date',
         'factors' => 'array',
+        'bedtime' => 'datetime',
+        'wake_time' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

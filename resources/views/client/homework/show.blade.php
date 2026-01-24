@@ -9,7 +9,7 @@
     </a>
     <h4 class="fw-bold mb-1">{{ $homework->title }}</h4>
     <p class="text-muted mb-0 small">
-        <i class="bi bi-{{ $this->getIcon($homework->homework_type) }} me-1"></i>
+        <i class="bi bi-{{ getIcon($homework->homework_type) }} me-1"></i>
         {{ ucfirst(str_replace('_', ' ', $homework->homework_type)) }}
     </p>
 </div>
@@ -199,4 +199,3 @@ function updatePercentageLabel(value) {
     color: white !important;
 }
 </style>
-@endsection

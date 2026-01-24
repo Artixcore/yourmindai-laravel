@@ -181,4 +181,3 @@ function selectMood(rating) {
     text-transform: uppercase;
 }
 </style>
-@endsection

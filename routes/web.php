@@ -263,11 +263,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     
     // Psychometric Assessments (Admin)
     Route::get('patients/{patient}/psychometric-assessments', [\App\Http\Controllers\PsychometricAssessmentController::class, 'index'])
-        ->name('admin.patients.psychometric.index');
+        ->name('patients.psychometric.index');
     Route::post('patients/{patient}/psychometric-assessments', [\App\Http\Controllers\PsychometricAssessmentController::class, 'assign'])
-        ->name('admin.patients.psychometric.assign');
+        ->name('patients.psychometric.assign');
     Route::get('patients/{patient}/psychometric-assessments/{assessment}', [\App\Http\Controllers\PsychometricAssessmentController::class, 'show'])
-        ->name('admin.patients.psychometric.show');
+        ->name('patients.psychometric.show');
     
     // Sessions Explorer
     Route::get('sessions', [AdminSessionController::class, 'index'])->name('sessions.index');

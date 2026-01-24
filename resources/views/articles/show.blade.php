@@ -61,7 +61,7 @@
             <!-- Interaction Bar -->
             <div class="d-flex gap-3 align-items-center py-3 border-top border-bottom mb-4">
                 <button type="button" class="btn btn-outline-primary like-button" data-article-id="{{ $article->id }}">
-                    <svg style="width: 20px; height: 20px;" fill="{{ $userHasLiked ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 20px; height: 20px;" fill="{{ ($userHasLiked ?? false) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                     <span class="likes-count">{{ $article->likes->count() }}</span>
@@ -153,11 +153,12 @@
 <script>
 document.querySelector('.like-button')?.addEventListener('click', function() {
     const articleId = this.dataset.articleId;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     fetch(`/articles/${articleId}/like`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': csrfToken || ''
         }
     })
     .then(res => res.json())

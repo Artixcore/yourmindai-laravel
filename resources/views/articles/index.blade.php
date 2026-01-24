@@ -12,7 +12,7 @@
         <div class="col-md-4">
             <form method="GET" action="{{ route('articles.public.search') }}">
                 <div class="input-group">
-                    <input type="text" name="q" class="form-control" placeholder="Search articles..." value="{{ request('search') }}">
+                    <input type="text" name="q" class="form-control" placeholder="Search articles..." value="{{ request('q') }}">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </div>
             </form>

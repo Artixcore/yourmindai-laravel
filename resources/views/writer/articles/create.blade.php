@@ -123,7 +123,7 @@
 </div>
 
 @push('scripts')
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
 <script src="{{ asset('js/tinymce-config.js') }}"></script>
 @endpush
 @endsection

@@ -2,11 +2,11 @@
 
 @php
     $colors = [
-        'draft' => 'bg-gray-100 text-gray-800',
-        'pending_review' => 'bg-yellow-100 text-yellow-800',
-        'approved' => 'bg-blue-100 text-blue-800',
-        'published' => 'bg-green-100 text-green-800',
-        'rejected' => 'bg-red-100 text-red-800',
+        'draft' => 'bg-secondary bg-opacity-25 text-secondary-emphasis',
+        'pending_review' => 'bg-warning bg-opacity-25 text-warning-emphasis',
+        'approved' => 'bg-info bg-opacity-25 text-info-emphasis',
+        'published' => 'bg-success bg-opacity-25 text-success-emphasis',
+        'rejected' => 'bg-danger bg-opacity-25 text-danger-emphasis',
     ];
     
     $labels = [
@@ -17,10 +17,10 @@
         'rejected' => 'Rejected',
     ];
     
-    $colorClass = $colors[$status] ?? 'bg-gray-100 text-gray-800';
+    $colorClass = $colors[$status] ?? 'bg-secondary bg-opacity-25 text-secondary-emphasis';
     $label = $labels[$status] ?? ucfirst($status);
 @endphp
 
-<span {{ $attributes->merge(['class' => "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {$colorClass}"]) }}>
+<span {{ $attributes->merge(['class' => "badge rounded-pill {$colorClass}"]) }}>
     {{ $label }}
 </span>

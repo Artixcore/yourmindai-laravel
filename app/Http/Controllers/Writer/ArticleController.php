@@ -10,6 +10,7 @@ use App\Services\ArticleSEOService;
 use App\Services\ArticleMediaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ArticleController extends Controller
@@ -206,7 +207,7 @@ class ArticleController extends Controller
         try {
             // Delete associated media
             if ($article->featured_image) {
-                \Storage::disk('public')->delete($article->featured_image);
+                Storage::disk('public')->delete($article->featured_image);
             }
             
             $article->delete();

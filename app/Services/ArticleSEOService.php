@@ -225,7 +225,7 @@ class ArticleSEOService
             'image' => $article->featured_image ? asset('storage/' . $article->featured_image) : null,
             'author' => [
                 '@type' => 'Person',
-                'name' => $article->user->name,
+                'name' => $article->user?->name ?? 'Unknown',
             ],
             'publisher' => [
                 '@type' => 'Organization',

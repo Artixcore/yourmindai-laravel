@@ -125,16 +125,31 @@ class Article extends Model
     {
         $wordCount = str_word_count(strip_tags($this->content));
         $this->reading_time = ceil($wordCount / 200); // Average reading speed: 200 words/min
-        $this->save();
+        // Note: Does not save automatically - caller must save the model
     }
 
     public function generateSlug()
     {
         $slug = Str::slug($this->title);
-        $count = static::where('slug', 'LIKE', "{$slug}%")->count();
+        $originalSlug = $slug;
         
-        if ($count > 0) {
-            $slug = $slug . '-' . ($count + 1);
+        // Check if the exact slug exists (excluding current article if updating)
+        $query = static::where('slug', $slug);
+        if ($this->exists) {
+            $query->where('id', '!=', $this->id);
+        }
+        
+        if ($query->exists()) {
+            // Find the next available slug
+            $count = 1;
+            do {
+                $slug = $originalSlug . '-' . $count;
+                $query = static::where('slug', $slug);
+                if ($this->exists) {
+                    $query->where('id', '!=', $this->id);
+                }
+                $count++;
+            } while ($query->exists());
         }
         
         $this->slug = $slug;

@@ -31,11 +31,16 @@ return new class extends Migration
         Schema::create('article_likes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('article_id')->constrained('articles')->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('ip_address', 45);
             $table->timestamps();
             
             $table->index('article_id');
+            $table->index('user_id');
+            // Prevent duplicate likes from same user
+            $table->unique(['article_id', 'user_id'], 'article_user_like_unique');
+            // Prevent duplicate likes from same IP (for guests)
+            $table->index(['article_id', 'ip_address']);
         });
         
         // Article Views
@@ -49,7 +54,10 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index('article_id');
+            $table->index('user_id');
             $table->index('viewed_at');
+            // Add composite index for view tracking queries
+            $table->index(['article_id', 'ip_address', 'viewed_at']);
         });
         
         // Article Earnings
@@ -65,7 +73,9 @@ return new class extends Migration
             $table->datetime('paid_at')->nullable();
             $table->timestamps();
             
+            $table->index('article_id');
             $table->index(['user_id', 'status']);
+            $table->index(['article_id', 'status']);
             $table->index(['period_start', 'period_end']);
         });
         

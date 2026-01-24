@@ -54,12 +54,12 @@ Route::prefix('articles')->name('articles.')->group(function () {
 
 // Authentication routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
-Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post')->middleware('guest');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Client login routes (for patients)
 Route::get('/client', [\App\Http\Controllers\ClientLoginController::class, 'showLoginForm'])->name('client.login')->middleware('guest');
-Route::post('/client', [\App\Http\Controllers\ClientLoginController::class, 'login'])->middleware('guest');
+Route::post('/client', [\App\Http\Controllers\ClientLoginController::class, 'login'])->name('client.login.post')->middleware('guest');
 Route::post('/client/logout', [\App\Http\Controllers\ClientLoginController::class, 'logout'])->name('client.logout')->middleware('auth');
 
 // Client dashboard routes (for webview app)
@@ -89,9 +89,9 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     Route::get('/progress', [\App\Http\Controllers\PatientProgressController::class, 'index'])->name('progress.index');
     
     // Tasks/Todos
-    Route::get('/tasks', [\App\Http\Controllers\PatientTaskController::class, 'index'])->name('tasks.index');
-    Route::get('/tasks/{task}', [\App\Http\Controllers\PatientTaskController::class, 'show'])->name('tasks.show');
-    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\PatientTaskController::class, 'complete'])->name('tasks.complete');
+    Route::get('/tasks', [\App\Http\Controllers\PatientTaskController::class, 'index'])->name('client.tasks.index');
+    Route::get('/tasks/{task}', [\App\Http\Controllers\PatientTaskController::class, 'show'])->name('client.tasks.show');
+    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\PatientTaskController::class, 'complete'])->name('client.tasks.complete');
     
     // Reviews
     Route::get('/reviews', [\App\Http\Controllers\ClientReviewController::class, 'index'])->name('reviews.index');
@@ -147,9 +147,9 @@ Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function
     Route::put('/profile', [\App\Http\Controllers\PatientDashboardController::class, 'updateProfile'])->name('profile.update');
     
     // Tasks/Todos
-    Route::get('/tasks', [\App\Http\Controllers\PatientTaskController::class, 'index'])->name('tasks.index');
-    Route::get('/tasks/{task}', [\App\Http\Controllers\PatientTaskController::class, 'show'])->name('tasks.show');
-    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\PatientTaskController::class, 'complete'])->name('tasks.complete');
+    Route::get('/tasks', [\App\Http\Controllers\PatientTaskController::class, 'index'])->name('patient.tasks.index');
+    Route::get('/tasks/{task}', [\App\Http\Controllers\PatientTaskController::class, 'show'])->name('patient.tasks.show');
+    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\PatientTaskController::class, 'complete'])->name('patient.tasks.complete');
 });
 
 // Doctor profile and papers routes
@@ -263,11 +263,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     
     // Psychometric Assessments (Admin)
     Route::get('patients/{patient}/psychometric-assessments', [\App\Http\Controllers\PsychometricAssessmentController::class, 'index'])
-        ->name('patients.psychometric.index');
+        ->name('admin.patients.psychometric.index');
     Route::post('patients/{patient}/psychometric-assessments', [\App\Http\Controllers\PsychometricAssessmentController::class, 'assign'])
-        ->name('patients.psychometric.assign');
+        ->name('admin.patients.psychometric.assign');
     Route::get('patients/{patient}/psychometric-assessments/{assessment}', [\App\Http\Controllers\PsychometricAssessmentController::class, 'show'])
-        ->name('patients.psychometric.show');
+        ->name('admin.patients.psychometric.show');
     
     // Sessions Explorer
     Route::get('sessions', [AdminSessionController::class, 'index'])->name('sessions.index');

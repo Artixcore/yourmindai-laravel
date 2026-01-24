@@ -13,7 +13,7 @@ export function initializeTinyMCE(selector = '.tinymce-editor') {
         plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+            'insertdatetime', 'media', 'table', 'help', 'wordcount'
         ],
         toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
             'alignleft aligncenter alignright alignjustify | ' +
@@ -97,7 +97,7 @@ export function initializeTinyMCE(selector = '.tinymce-editor') {
 
 // Update word count display
 function updateWordCount(editor) {
-    const wordCount = editor.plugins.wordcount.getCount();
+    const wordCount = editor.plugins.wordcount.body.getWordCount();
     const wordCountElement = document.getElementById('word-count');
     if (wordCountElement) {
         wordCountElement.textContent = wordCount;
@@ -106,7 +106,7 @@ function updateWordCount(editor) {
 
 // Update reading time display
 function updateReadingTime(editor) {
-    const wordCount = editor.plugins.wordcount.getCount();
+    const wordCount = editor.plugins.wordcount.body.getWordCount();
     const readingTime = Math.ceil(wordCount / 200); // 200 words per minute
     const readingTimeElement = document.getElementById('reading-time');
     if (readingTimeElement) {

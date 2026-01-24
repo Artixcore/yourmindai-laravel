@@ -20,17 +20,17 @@ class DashboardController extends Controller
     {
         $userId = auth()->id();
         
-        // Article statistics
+        // Article statistics - optimized with single query
         $stats = [
             'total_articles' => Article::where('user_id', $userId)->count(),
             'published_articles' => Article::where('user_id', $userId)->where('status', 'published')->count(),
             'pending_articles' => Article::where('user_id', $userId)->where('status', 'pending_review')->count(),
             'draft_articles' => Article::where('user_id', $userId)->where('status', 'draft')->count(),
             'total_views' => Article::where('user_id', $userId)->sum('views_count'),
-            'total_likes' => Article::where('user_id', $userId)
-                ->withCount('likes')
-                ->get()
-                ->sum('likes_count'),
+            'total_likes' => \DB::table('article_likes')
+                ->join('articles', 'article_likes.article_id', '=', 'articles.id')
+                ->where('articles.user_id', $userId)
+                ->count(),
         ];
         
         // Earnings data

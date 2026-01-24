@@ -102,10 +102,74 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     Route::put('/reviews/{review}', [\App\Http\Controllers\ClientReviewController::class, 'update'])->name('reviews.update');
     Route::get('/reviews/check-eligibility', [\App\Http\Controllers\ClientReviewController::class, 'checkEligibility'])->name('reviews.check-eligibility');
     Route::get('/doctors/{doctor}/reviews', [\App\Http\Controllers\ClientReviewController::class, 'doctorReviews'])->name('doctors.reviews');
+    
+    // General Assessments (Phase 2)
+    Route::get('/general-assessments', [\App\Http\Controllers\ClientGeneralAssessmentController::class, 'index'])->name('general-assessment.index');
+    Route::get('/general-assessments/{assessment}', [\App\Http\Controllers\ClientGeneralAssessmentController::class, 'show'])->name('general-assessment.show');
+    Route::post('/general-assessments/{assessment}/submit', [\App\Http\Controllers\ClientGeneralAssessmentController::class, 'submit'])->name('general-assessment.submit');
+    Route::get('/general-assessments/{assessment}/result', [\App\Http\Controllers\ClientGeneralAssessmentController::class, 'result'])->name('general-assessment.result');
+    
+    // Homework & Techniques (Phase 2)
+    Route::get('/homework', [\App\Http\Controllers\ClientHomeworkController::class, 'index'])->name('homework.index');
+    Route::get('/homework/{homework}', [\App\Http\Controllers\ClientHomeworkController::class, 'show'])->name('homework.show');
+    Route::post('/homework/{homework}/complete', [\App\Http\Controllers\ClientHomeworkController::class, 'complete'])->name('homework.complete');
+    
+    // Mood Tracking
+    Route::get('/mood', [\App\Http\Controllers\ClientMoodController::class, 'index'])->name('mood.index');
+    Route::post('/mood', [\App\Http\Controllers\ClientMoodController::class, 'store'])->name('mood.store');
+    
+    // Sleep Tracking
+    Route::get('/sleep', [\App\Http\Controllers\ClientSleepController::class, 'index'])->name('sleep.index');
+    Route::post('/sleep', [\App\Http\Controllers\ClientSleepController::class, 'store'])->name('sleep.store');
+    
+    // Exercise Tracking
+    Route::get('/exercise', [\App\Http\Controllers\ClientExerciseController::class, 'index'])->name('exercise.index');
+    Route::post('/exercise', [\App\Http\Controllers\ClientExerciseController::class, 'store'])->name('exercise.store');
+    
+    // Routine Management
+    Route::get('/routine', [\App\Http\Controllers\ClientRoutineController::class, 'index'])->name('routine.index');
+    Route::post('/routine/{item}/log', [\App\Http\Controllers\ClientRoutineController::class, 'logItem'])->name('routine.log');
 });
 
 // Dashboard (protected)
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+
+// Parent routes (Phase 1)
+Route::prefix('parent')->name('parent.')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\ParentDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/child/{patient}', [\App\Http\Controllers\ParentDashboardController::class, 'showChild'])->name('child.show');
+    Route::get('/child/{patient}/homework', [\App\Http\Controllers\ParentDashboardController::class, 'showChildHomework'])->name('child.homework');
+    Route::get('/child/{patient}/sessions', [\App\Http\Controllers\ParentDashboardController::class, 'showChildSessions'])->name('child.sessions');
+    
+    // Feedback
+    Route::post('/feedback/{feedbackable_type}/{feedbackable_id}', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('feedback.store');
+    
+    // Practice Progression
+    Route::post('/progression/{progressionable_type}/{progressionable_id}', [\App\Http\Controllers\PracticeProgressionController::class, 'store'])->name('progression.store');
+    
+    // Permissions
+    Route::get('/permissions', [\App\Http\Controllers\ParentPermissionController::class, 'index'])->name('permissions.index');
+    Route::post('/permissions', [\App\Http\Controllers\ParentPermissionController::class, 'update'])->name('permissions.update');
+});
+
+// Others/Experts routes (Phase 1)
+Route::prefix('others')->name('others.')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\OthersController::class, 'index'])->name('dashboard');
+    Route::get('/clients', [\App\Http\Controllers\OthersController::class, 'clients'])->name('clients.index');
+    Route::get('/clients/{patient}', [\App\Http\Controllers\OthersController::class, 'showClient'])->name('clients.show');
+    Route::get('/clients/{patient}/homework', [\App\Http\Controllers\OthersController::class, 'showClientHomework'])->name('clients.homework');
+    
+    // Feedback
+    Route::post('/feedback/{feedbackable_type}/{feedbackable_id}', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('feedback.store');
+    
+    // Practice Progression
+    Route::post('/progression/{progressionable_type}/{progressionable_id}', [\App\Http\Controllers\PracticeProgressionController::class, 'store'])->name('progression.store');
+    
+    // Referrals
+    Route::get('/referrals', [\App\Http\Controllers\OthersController::class, 'referrals'])->name('referrals.index');
+    Route::get('/referrals/{referral}', [\App\Http\Controllers\OthersController::class, 'showReferral'])->name('referrals.show');
+    Route::post('/referrals/{referral}/respond', [\App\Http\Controllers\OthersController::class, 'respondToReferral'])->name('referrals.respond');
+});
 
 // Writer routes (for article writers - admin, doctors, or writers)
 Route::prefix('writer')->name('writer.')->middleware(['auth', \App\Http\Middleware\WriterMiddleware::class])->group(function () {
@@ -181,6 +245,11 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     // Session routes (nested under patients)
     Route::resource('patients.sessions', SessionController::class);
     
+    // Session Reports (Phase 2)
+    Route::get('sessions/{session}/report/create', [\App\Http\Controllers\SessionReportController::class, 'create'])->name('sessions.report.create');
+    Route::post('sessions/{session}/report', [\App\Http\Controllers\SessionReportController::class, 'store'])->name('sessions.report.store');
+    Route::get('session-reports/{report}', [\App\Http\Controllers\SessionReportController::class, 'show'])->name('session-reports.show');
+    
     // Session day routes
     Route::post('patients/{patient}/sessions/{session}/days', [SessionDayController::class, 'store'])
         ->name('patients.sessions.days.store');
@@ -232,6 +301,50 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::resource('patients.contingency-plans', ContingencyPlanController::class);
     Route::post('patients/{patient}/contingency-plans/{contingencyPlan}/activate', [ContingencyPlanController::class, 'activate'])
         ->name('patients.contingency.activate');
+    
+    // General Assessments Management (Phase 3)
+    Route::get('patients/{patient}/general-assessments', [\App\Http\Controllers\Doctor\GeneralAssessmentController::class, 'index'])
+        ->name('patients.general-assessments.index');
+    Route::get('patients/{patient}/general-assessments/create', [\App\Http\Controllers\Doctor\GeneralAssessmentController::class, 'create'])
+        ->name('patients.general-assessments.create');
+    Route::post('patients/{patient}/general-assessments', [\App\Http\Controllers\Doctor\GeneralAssessmentController::class, 'store'])
+        ->name('patients.general-assessments.store');
+    Route::get('patients/{patient}/general-assessments/{assessment}', [\App\Http\Controllers\Doctor\GeneralAssessmentController::class, 'show'])
+        ->name('patients.general-assessments.show');
+    
+    // Homework Management (Phase 3)
+    Route::get('patients/{patient}/homework', [\App\Http\Controllers\Doctor\HomeworkController::class, 'index'])
+        ->name('patients.homework.index');
+    Route::get('patients/{patient}/homework/create', [\App\Http\Controllers\Doctor\HomeworkController::class, 'create'])
+        ->name('patients.homework.create');
+    Route::post('patients/{patient}/homework', [\App\Http\Controllers\Doctor\HomeworkController::class, 'store'])
+        ->name('patients.homework.store');
+    Route::get('patients/{patient}/homework/{homework}', [\App\Http\Controllers\Doctor\HomeworkController::class, 'show'])
+        ->name('patients.homework.show');
+    Route::put('patients/{patient}/homework/{homework}', [\App\Http\Controllers\Doctor\HomeworkController::class, 'update'])
+        ->name('patients.homework.update');
+    
+    // Routine Management (Phase 3)
+    Route::get('patients/{patient}/routines', [\App\Http\Controllers\Doctor\RoutineController::class, 'index'])
+        ->name('patients.routines.index');
+    Route::get('patients/{patient}/routines/create', [\App\Http\Controllers\Doctor\RoutineController::class, 'create'])
+        ->name('patients.routines.create');
+    Route::post('patients/{patient}/routines', [\App\Http\Controllers\Doctor\RoutineController::class, 'store'])
+        ->name('patients.routines.store');
+    Route::get('patients/{patient}/routines/{routine}', [\App\Http\Controllers\Doctor\RoutineController::class, 'show'])
+        ->name('patients.routines.show');
+    Route::post('patients/{patient}/routines/{routine}/toggle', [\App\Http\Controllers\Doctor\RoutineController::class, 'toggleActive'])
+        ->name('patients.routines.toggle');
+    
+    // Tracking Logs Monitoring (Phase 3)
+    Route::get('patients/{patient}/tracking', [\App\Http\Controllers\Doctor\TrackingLogController::class, 'index'])
+        ->name('patients.tracking.index');
+    Route::get('patients/{patient}/tracking/mood', [\App\Http\Controllers\Doctor\TrackingLogController::class, 'mood'])
+        ->name('patients.tracking.mood');
+    Route::get('patients/{patient}/tracking/sleep', [\App\Http\Controllers\Doctor\TrackingLogController::class, 'sleep'])
+        ->name('patients.tracking.sleep');
+    Route::get('patients/{patient}/tracking/exercise', [\App\Http\Controllers\Doctor\TrackingLogController::class, 'exercise'])
+        ->name('patients.tracking.exercise');
     
     // Doctor Reviews
     Route::get('doctors/reviews', [\App\Http\Controllers\DoctorReviewController::class, 'index'])
@@ -333,4 +446,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     Route::get('article-earnings', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'index'])->name('article-earnings.index');
     Route::post('article-earnings/calculate', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'calculate'])->name('article-earnings.calculate');
     Route::post('article-earnings/{earning}/paid', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'markAsPaid'])->name('article-earnings.paid');
+    
+    // General Assessments Overview (Phase 4)
+    Route::get('general-assessments', [\App\Http\Controllers\Admin\GeneralAssessmentController::class, 'index'])->name('general-assessments.index');
+    Route::get('general-assessments/{assessment}', [\App\Http\Controllers\Admin\GeneralAssessmentController::class, 'show'])->name('general-assessments.show');
+    Route::get('general-assessments/export', [\App\Http\Controllers\Admin\GeneralAssessmentController::class, 'export'])->name('general-assessments.export');
+    
+    // Homework Overview (Phase 4)
+    Route::get('homework', [\App\Http\Controllers\Admin\HomeworkTemplateController::class, 'index'])->name('homework.index');
+    Route::get('homework/{homework}', [\App\Http\Controllers\Admin\HomeworkTemplateController::class, 'show'])->name('homework.show');
+    Route::get('homework/analytics', [\App\Http\Controllers\Admin\HomeworkTemplateController::class, 'analytics'])->name('homework.analytics');
+    
+    // Tracking Logs Overview (Phase 4)
+    Route::get('tracking', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'index'])->name('tracking.index');
+    Route::get('tracking/mood', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'mood'])->name('tracking.mood');
+    Route::get('tracking/sleep', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'sleep'])->name('tracking.sleep');
+    Route::get('tracking/exercise', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'exercise'])->name('tracking.exercise');
 });

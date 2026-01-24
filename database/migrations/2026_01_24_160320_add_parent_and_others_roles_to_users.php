@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            // Add specialty field for others/experts
+            $table->string('specialty')->nullable()->after('role')->comment('For others/expert role - their specialty');
+            $table->text('qualifications')->nullable()->after('specialty')->comment('Professional qualifications');
+            $table->string('license_number')->nullable()->after('qualifications')->comment('Professional license number');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['specialty', 'qualifications', 'license_number']);
+        });
+    }
+};

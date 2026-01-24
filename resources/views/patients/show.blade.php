@@ -371,6 +371,241 @@
         @endif
     </x-card>
 
+    <!-- General Assessments Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">General Assessments</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ route('patients.general-assessments.create', $patient) }}" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Create Assessment</span>
+                </a>
+                <a href="{{ route('patients.general-assessments.index', $patient) }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-clipboard-data"></i>
+                    <span>View All</span>
+                </a>
+            </div>
+        </div>
+
+        @php
+            $generalAssessments = \App\Models\GeneralAssessment::where('patient_id', $patient->id)
+                ->orderBy('assigned_at', 'desc')
+                ->take(3)
+                ->get();
+        @endphp
+
+        @if($generalAssessments->isEmpty())
+            <div class="text-center py-4 text-stone-500">
+                <i class="bi bi-clipboard-data text-stone-400" style="font-size: 2rem;"></i>
+                <p class="mb-0 mt-2">No general assessments yet.</p>
+                <p class="small mt-1 mb-0">Create custom assessments for this patient.</p>
+            </div>
+        @else
+            <div class="d-flex flex-column gap-3">
+                @foreach($generalAssessments as $assessment)
+                    <div class="border border-stone-200 rounded p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <h6 class="font-semibold text-stone-900 mb-1">{{ $assessment->title }}</h6>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if($assessment->status === 'completed')
+                                        <span class="badge bg-success">Completed</span>
+                                    @elseif($assessment->status === 'in_progress')
+                                        <span class="badge bg-warning">In Progress</span>
+                                    @else
+                                        <span class="badge bg-secondary">Pending</span>
+                                    @endif
+                                    <small class="text-stone-500">
+                                        {{ $assessment->questions->count() }} questions
+                                    </small>
+                                </div>
+                            </div>
+                            <a href="{{ route('patients.general-assessments.show', [$patient, $assessment]) }}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-card>
+
+    <!-- Homework & Techniques Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">Homework & Techniques</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ route('patients.homework.create', $patient) }}" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Assign Homework</span>
+                </a>
+                <a href="{{ route('patients.homework.index', $patient) }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-journal-check"></i>
+                    <span>View All</span>
+                </a>
+            </div>
+        </div>
+
+        @php
+            $homework = \App\Models\HomeworkAssignment::where('patient_id', $patient->id)
+                ->whereIn('status', ['assigned', 'in_progress'])
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+        @endphp
+
+        @if($homework->isEmpty())
+            <div class="text-center py-4 text-stone-500">
+                <i class="bi bi-journal-check text-stone-400" style="font-size: 2rem;"></i>
+                <p class="mb-0 mt-2">No active homework assignments.</p>
+                <p class="small mt-1 mb-0">Assign therapy techniques to track patient progress.</p>
+            </div>
+        @else
+            <div class="d-flex flex-column gap-2">
+                @foreach($homework as $hw)
+                    <div class="border border-stone-200 rounded p-2">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <strong class="text-stone-900">{{ $hw->title }}</strong>
+                                    <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $hw->homework_type)) }}</span>
+                                    @if($hw->status === 'in_progress')
+                                        <span class="badge bg-primary">In Progress</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <a href="{{ route('patients.homework.show', [$patient, $hw]) }}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-card>
+
+    <!-- Routines Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">Daily Routines</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ route('patients.routines.create', $patient) }}" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Create Routine</span>
+                </a>
+                <a href="{{ route('patients.routines.index', $patient) }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>View All</span>
+                </a>
+            </div>
+        </div>
+
+        @php
+            $routines = \App\Models\Routine::where('patient_id', $patient->id)
+                ->where('is_active', true)
+                ->with('items')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        @endphp
+
+        @if($routines->isEmpty())
+            <div class="text-center py-4 text-stone-500">
+                <i class="bi bi-calendar-check text-stone-400" style="font-size: 2rem;"></i>
+                <p class="mb-0 mt-2">No routines created yet.</p>
+                <p class="small mt-1 mb-0">Create daily routines to help structure the patient's day.</p>
+            </div>
+        @else
+            <div class="d-flex flex-column gap-2">
+                @foreach($routines as $routine)
+                    <div class="border border-stone-200 rounded p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <strong class="text-stone-900">{{ $routine->title }}</strong>
+                                <div class="small text-stone-500 mt-1">
+                                    {{ $routine->items->count() }} tasks | {{ ucfirst($routine->frequency) }}
+                                </div>
+                            </div>
+                            <a href="{{ route('patients.routines.show', [$patient, $routine]) }}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-card>
+
+    <!-- Tracking Logs Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">Tracking Logs</h2>
+            <a href="{{ route('patients.tracking.index', $patient) }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                <i class="bi bi-graph-up"></i>
+                <span>View All Logs</span>
+            </a>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card border-primary border-opacity-25">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-emoji-smile text-primary" style="font-size: 1.5rem;"></i>
+                            <strong>Mood Logs</strong>
+                        </div>
+                        @php
+                            $moodCount = \App\Models\MoodLog::where('patient_id', $patient->id)->count();
+                            $avgMood = \App\Models\MoodLog::where('patient_id', $patient->id)->avg('mood_rating');
+                        @endphp
+                        <div class="small text-muted">{{ $moodCount }} entries</div>
+                        @if($avgMood)
+                            <div class="small">Avg: <strong>{{ round($avgMood, 1) }}/10</strong></div>
+                        @endif
+                        <a href="{{ route('patients.tracking.mood', $patient) }}" class="btn btn-sm btn-primary mt-2">View</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-info border-opacity-25">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-moon-stars text-info" style="font-size: 1.5rem;"></i>
+                            <strong>Sleep Logs</strong>
+                        </div>
+                        @php
+                            $sleepCount = \App\Models\SleepLog::where('patient_id', $patient->id)->count();
+                            $avgSleep = \App\Models\SleepLog::where('patient_id', $patient->id)->avg('hours_slept');
+                        @endphp
+                        <div class="small text-muted">{{ $sleepCount }} entries</div>
+                        @if($avgSleep)
+                            <div class="small">Avg: <strong>{{ round($avgSleep, 1) }} hrs</strong></div>
+                        @endif
+                        <a href="{{ route('patients.tracking.sleep', $patient) }}" class="btn btn-sm btn-info mt-2">View</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-success border-opacity-25">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-bicycle text-success" style="font-size: 1.5rem;"></i>
+                            <strong>Exercise Logs</strong>
+                        </div>
+                        @php
+                            $exerciseCount = \App\Models\ExerciseLog::where('patient_id', $patient->id)->count();
+                            $totalMinutes = \App\Models\ExerciseLog::where('patient_id', $patient->id)->sum('duration_minutes');
+                        @endphp
+                        <div class="small text-muted">{{ $exerciseCount }} entries</div>
+                        @if($totalMinutes)
+                            <div class="small">Total: <strong>{{ round($totalMinutes / 60, 1) }} hrs</strong></div>
+                        @endif
+                        <a href="{{ route('patients.tracking.exercise', $patient) }}" class="btn btn-sm btn-success mt-2">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </x-card>
+
     <!-- Resources Section -->
     <x-card class="mt-4">
         <div class="d-flex align-items-center justify-content-between mb-3">

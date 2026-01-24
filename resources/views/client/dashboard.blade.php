@@ -187,11 +187,23 @@
         <div class="d-grid gap-2">
             <a href="{{ route('client.assessments.index') }}" class="btn btn-outline-primary">
                 <i class="bi bi-clipboard-check me-2"></i>
-                Complete Assessment
+                Psychometric Assessment
             </a>
-            <a href="{{ route('client.devices.index') }}" class="btn btn-outline-primary">
-                <i class="bi bi-phone me-2"></i>
-                Manage Devices
+            <a href="{{ route('client.general-assessment.index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-clipboard-data me-2"></i>
+                General Assessment
+            </a>
+            <a href="{{ route('client.homework.index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-journal-check me-2"></i>
+                Techniques & Homework
+            </a>
+            <a href="{{ route('client.mood.index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-emoji-smile me-2"></i>
+                Mood Tracking
+            </a>
+            <a href="{{ route('client.routine.index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-calendar-check me-2"></i>
+                Daily Routine
             </a>
             <a href="{{ route('client.contingency.index') }}" class="btn btn-outline-danger">
                 <i class="bi bi-shield-exclamation me-2"></i>

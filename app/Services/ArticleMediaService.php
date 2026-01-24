@@ -7,7 +7,6 @@ use App\Models\ArticleMedia;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
 
 class ArticleMediaService
 {
@@ -48,7 +47,7 @@ class ArticleMediaService
     }
 
     /**
-     * Process and optimize image
+     * Process and optimize image using native PHP GD
      */
     public function processImage(UploadedFile $file): string
     {
@@ -56,25 +55,72 @@ class ArticleMediaService
         $path = 'articles/images/' . date('Y/m');
         $fullPath = $path . '/' . $filename;
         
-        // Create directory if it doesn't exist
+        // Create directory
         Storage::disk('public')->makeDirectory($path);
         
-        // Process image
-        $image = Image::make($file);
+        // Get full storage path
+        $storagePath = storage_path('app/public/' . $fullPath);
         
-        // Resize if larger than 1200px width
-        if ($image->width() > 1200) {
-            $image->resize(1200, null, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
+        // Create image resource based on mime type
+        $mimeType = $file->getMimeType();
+        $sourceImage = match($mimeType) {
+            'image/jpeg', 'image/jpg' => imagecreatefromjpeg($file->getPathname()),
+            'image/png' => imagecreatefrompng($file->getPathname()),
+            'image/gif' => imagecreatefromgif($file->getPathname()),
+            default => throw new \Exception('Unsupported image type'),
+        };
+        
+        if (!$sourceImage) {
+            throw new \Exception('Failed to process image');
         }
         
-        // Encode to JPG with 85% quality
-        $imageData = $image->encode('jpg', 85);
+        // Get original dimensions
+        $originalWidth = imagesx($sourceImage);
+        $originalHeight = imagesy($sourceImage);
         
-        // Save to storage
-        Storage::disk('public')->put($fullPath, $imageData);
+        // Calculate new dimensions (max 1200px width)
+        $maxWidth = 1200;
+        if ($originalWidth > $maxWidth) {
+            $ratio = $maxWidth / $originalWidth;
+            $newWidth = $maxWidth;
+            $newHeight = (int)($originalHeight * $ratio);
+        } else {
+            $newWidth = $originalWidth;
+            $newHeight = $originalHeight;
+        }
+        
+        // Create resized image
+        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+        
+        // Preserve transparency for PNG
+        imagealphablending($resizedImage, false);
+        imagesavealpha($resizedImage, true);
+        
+        // Resize
+        imagecopyresampled(
+            $resizedImage, $sourceImage,
+            0, 0, 0, 0,
+            $newWidth, $newHeight,
+            $originalWidth, $originalHeight
+        );
+        
+        // Compress and save - start with quality 85
+        $quality = 85;
+        $tempPath = $storagePath;
+        
+        // Try to save under 1MB by reducing quality
+        do {
+            imagejpeg($resizedImage, $tempPath, $quality);
+            $fileSize = filesize($tempPath);
+            
+            if ($fileSize > 1024 * 1024) { // 1MB
+                $quality -= 5;
+            }
+        } while ($fileSize > 1024 * 1024 && $quality >= 50);
+        
+        // Clean up
+        imagedestroy($sourceImage);
+        imagedestroy($resizedImage);
         
         return $fullPath;
     }

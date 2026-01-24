@@ -55,10 +55,15 @@ class ArticleMediaService
         $path = 'articles/images/' . date('Y/m');
         $fullPath = $path . '/' . $filename;
         
-        // Create directory
-        Storage::disk('public')->makeDirectory($path);
+        // Get full storage path for directory
+        $directoryPath = storage_path('app/public/' . $path);
         
-        // Get full storage path
+        // Create directory with proper permissions if it doesn't exist
+        if (!file_exists($directoryPath)) {
+            mkdir($directoryPath, 0755, true);
+        }
+        
+        // Get full file path
         $storagePath = storage_path('app/public/' . $fullPath);
         
         // Create image resource based on mime type

@@ -49,6 +49,22 @@ class Session extends Model
     }
 
     /**
+     * Get the reviews for the session.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'session_id');
+    }
+
+    /**
+     * Check if the session has been reviewed by the patient.
+     */
+    public function hasBeenReviewed(): bool
+    {
+        return $this->reviews()->where('review_type', 'session')->exists();
+    }
+
+    /**
      * Resolve route binding with scoped query to ensure doctor ownership.
      */
     public function resolveRouteBinding($value, $field = null)

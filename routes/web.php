@@ -81,6 +81,16 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     Route::get('/tasks', [\App\Http\Controllers\PatientTaskController::class, 'index'])->name('tasks.index');
     Route::get('/tasks/{task}', [\App\Http\Controllers\PatientTaskController::class, 'show'])->name('tasks.show');
     Route::post('/tasks/{task}/complete', [\App\Http\Controllers\PatientTaskController::class, 'complete'])->name('tasks.complete');
+    
+    // Reviews
+    Route::get('/reviews', [\App\Http\Controllers\ClientReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/create', [\App\Http\Controllers\ClientReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews', [\App\Http\Controllers\ClientReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/{review}', [\App\Http\Controllers\ClientReviewController::class, 'show'])->name('reviews.show');
+    Route::get('/reviews/{review}/edit', [\App\Http\Controllers\ClientReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [\App\Http\Controllers\ClientReviewController::class, 'update'])->name('reviews.update');
+    Route::get('/reviews/check-eligibility', [\App\Http\Controllers\ClientReviewController::class, 'checkEligibility'])->name('reviews.check-eligibility');
+    Route::get('/doctors/{doctor}/reviews', [\App\Http\Controllers\ClientReviewController::class, 'doctorReviews'])->name('doctors.reviews');
 });
 
 // Dashboard (protected)
@@ -195,6 +205,14 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::resource('patients.contingency-plans', ContingencyPlanController::class);
     Route::post('patients/{patient}/contingency-plans/{contingencyPlan}/activate', [ContingencyPlanController::class, 'activate'])
         ->name('patients.contingency.activate');
+    
+    // Doctor Reviews
+    Route::get('doctors/reviews', [\App\Http\Controllers\DoctorReviewController::class, 'index'])
+        ->name('doctor.reviews.index');
+    Route::get('doctors/reviews/analytics', [\App\Http\Controllers\DoctorReviewController::class, 'analytics'])
+        ->name('doctor.reviews.analytics');
+    Route::get('doctors/reviews/{review}', [\App\Http\Controllers\DoctorReviewController::class, 'show'])
+        ->name('doctor.reviews.show');
 });
 
 // Admin routes
@@ -252,4 +270,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     Route::post('appointment-requests/{appointmentRequest}/reject', [\App\Http\Controllers\AppointmentRequestController::class, 'reject'])->name('appointment-requests.reject');
     Route::get('appointment-requests/{appointmentRequest}/create-patient', [\App\Http\Controllers\AppointmentRequestController::class, 'createPatient'])->name('appointment-requests.create-patient');
     Route::post('appointment-requests/{appointmentRequest}/create-patient', [\App\Http\Controllers\AppointmentRequestController::class, 'storePatient'])->name('appointment-requests.store-patient');
+    
+    // Review Management
+    Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'show']);
+    Route::post('reviews/{review}/moderate', [\App\Http\Controllers\Admin\ReviewController::class, 'moderate'])->name('reviews.moderate');
+    Route::get('analytics/reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'analytics'])->name('analytics.reviews');
+    
+    // Review Question Management
+    Route::resource('review-questions', \App\Http\Controllers\Admin\ReviewQuestionController::class);
+    Route::post('review-questions/reorder', [\App\Http\Controllers\Admin\ReviewQuestionController::class, 'reorder'])->name('review-questions.reorder');
 });

@@ -113,6 +113,14 @@ class Patient extends Model implements AuthenticatableContract
     }
 
     /**
+     * Get the reviews written by the patient.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'patient_id');
+    }
+
+    /**
      * Get the photo URL attribute.
      */
     public function getPhotoUrlAttribute()

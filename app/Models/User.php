@@ -122,6 +122,35 @@ class User extends Model implements AuthenticatableContract, JWTSubject
     }
 
     /**
+     * Get the reviews for this doctor.
+     */
+    public function doctorReviews()
+    {
+        return $this->hasMany(Review::class, 'doctor_id');
+    }
+
+    /**
+     * Get the average rating for this doctor.
+     */
+    public function averageRating()
+    {
+        return $this->doctorReviews()
+            ->where('status', 'published')
+            ->where('review_type', 'doctor')
+            ->avg('overall_rating');
+    }
+
+    /**
+     * Get the cached average rating for this doctor.
+     */
+    public function getCachedAverageRatingAttribute()
+    {
+        return cache()->remember("doctor_{$this->id}_avg_rating", 3600, function () {
+            return round($this->averageRating() ?? 0, 2);
+        });
+    }
+
+    /**
      * Check if user is active.
      */
     public function isActive(): bool

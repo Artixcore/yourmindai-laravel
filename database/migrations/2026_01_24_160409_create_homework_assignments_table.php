@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('patient_id')->constrained('patient_profiles')->onDelete('cascade');
             $table->foreignId('assigned_by')->constrained('users')->onDelete('cascade')->comment('Doctor who assigned');
-            $table->foreignId('session_id')->nullable()->constrained('sessions')->onDelete('set null');
+            $table->string('session_id')->nullable();
+            $table->foreign('session_id')->references('id')->on('sessions')->onDelete('set null');
             $table->enum('homework_type', [
                 'psychotherapy',
                 'lifestyle_modification',

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('session_reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('session_id')->constrained('sessions')->onDelete('cascade');
+            $table->string('session_id');
+            $table->foreign('session_id')->references('id')->on('sessions')->onDelete('cascade');
             $table->foreignId('patient_id')->constrained('patient_profiles')->onDelete('cascade');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade')->comment('Doctor who created');
             $table->string('title');

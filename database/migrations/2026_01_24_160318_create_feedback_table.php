@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Indexes for performance
-            $table->index(['feedbackable_type', 'feedbackable_id']);
+            // Note: morphs() already creates index on feedbackable_type and feedbackable_id
             $table->index(['patient_id', 'source']);
             $table->index('feedback_date');
         });

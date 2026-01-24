@@ -10,11 +10,19 @@ use App\Models\Session;
 use App\Models\SessionDay;
 use App\Models\PatientResource;
 use App\Models\AppointmentRequest;
+use App\Models\Feedback;
+use App\Models\PracticeProgression;
+use App\Models\SessionReport;
+use App\Models\ParentPermission;
 use App\Policies\PatientPolicy;
 use App\Policies\SessionPolicy;
 use App\Policies\SessionDayPolicy;
 use App\Policies\PatientResourcePolicy;
 use App\Policies\AppointmentRequestPolicy;
+use App\Policies\FeedbackPolicy;
+use App\Policies\PracticeProgressionPolicy;
+use App\Policies\SessionReportPolicy;
+use App\Policies\ParentPermissionPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,6 +44,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(SessionDay::class, SessionDayPolicy::class);
         Gate::policy(PatientResource::class, PatientResourcePolicy::class);
         Gate::policy(AppointmentRequest::class, AppointmentRequestPolicy::class);
+        Gate::policy(Feedback::class, FeedbackPolicy::class);
+        Gate::policy(PracticeProgression::class, PracticeProgressionPolicy::class);
+        Gate::policy(SessionReport::class, SessionReportPolicy::class);
+        Gate::policy(ParentPermission::class, ParentPermissionPolicy::class);
 
         // Force HTTPS when:
         // 1. In production environment

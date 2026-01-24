@@ -58,17 +58,6 @@
                     class="dropdown-menu dropdown-menu-end shadow-sm border position-absolute"
                     style="display: none; min-width: 200px; margin-top: 0.5rem; z-index: 1060; top: 100%; right: 0;"
                 >
-                    <div class="px-3 py-2 border-bottom">
-                        <div class="fw-semibold small">{{ $user->name ?? 'User' }}</div>
-                        <div class="text-muted small">{{ $user->email ?? '' }}</div>
-                    </div>
-                    <a href="#" class="dropdown-item">
-                        <i class="bi bi-person me-2"></i>Profile
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <i class="bi bi-gear me-2"></i>Settings
-                    </a>
-                    <hr class="dropdown-divider">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item text-danger w-100 text-start border-0 bg-transparent">

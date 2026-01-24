@@ -31,6 +31,7 @@ use App\Http\Controllers\DoctorMessageController;
 use App\Http\Controllers\PsychometricScaleController;
 use App\Http\Controllers\PsychometricAssessmentController;
 use App\Http\Controllers\ContingencyPlanController;
+use App\Http\Controllers\ClientRiskAssessmentController;
 
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -129,6 +130,10 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     // Routine Management
     Route::get('/routine', [\App\Http\Controllers\ClientRoutineController::class, 'index'])->name('routine.index');
     Route::post('/routine/{item}/log', [\App\Http\Controllers\ClientRoutineController::class, 'logItem'])->name('routine.log');
+    
+    // Risk Assessments (Phase 5)
+    Route::get('/risk-assessments', [\App\Http\Controllers\ClientRiskAssessmentController::class, 'index'])->name('risk-assessments.index');
+    Route::get('/risk-assessments/{assessment}', [\App\Http\Controllers\ClientRiskAssessmentController::class, 'show'])->name('risk-assessments.show');
 });
 
 // Dashboard (protected)
@@ -346,6 +351,18 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::get('patients/{patient}/tracking/exercise', [\App\Http\Controllers\Doctor\TrackingLogController::class, 'exercise'])
         ->name('patients.tracking.exercise');
     
+    // Risk Assessment Management (Phase 5)
+    Route::get('patients/{patient}/risk-assessments', [\App\Http\Controllers\Doctor\RiskAssessmentController::class, 'index'])
+        ->name('patients.risk-assessments.index');
+    Route::get('patients/{patient}/risk-assessments/create', [\App\Http\Controllers\Doctor\RiskAssessmentController::class, 'create'])
+        ->name('patients.risk-assessments.create');
+    Route::post('patients/{patient}/risk-assessments', [\App\Http\Controllers\Doctor\RiskAssessmentController::class, 'store'])
+        ->name('patients.risk-assessments.store');
+    Route::get('patients/{patient}/risk-assessments/{assessment}', [\App\Http\Controllers\Doctor\RiskAssessmentController::class, 'show'])
+        ->name('patients.risk-assessments.show');
+    Route::put('patients/{patient}/risk-assessments/{assessment}', [\App\Http\Controllers\Doctor\RiskAssessmentController::class, 'update'])
+        ->name('patients.risk-assessments.update');
+    
     // Doctor Reviews
     Route::get('doctors/reviews', [\App\Http\Controllers\DoctorReviewController::class, 'index'])
         ->name('doctor.reviews.index');
@@ -353,6 +370,53 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('doctor.reviews.analytics');
     Route::get('doctors/reviews/{review}', [\App\Http\Controllers\DoctorReviewController::class, 'show'])
         ->name('doctor.reviews.show');
+    
+    // Doctor - Feedback Management (Phase 6)
+    Route::get('patients/{patient}/feedback', [\App\Http\Controllers\Doctor\FeedbackController::class, 'index'])
+        ->name('patients.feedback.index');
+    Route::get('patients/{patient}/feedback/{feedback}', [\App\Http\Controllers\Doctor\FeedbackController::class, 'show'])
+        ->name('patients.feedback.show');
+    Route::post('feedback/{feedback}/respond', [\App\Http\Controllers\Doctor\FeedbackController::class, 'respond'])
+        ->name('feedback.respond');
+    
+    // Doctor - Practice Progression Management (Phase 6)
+    Route::get('patients/{patient}/practice-progressions', [\App\Http\Controllers\Doctor\PracticeProgressionController::class, 'index'])
+        ->name('patients.practice-progressions.index');
+    Route::get('patients/{patient}/practice-progressions/{progression}', [\App\Http\Controllers\Doctor\PracticeProgressionController::class, 'show'])
+        ->name('patients.practice-progressions.show');
+    Route::get('patients/{patient}/practice-progressions-analytics', [\App\Http\Controllers\Doctor\PracticeProgressionController::class, 'analytics'])
+        ->name('patients.practice-progressions.analytics');
+    
+    // Doctor - Session Reports (Phase 6)
+    Route::resource('session-reports', \App\Http\Controllers\Doctor\SessionReportController::class);
+    Route::post('session-reports/{report}/finalize', [\App\Http\Controllers\Doctor\SessionReportController::class, 'finalize'])
+        ->name('session-reports.finalize');
+    Route::post('session-reports/{report}/share', [\App\Http\Controllers\Doctor\SessionReportController::class, 'share'])
+        ->name('session-reports.share');
+    
+    // Doctor - Psychometric Assessments (Phase 6 - Enhanced)
+    Route::get('patients/{patient}/psychometric-compare', [\App\Http\Controllers\Doctor\PsychometricAssessmentController::class, 'compare'])
+        ->name('patients.psychometric.compare');
+    
+    // Doctor - Patient Tracking Dashboard (Phase 6)
+    Route::get('patients/{patient}/tracking-overview', [\App\Http\Controllers\Doctor\PatientTrackingController::class, 'overview'])
+        ->name('patients.tracking.overview');
+    Route::get('patients/{patient}/tracking/timeline', [\App\Http\Controllers\Doctor\PatientTrackingController::class, 'timeline'])
+        ->name('patients.tracking.timeline');
+    Route::get('patients/{patient}/tracking/compliance', [\App\Http\Controllers\Doctor\PatientTrackingController::class, 'compliance'])
+        ->name('patients.tracking.compliance');
+    
+    // Doctor - Patient Device Monitoring (Phase 6)
+    Route::get('patients/{patient}/devices', [\App\Http\Controllers\Doctor\PatientDeviceController::class, 'index'])
+        ->name('patients.devices.index');
+    Route::get('patients/{patient}/devices/{device}', [\App\Http\Controllers\Doctor\PatientDeviceController::class, 'show'])
+        ->name('patients.devices.show');
+    
+    // Doctor - Task Management (Phase 6)
+    Route::resource('tasks', \App\Http\Controllers\Doctor\TaskManagementController::class)->except(['index']);
+    Route::get('tasks', [\App\Http\Controllers\Doctor\TaskManagementController::class, 'index'])->name('tasks.index');
+    Route::get('patients/{patient}/tasks', [\App\Http\Controllers\Doctor\TaskManagementController::class, 'patientTasks'])
+        ->name('patients.tasks.index');
 });
 
 // Admin routes
@@ -419,6 +483,49 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     // Review Question Management
     Route::resource('review-questions', \App\Http\Controllers\Admin\ReviewQuestionController::class);
     Route::post('review-questions/reorder', [\App\Http\Controllers\Admin\ReviewQuestionController::class, 'reorder'])->name('review-questions.reorder');
+    
+    // Risk Assessment Overview (Phase 5)
+    Route::get('risk-assessments', [\App\Http\Controllers\Admin\RiskAssessmentController::class, 'index'])->name('risk-assessments.index');
+    Route::get('risk-assessments/analytics', [\App\Http\Controllers\Admin\RiskAssessmentController::class, 'analytics'])->name('risk-assessments.analytics');
+    Route::get('risk-assessments/high-risk', [\App\Http\Controllers\Admin\RiskAssessmentController::class, 'highRisk'])->name('risk-assessments.high-risk');
+    Route::get('risk-assessments/{assessment}', [\App\Http\Controllers\Admin\RiskAssessmentController::class, 'show'])->name('risk-assessments.show');
+    
+    // Feedback Management (Phase 6)
+    Route::resource('feedback', \App\Http\Controllers\Admin\FeedbackController::class)->only(['index', 'show', 'destroy']);
+    Route::get('feedback-export', [\App\Http\Controllers\Admin\FeedbackController::class, 'export'])->name('feedback.export');
+    
+    // Practice Progression Management (Phase 6)
+    Route::resource('practice-progressions', \App\Http\Controllers\Admin\PracticeProgressionController::class)->only(['index', 'show']);
+    Route::get('practice-progressions-analytics', [\App\Http\Controllers\Admin\PracticeProgressionController::class, 'analytics'])->name('practice-progressions.analytics');
+    Route::get('practice-progressions-export', [\App\Http\Controllers\Admin\PracticeProgressionController::class, 'export'])->name('practice-progressions.export');
+    
+    // Session Reports Management (Phase 6)
+    Route::resource('session-reports', \App\Http\Controllers\Admin\SessionReportController::class)->only(['index', 'show']);
+    Route::get('session-reports-analytics', [\App\Http\Controllers\Admin\SessionReportController::class, 'analytics'])->name('session-reports.analytics');
+    
+    // Parent Permission Management (Phase 6)
+    Route::resource('parent-permissions', \App\Http\Controllers\Admin\ParentPermissionController::class);
+    
+    // Psychometric Scales Management (Phase 6 - Enhanced)
+    Route::resource('psychometric-scales', \App\Http\Controllers\Admin\PsychometricScaleController::class);
+    Route::post('psychometric-scales/{psychometricScale}/toggle', [\App\Http\Controllers\Admin\PsychometricScaleController::class, 'toggleActive'])->name('psychometric-scales.toggle');
+    
+    // Patient Device Management (Phase 6)
+    Route::get('devices', [\App\Http\Controllers\Admin\PatientDeviceController::class, 'index'])->name('devices.index');
+    Route::get('devices/analytics', [\App\Http\Controllers\Admin\PatientDeviceController::class, 'analytics'])->name('devices.analytics');
+    Route::get('devices/{device}', [\App\Http\Controllers\Admin\PatientDeviceController::class, 'show'])->name('devices.show');
+    Route::delete('devices/{device}', [\App\Http\Controllers\Admin\PatientDeviceController::class, 'destroy'])->name('devices.destroy');
+    
+    // Enhanced Tracking Overview (Phase 6)
+    Route::get('tracking/all', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'allTracking'])->name('tracking.all');
+    Route::get('tracking/by-type', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'trackingByType'])->name('tracking.by-type');
+    Route::get('tracking/compliance', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'complianceReport'])->name('tracking.compliance');
+    Route::get('tracking/patient-comparison', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'patientComparison'])->name('tracking.patient-comparison');
+    
+    // Task Management (Phase 6)
+    Route::get('tasks', [\App\Http\Controllers\Admin\TaskManagementController::class, 'index'])->name('tasks.index');
+    Route::get('tasks/analytics', [\App\Http\Controllers\Admin\TaskManagementController::class, 'analytics'])->name('tasks.analytics');
+    Route::get('tasks/{task}', [\App\Http\Controllers\Admin\TaskManagementController::class, 'show'])->name('tasks.show');
     
     // Article Management
     Route::prefix('articles')->name('articles.')->group(function () {

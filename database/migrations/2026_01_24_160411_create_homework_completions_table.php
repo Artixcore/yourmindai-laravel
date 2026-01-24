@@ -23,8 +23,8 @@ return new class extends Migration
             $table->json('completion_data')->nullable()->comment('Flexible data based on homework type');
             $table->timestamps();
             
-            $table->index(['homework_assignment_id', 'completion_date']);
-            $table->index(['patient_id', 'completion_date']);
+            $table->index(['homework_assignment_id', 'completion_date'], 'hw_completion_assignment_date_idx');
+            $table->index(['patient_id', 'completion_date'], 'hw_completion_patient_date_idx');
         });
     }
 

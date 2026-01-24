@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('practice_progressions', function (Blueprint $table) {
             $table->id();
-            $table->morphs('progressionable'); // polymorphic relationship
+            $table->morphs('progressionable', 'progressionable_idx'); // polymorphic relationship with custom index name
             $table->foreignId('patient_id')->constrained('patient_profiles')->onDelete('cascade');
             $table->date('progress_date');
             $table->integer('progress_percentage')->default(0)->comment('0-100');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Indexes for performance
-            $table->index(['progressionable_type', 'progressionable_id']);
+            // Note: morphs() already creates index on progressionable_type and progressionable_id
             $table->index(['patient_id', 'progress_date']);
             $table->index('monitored_by');
         });

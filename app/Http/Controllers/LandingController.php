@@ -12,7 +12,21 @@ class LandingController extends Controller
      */
     public function index()
     {
-        return view('pages.landing');
+        // Get featured articles
+        $featuredArticles = \App\Models\Article::published()
+            ->featured()
+            ->with(['user', 'categories'])
+            ->take(3)
+            ->get();
+        
+        // Get latest articles
+        $latestArticles = \App\Models\Article::published()
+            ->with(['user', 'categories'])
+            ->orderBy('published_at', 'desc')
+            ->take(6)
+            ->get();
+        
+        return view('pages.landing', compact('featuredArticles', 'latestArticles'));
     }
 
     /**

@@ -41,6 +41,17 @@ Route::post('/contact', [LandingController::class, 'storeContact'])->name('conta
 // Public appointment request (no auth required)
 Route::post('/appointment-request', [\App\Http\Controllers\AppointmentRequestController::class, 'store'])->name('appointment-request.store');
 
+// Public Articles (accessible to everyone)
+Route::prefix('articles')->name('articles.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ArticlePublicController::class, 'index'])->name('public.index');
+    Route::get('/category/{slug}', [\App\Http\Controllers\ArticlePublicController::class, 'category'])->name('public.category');
+    Route::get('/tag/{slug}', [\App\Http\Controllers\ArticlePublicController::class, 'tag'])->name('public.tag');
+    Route::get('/search', [\App\Http\Controllers\ArticlePublicController::class, 'search'])->name('public.search');
+    Route::post('/{article}/like', [\App\Http\Controllers\ArticlePublicController::class, 'like'])->name('public.like');
+    Route::post('/{article}/comment', [\App\Http\Controllers\ArticlePublicController::class, 'comment'])->name('public.comment');
+    Route::get('/{slug}', [\App\Http\Controllers\ArticlePublicController::class, 'show'])->name('public.show');
+});
+
 // Authentication routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
@@ -95,6 +106,22 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
 
 // Dashboard (protected)
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+
+// Writer routes (for article writers - admin, doctors, or writers)
+Route::prefix('writer')->name('writer.')->middleware(['auth', \App\Http\Middleware\WriterMiddleware::class])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Writer\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Articles
+    Route::resource('articles', \App\Http\Controllers\Writer\ArticleController::class);
+    Route::post('articles/{article}/submit', [\App\Http\Controllers\Writer\ArticleController::class, 'submitForReview'])->name('articles.submit');
+    Route::get('articles/{article}/preview', [\App\Http\Controllers\Writer\ArticleController::class, 'preview'])->name('articles.preview');
+    Route::post('articles/upload-image', [\App\Http\Controllers\Writer\ArticleController::class, 'uploadImage'])->name('articles.upload-image');
+    
+    // Earnings
+    Route::get('/earnings', [\App\Http\Controllers\Writer\EarningsController::class, 'index'])->name('earnings.index');
+    Route::get('/earnings/{period}', [\App\Http\Controllers\Writer\EarningsController::class, 'show'])->name('earnings.show');
+});
 
 // Patient routes (for patients logged in via web)
 Route::prefix('patient')->name('patient.')->middleware(['auth'])->group(function () {
@@ -279,4 +306,31 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     // Review Question Management
     Route::resource('review-questions', \App\Http\Controllers\Admin\ReviewQuestionController::class);
     Route::post('review-questions/reorder', [\App\Http\Controllers\Admin\ReviewQuestionController::class, 'reorder'])->name('review-questions.reorder');
+    
+    // Article Management
+    Route::prefix('articles')->name('articles.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ArticleController::class, 'index'])->name('index');
+        Route::get('/{article}', [\App\Http\Controllers\Admin\ArticleController::class, 'show'])->name('show');
+        Route::post('/{article}/approve', [\App\Http\Controllers\Admin\ArticleController::class, 'approve'])->name('approve');
+        Route::post('/{article}/reject', [\App\Http\Controllers\Admin\ArticleController::class, 'reject'])->name('reject');
+        Route::post('/{article}/publish', [\App\Http\Controllers\Admin\ArticleController::class, 'publish'])->name('publish');
+        Route::post('/{article}/unpublish', [\App\Http\Controllers\Admin\ArticleController::class, 'unpublish'])->name('unpublish');
+        Route::post('/{article}/feature', [\App\Http\Controllers\Admin\ArticleController::class, 'feature'])->name('feature');
+        Route::post('/{article}/unfeature', [\App\Http\Controllers\Admin\ArticleController::class, 'unfeature'])->name('unfeature');
+        Route::post('/reorder', [\App\Http\Controllers\Admin\ArticleController::class, 'reorder'])->name('reorder');
+    });
+    
+    // Article Categories
+    Route::resource('article-categories', \App\Http\Controllers\Admin\ArticleCategoryController::class);
+    
+    // Article Comments
+    Route::get('article-comments', [\App\Http\Controllers\Admin\ArticleCommentController::class, 'index'])->name('article-comments.index');
+    Route::post('article-comments/{comment}/approve', [\App\Http\Controllers\Admin\ArticleCommentController::class, 'approve'])->name('article-comments.approve');
+    Route::post('article-comments/{comment}/reject', [\App\Http\Controllers\Admin\ArticleCommentController::class, 'reject'])->name('article-comments.reject');
+    Route::delete('article-comments/{comment}', [\App\Http\Controllers\Admin\ArticleCommentController::class, 'destroy'])->name('article-comments.destroy');
+    
+    // Article Earnings
+    Route::get('article-earnings', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'index'])->name('article-earnings.index');
+    Route::post('article-earnings/calculate', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'calculate'])->name('article-earnings.calculate');
+    Route::post('article-earnings/{earning}/paid', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'markAsPaid'])->name('article-earnings.paid');
 });

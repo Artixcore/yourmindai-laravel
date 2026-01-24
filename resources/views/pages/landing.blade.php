@@ -108,6 +108,58 @@
         </div>
     </section>
 
+    <!-- Featured Articles Section -->
+    @if ($featuredArticles->count() > 0)
+    <section class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-white position-relative">
+        <div class="container-fluid">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="h1 fw-bold text-psychological-primary mb-3">Featured Articles</h2>
+                <p class="h5 text-stone-600 mx-auto" style="max-width: 768px; line-height: 1.7;">
+                    Explore our expert insights on mental health and wellness
+                </p>
+            </div>
+            
+            <div class="row g-4 mb-4">
+                @foreach ($featuredArticles as $article)
+                    <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
+                        <a href="{{ route('articles.public.show', $article->slug) }}" class="text-decoration-none">
+                            <x-article-card :article="$article" :showAuthor="true" class="h-100 hover:shadow-lg transition" />
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+            
+            <div class="text-center">
+                <a href="{{ route('articles.public.index') }}" class="btn btn-outline-primary btn-lg px-5 py-3">
+                    View All Articles <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- Latest Articles Section -->
+    @if ($latestArticles->count() > 0)
+    <section class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-2 position-relative">
+        <div class="container-fluid">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="h1 fw-bold text-psychological-primary mb-3">Latest Articles</h2>
+                <p class="h5 text-stone-600">Recent insights from our team</p>
+            </div>
+            
+            <div class="row g-4">
+                @foreach ($latestArticles as $article)
+                    <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 50 }}">
+                        <a href="{{ route('articles.public.show', $article->slug) }}" class="text-decoration-none">
+                            <x-article-card :article="$article" :showAuthor="true" :compact="true" class="h-100" />
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
     <!-- Appointment Booking Section -->
     <section id="appointment" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-3 position-relative">
         <div class="container-fluid" style="max-width: 896px;">

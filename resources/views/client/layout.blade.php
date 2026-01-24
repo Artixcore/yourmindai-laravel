@@ -164,17 +164,17 @@
             <i class="bi bi-house-door"></i>
             <span>Home</span>
         </a>
+        <a href="{{ route('articles.public.index') }}" class="nav-item {{ request()->routeIs('articles.public.*') ? 'active' : '' }}">
+            <i class="bi bi-newspaper"></i>
+            <span>Articles</span>
+        </a>
+        <a href="{{ route('client.reviews.index') }}" class="nav-item {{ request()->routeIs('client.reviews.*') ? 'active' : '' }}">
+            <i class="bi bi-star"></i>
+            <span>Reviews</span>
+        </a>
         <a href="{{ route('client.assessments.index') }}" class="nav-item {{ request()->routeIs('client.assessments.*') ? 'active' : '' }}">
             <i class="bi bi-clipboard-check"></i>
-            <span>Assessments</span>
-        </a>
-        <a href="{{ route('client.tasks.index') }}" class="nav-item {{ request()->routeIs('client.tasks.*') ? 'active' : '' }}">
-            <i class="bi bi-list-check"></i>
-            <span>Tasks</span>
-        </a>
-        <a href="{{ route('client.devices.index') }}" class="nav-item {{ request()->routeIs('client.devices.*') ? 'active' : '' }}">
-            <i class="bi bi-phone"></i>
-            <span>Devices</span>
+            <span>Tests</span>
         </a>
         <a href="{{ route('client.contingency.index') }}" class="nav-item {{ request()->routeIs('client.contingency.*') ? 'active' : '' }}">
             <i class="bi bi-shield-exclamation"></i>

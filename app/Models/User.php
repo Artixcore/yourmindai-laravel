@@ -26,6 +26,9 @@ class User extends Model implements AuthenticatableContract, JWTSubject
         'avatar',
         'avatar_path',
         'status',
+        'is_writer',
+        'writer_bio',
+        'writer_avatar',
     ];
 
     protected $hidden = [
@@ -259,5 +262,37 @@ class User extends Model implements AuthenticatableContract, JWTSubject
     public function getRememberTokenName()
     {
         return 'remember_token';
+    }
+
+    /**
+     * Get the articles written by this user.
+     */
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
+
+    /**
+     * Get the earnings for articles written by this user.
+     */
+    public function articleEarnings()
+    {
+        return $this->hasMany(ArticleEarning::class);
+    }
+
+    /**
+     * Check if user is a writer.
+     */
+    public function isWriter(): bool
+    {
+        return $this->is_writer ?? false;
+    }
+
+    /**
+     * Check if user can write articles.
+     */
+    public function canWriteArticles(): bool
+    {
+        return $this->isWriter() || $this->isDoctor() || $this->isAdmin();
     }
 }

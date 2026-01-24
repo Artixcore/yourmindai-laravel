@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RequireRole::class,
             'blade.role' => \App\Http\Middleware\BladeRoleMiddleware::class,
             'require.admin' => \App\Http\Middleware\RequireAdmin::class,
+            'writer' => \App\Http\Middleware\WriterMiddleware::class,
         ]);
         
         // Enable CORS for API routes

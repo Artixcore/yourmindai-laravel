@@ -71,6 +71,22 @@
                     <i class="bi bi-clipboard-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Psychometric Scales</span>
                 </a>
+                <a href="{{ route('admin.articles.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-newspaper flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Articles</span>
+                </a>
+                <a href="{{ route('admin.article-categories.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.article-categories.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-folder flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Article Categories</span>
+                </a>
+                <a href="{{ route('admin.article-comments.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.article-comments.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-chat-left-text flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Article Comments</span>
+                </a>
+                <a href="{{ route('admin.article-earnings.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.article-earnings.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-currency-dollar flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Article Earnings</span>
+                </a>
             @endif
             
             @if($role === 'doctor')
@@ -95,6 +111,16 @@
                     <i class="bi bi-clipboard-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Assessment Scales</span>
                 </a>
+                <a href="{{ route('doctor.reviews.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctor.reviews.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-star flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">My Reviews</span>
+                </a>
+                @if(auth()->user()->canWriteArticles())
+                    <a href="{{ route('writer.dashboard') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('writer.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                        <i class="bi bi-pencil-square flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                        <span x-show="!collapsed">My Articles</span>
+                    </a>
+                @endif
                 <a href="{{ route('doctors.settings') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('doctors.settings*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-gear flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Settings</span>

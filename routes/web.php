@@ -250,11 +250,6 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     // Session routes (nested under patients)
     Route::resource('patients.sessions', SessionController::class);
     
-    // Session Reports (Phase 2)
-    Route::get('sessions/{session}/report/create', [\App\Http\Controllers\SessionReportController::class, 'create'])->name('sessions.report.create');
-    Route::post('sessions/{session}/report', [\App\Http\Controllers\SessionReportController::class, 'store'])->name('sessions.report.store');
-    Route::get('session-reports/{report}', [\App\Http\Controllers\SessionReportController::class, 'show'])->name('session-reports.show');
-    
     // Session day routes
     Route::post('patients/{patient}/sessions/{session}/days', [SessionDayController::class, 'store'])
         ->name('patients.sessions.days.store');

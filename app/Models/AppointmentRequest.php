@@ -17,6 +17,7 @@ class AppointmentRequest extends Model
         'address',
         'preferred_date',
         'preferred_time',
+        'session_mode',
         'status',
         'notes',
         'doctor_id',

@@ -36,11 +36,19 @@ use App\Http\Controllers\ClientRiskAssessmentController;
 // Landing page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-// Contact form
-Route::post('/contact', [LandingController::class, 'storeContact'])->name('contact.store');
+// Contact form (rate limited: 10 per minute per IP)
+Route::post('/contact', [LandingController::class, 'storeContact'])->name('contact.store')->middleware('throttle:10,1');
 
-// Public appointment request (no auth required)
-Route::post('/appointment-request', [\App\Http\Controllers\AppointmentRequestController::class, 'store'])->name('appointment-request.store');
+// Public appointment request (rate limited: 10 per minute per IP)
+Route::post('/appointment-request', [\App\Http\Controllers\AppointmentRequestController::class, 'store'])->name('appointment-request.store')->middleware('throttle:10,1');
+
+// Public Digital Wellbeing (no auth required)
+Route::get('/wellbeing', [\App\Http\Controllers\ClientWellbeingController::class, 'publicIndex'])->name('wellbeing.public');
+
+// Public signed download for session report PDF (share link)
+Route::get('/report/{report}/download', [\App\Http\Controllers\ReportDownloadController::class, 'download'])
+    ->name('report.download-public')
+    ->middleware('signed');
 
 // Public Articles (accessible to everyone)
 Route::prefix('articles')->name('articles.')->group(function () {
@@ -82,6 +90,28 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     Route::get('/contingency', [\App\Http\Controllers\ClientContingencyController::class, 'index'])->name('contingency.index');
     Route::get('/contingency/{plan}', [\App\Http\Controllers\ClientContingencyController::class, 'show'])->name('contingency.show');
     Route::post('/contingency/{plan}/activate', [\App\Http\Controllers\ClientContingencyController::class, 'activate'])->name('contingency.activate');
+    
+    // Digital Wellbeing
+    Route::get('/wellbeing', [\App\Http\Controllers\ClientWellbeingController::class, 'index'])->name('wellbeing.index');
+    
+    // Lifestyle Monitoring
+    Route::get('/lifestyle', [\App\Http\Controllers\ClientLifestyleController::class, 'index'])->name('lifestyle.index');
+    Route::post('/lifestyle', [\App\Http\Controllers\ClientLifestyleController::class, 'store'])->name('lifestyle.store');
+    
+    // Client Notes (text + voice)
+    Route::get('/notes', [\App\Http\Controllers\ClientNotesController::class, 'index'])->name('notes.index');
+    Route::post('/notes', [\App\Http\Controllers\ClientNotesController::class, 'store'])->name('notes.store');
+    
+    // Resources (doctor-shared PDFs/videos) + App feedback
+    Route::get('/resources', [\App\Http\Controllers\ClientResourceController::class, 'index'])->name('resources.index');
+    Route::post('/feedback', [\App\Http\Controllers\ClientResourceController::class, 'storeFeedback'])->name('feedback.store');
+    
+    // Daily Journal (client panel)
+    Route::get('/journal', [\App\Http\Controllers\ClientJournalController::class, 'index'])->name('journal.index');
+    Route::get('/journal/create', function () {
+        return view('client.journal.create');
+    })->name('journal.create');
+    Route::post('/journal', [\App\Http\Controllers\ClientJournalController::class, 'store'])->name('journal.store');
     
     // Session Details (enhanced)
     Route::get('/sessions/{session}', [\App\Http\Controllers\PatientSessionController::class, 'show'])->name('sessions.show');
@@ -324,6 +354,20 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::put('patients/{patient}/homework/{homework}', [\App\Http\Controllers\Doctor\HomeworkController::class, 'update'])
         ->name('patients.homework.update');
     
+    // Goals Management
+    Route::get('patients/{patient}/goals', [\App\Http\Controllers\Doctor\GoalController::class, 'index'])
+        ->name('patients.goals.index');
+    Route::get('patients/{patient}/goals/create', [\App\Http\Controllers\Doctor\GoalController::class, 'create'])
+        ->name('patients.goals.create');
+    Route::post('patients/{patient}/goals', [\App\Http\Controllers\Doctor\GoalController::class, 'store'])
+        ->name('patients.goals.store');
+    Route::get('patients/{patient}/goals/{goal}/edit', [\App\Http\Controllers\Doctor\GoalController::class, 'edit'])
+        ->name('patients.goals.edit');
+    Route::put('patients/{patient}/goals/{goal}', [\App\Http\Controllers\Doctor\GoalController::class, 'update'])
+        ->name('patients.goals.update');
+    Route::delete('patients/{patient}/goals/{goal}', [\App\Http\Controllers\Doctor\GoalController::class, 'destroy'])
+        ->name('patients.goals.destroy');
+    
     // Routine Management (Phase 3)
     Route::get('patients/{patient}/routines', [\App\Http\Controllers\Doctor\RoutineController::class, 'index'])
         ->name('patients.routines.index');
@@ -388,6 +432,14 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('session-reports.finalize');
     Route::post('session-reports/{report}/share', [\App\Http\Controllers\Doctor\SessionReportController::class, 'share'])
         ->name('session-reports.share');
+    Route::post('session-reports/{report}/generate-pdf', [\App\Http\Controllers\Doctor\SessionReportController::class, 'generatePdf'])
+        ->name('session-reports.generate-pdf');
+    Route::get('session-reports/{report}/download-pdf', [\App\Http\Controllers\Doctor\SessionReportController::class, 'downloadPdf'])
+        ->name('session-reports.download-pdf');
+    Route::get('session-reports/{report}/share-link', [\App\Http\Controllers\Doctor\SessionReportController::class, 'shareLink'])
+        ->name('session-reports.share-link');
+    Route::post('session-reports/{report}/send-email', [\App\Http\Controllers\Doctor\SessionReportController::class, 'sendViaEmail'])
+        ->name('session-reports.send-email');
     
     // Doctor - Psychometric Assessments (Phase 6 - Enhanced)
     Route::get('patients/{patient}/psychometric-compare', [\App\Http\Controllers\Doctor\PsychometricAssessmentController::class, 'compare'])

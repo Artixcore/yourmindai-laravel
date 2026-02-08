@@ -16,14 +16,22 @@ class Appointment extends Model
         'status',
         'appointment_type',
         'setting_place',
+        'session_mode',
+        'booking_fee',
+        'payment_status',
+        'paid_at',
         'notes',
         'reminder_enabled',
         'cancellation_reason',
+        'cancelled_at',
     ];
 
     protected $casts = [
         'date' => 'datetime',
         'reminder_enabled' => 'boolean',
+        'paid_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+        'booking_fee' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

@@ -160,6 +160,21 @@
     </section>
     @endif
 
+    <!-- Digital Wellbeing Section -->
+    <section id="wellbeing" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-white position-relative">
+        <div class="container-fluid">
+            <div class="text-center mb-4" data-aos="fade-up">
+                <h2 class="h1 fw-bold text-psychological-primary mb-3">Digital Wellbeing</h2>
+                <p class="h5 text-stone-600 mx-auto" style="max-width: 640px; line-height: 1.7;">
+                    Simple practices for a healthier relationship with technology: screen time awareness, mindfulness prompts, and daily tips.
+                </p>
+                <a href="{{ route('wellbeing.public') }}" class="btn btn-primary btn-lg mt-3 px-4 py-2">
+                    Explore Digital Wellbeing <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Appointment Booking Section -->
     <section id="appointment" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-3 position-relative">
         <div class="container-fluid" style="max-width: 896px;">
@@ -238,6 +253,20 @@
                                 :error="$errors->first('phone')"
                             />
                         </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="session_mode" class="form-label text-stone-700 fw-semibold">
+                            Session Mode
+                        </label>
+                        <select id="session_mode" name="session_mode" class="form-select @error('session_mode') is-invalid @enderror" style="transition: border-color 0.3s ease;">
+                            <option value="">Select mode</option>
+                            <option value="in_person" {{ old('session_mode') == 'in_person' ? 'selected' : '' }}>In-person</option>
+                            <option value="online" {{ old('session_mode') == 'online' ? 'selected' : '' }}>Online</option>
+                        </select>
+                        @error('session_mode')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                     
                     <div class="mb-4">

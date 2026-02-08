@@ -484,6 +484,49 @@
         @endif
     </x-card>
 
+    <!-- Goals Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">Goals</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ route('patients.goals.create', $patient) }}" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>New Goal</span>
+                </a>
+                <a href="{{ route('patients.goals.index', $patient) }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-bullseye"></i>
+                    <span>View All</span>
+                </a>
+            </div>
+        </div>
+        @php
+            $goals = \App\Models\Goal::where('patient_id', $patient->id)->orderBy('start_date', 'desc')->take(5)->get();
+        @endphp
+        @if($goals->isEmpty())
+            <div class="text-center py-4 text-stone-500">
+                <i class="bi bi-bullseye text-stone-400" style="font-size: 2rem;"></i>
+                <p class="mb-0 mt-2">No goals set yet.</p>
+                <a href="{{ route('patients.goals.create', $patient) }}" class="btn btn-primary mt-2">Set first goal</a>
+            </div>
+        @else
+            <div class="d-flex flex-column gap-2">
+                @foreach($goals as $goal)
+                    <div class="border border-stone-200 rounded p-2">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <strong class="text-stone-900">{{ $goal->title }}</strong>
+                                @if($goal->start_date || $goal->end_date)
+                                    <br><small class="text-muted">{{ $goal->start_date?->format('M d') }} @if($goal->end_date)– {{ $goal->end_date->format('M d, Y') }}@endif</small>
+                                @endif
+                            </div>
+                            <a href="{{ route('patients.goals.edit', [$patient, $goal]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-card>
+
     <!-- Routines Section -->
     <x-card class="mt-4">
         <div class="d-flex align-items-center justify-content-between mb-3">

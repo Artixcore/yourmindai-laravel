@@ -20,8 +20,10 @@ class BladeRoleMiddleware
         }
 
         $user = auth()->user();
-        
-        if (!in_array($user->role, $roles)) {
+        $userRole = strtolower((string) $user->role);
+        $allowedRoles = array_map('strtolower', array_map('strval', $roles));
+
+        if (!in_array($userRole, $allowedRoles, true)) {
             abort(403, 'Access denied. Required roles: ' . implode(', ', $roles));
         }
 

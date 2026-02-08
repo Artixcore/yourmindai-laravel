@@ -74,8 +74,23 @@
         <form action="{{ route('client.homework.complete', $homework->id) }}" method="POST">
             @csrf
             
-            <!-- Completion Percentage -->
+            <!-- Homework Done? Yes/No -->
             <div class="mb-3">
+                <label class="form-label fw-semibold">Homework done today?</label>
+                <div class="d-flex gap-4">
+                    <div class="form-check">
+                        <input type="radio" name="homework_done" id="homework_done_yes" value="yes" class="form-check-input" {{ old('homework_done', 'yes') === 'yes' ? 'checked' : '' }} onchange="togglePercentage(this)">
+                        <label for="homework_done_yes" class="form-check-label">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="homework_done" id="homework_done_no" value="no" class="form-check-input" {{ old('homework_done') === 'no' ? 'checked' : '' }} onchange="togglePercentage(this)">
+                        <label for="homework_done_no" class="form-check-label">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completion Percentage -->
+            <div class="mb-3" id="percentageGroup">
                 <label for="completion_percentage" class="form-label">How much did you complete today?</label>
                 <input type="range" class="form-range" name="completion_percentage" id="completion_percentage" 
                        min="0" max="100" step="10" value="100" oninput="updatePercentageLabel(this.value)">
@@ -86,12 +101,10 @@
                 </div>
             </div>
 
-            <!-- Notes -->
+            <!-- Comment / Feedback -->
             <div class="mb-3">
-                <label for="patient_notes" class="form-label">Your Notes (Optional)</label>
-                <textarea name="patient_notes" id="patient_notes" rows="3" 
-                          class="form-control" 
-                          placeholder="How did it go? Any challenges or observations?"></textarea>
+                <label for="patient_notes" class="form-label">Comment / Feedback (Optional)</label>
+                <textarea name="patient_notes" id="patient_notes" rows="3" class="form-control" placeholder="How did it go? Any challenges or observations? Feedback for your doctor?">{{ old('patient_notes') }}</textarea>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">
@@ -190,6 +203,19 @@ function getIcon($type) {
 <script>
 function updatePercentageLabel(value) {
     document.getElementById('percentageLabel').textContent = value + '%';
+}
+function togglePercentage(radio) {
+    var group = document.getElementById('percentageGroup');
+    var slider = document.getElementById('completion_percentage');
+    if (radio.value === 'yes') {
+        group.style.display = 'block';
+        slider.value = 100;
+        updatePercentageLabel(100);
+    } else {
+        group.style.display = 'block';
+        slider.value = 0;
+        updatePercentageLabel(0);
+    }
 }
 </script>
 

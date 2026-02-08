@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'booking_fee' => (float) env('BOOKING_FEE', 0),
+
 ];

@@ -14,9 +14,24 @@ class Session extends Model
         'doctor_id',
         'patient_id',
         'title',
+        'session_type',
         'notes',
         'status',
     ];
+
+    public static function sessionTypeOptions(): array
+    {
+        return [
+            'individual' => 'Individual',
+            'group' => 'Group',
+            'skill_based' => 'Skill-Based',
+            'family' => 'Family',
+            'couple' => 'Couple',
+            'parents' => 'Parents',
+            'relapse_prevention' => 'Relapse Prevention',
+            'others' => 'Others',
+        ];
+    }
 
     protected $casts = [
         'status' => 'string',

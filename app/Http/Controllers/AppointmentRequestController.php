@@ -7,6 +7,8 @@ use App\Models\Patient;
 use App\Models\PatientProfile;
 use App\Models\User;
 use App\Models\Appointment;
+use App\Services\AppointmentSlotService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -26,6 +28,7 @@ class AppointmentRequestController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:1000',
+            'session_mode' => 'nullable|in:in_person,online',
             'preferred_date' => 'required|date|after_or_equal:today',
             'preferred_time' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:2000',
@@ -38,6 +41,7 @@ class AppointmentRequestController extends Controller
                 'email' => $validated['email'],
                 'phone' => $validated['phone'] ?? null,
                 'address' => $validated['address'] ?? null,
+                'session_mode' => $validated['session_mode'] ?? null,
                 'preferred_date' => $validated['preferred_date'],
                 'preferred_time' => $validated['preferred_time'] ?? null,
                 'notes' => $validated['notes'] ?? null,
@@ -253,16 +257,37 @@ class AppointmentRequestController extends Controller
             // Mark appointment request as converted
             $appointmentRequest->markAsConverted($patient->id, $patientProfile->id);
 
-            // Optionally create appointment
+            // Optionally create appointment (with slot validation: max 5/day, no conflict)
             if ($request->boolean('create_appointment')) {
+                $slotService = app(AppointmentSlotService::class);
+                $dateStr = $appointmentRequest->preferred_date instanceof \Carbon\Carbon
+                    ? $appointmentRequest->preferred_date->toDateString()
+                    : Carbon::parse($appointmentRequest->preferred_date)->toDateString();
+                $timeSlot = $appointmentRequest->preferred_time ?? '09:00';
+                $errors = $slotService->validateSlot($doctorId, $dateStr, $timeSlot);
+                if (!empty($errors)) {
+                    DB::rollBack();
+                    return back()->withInput()->withErrors(['error' => implode(' ', $errors)]);
+                }
+                $date = Carbon::parse($appointmentRequest->preferred_date);
+                if ($appointmentRequest->preferred_time && preg_match('/^(\d{1,2}):(\d{2})/', $appointmentRequest->preferred_time, $m)) {
+                    $date->setTime((int) $m[1], (int) $m[2], 0);
+                } else {
+                    $date->setTime(9, 0, 0);
+                }
+                $bookingFee = (float) config('app.booking_fee', 0);
                 Appointment::create([
                     'doctor_id' => $doctorId,
                     'patient_id' => $patientProfile->id,
-                    'date' => $appointmentRequest->preferred_date,
-                    'time_slot' => $appointmentRequest->preferred_time,
+                    'date' => $date,
+                    'time_slot' => $timeSlot,
                     'status' => 'pending',
                     'appointment_type' => 'initial',
+                    'session_mode' => $appointmentRequest->session_mode ?? null,
+                    'booking_fee' => $bookingFee,
+                    'payment_status' => $bookingFee > 0 ? 'pending' : 'paid',
                     'notes' => 'Created from appointment request',
+                    'reminder_enabled' => false,
                 ]);
             }
 

@@ -39,6 +39,28 @@
                     :error="$errors->first('title')"
                 />
 
+                <!-- Session Type -->
+                <div class="mb-3">
+                    <label for="session_type" class="form-label text-stone-700">
+                        Session Type
+                    </label>
+                    <select
+                        id="session_type"
+                        name="session_type"
+                        class="form-select @error('session_type') is-invalid @enderror"
+                    >
+                        <option value="">— Select type —</option>
+                        @foreach(\App\Models\Session::sessionTypeOptions() as $value => $label)
+                            <option value="{{ $value }}" {{ old('session_type', $session->session_type) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('session_type')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
                 <!-- Notes -->
                 <div class="mb-3">
                     <label for="notes" class="form-label text-stone-700">

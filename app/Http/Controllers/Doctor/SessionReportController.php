@@ -3,19 +3,25 @@
 namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SessionReportShared;
+use App\Services\SessionReportPdfService;
 use Illuminate\Http\Request;
 use App\Models\SessionReport;
 use App\Models\PatientProfile;
 use App\Models\Session;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class SessionReportController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', SessionReport::class);
         $user = $request->user();
-        
+
         $query = SessionReport::where('created_by', $user->id)
             ->with(['patient.user', 'session']);
 
@@ -125,40 +131,26 @@ class SessionReportController extends Controller
 
     public function show($id)
     {
-        $user = auth()->user();
-        
-        $report = SessionReport::with(['patient.user', 'session'])
-            ->findOrFail($id);
-
-        // Verify doctor owns this report or is admin
-        if ($report->created_by != $user->id && $user->role != 'admin') {
-            abort(403, 'Unauthorized access to report');
-        }
+        $report = SessionReport::with(['patient.user', 'session'])->findOrFail($id);
+        $this->authorize('view', $report);
 
         return view('doctor.session-reports.show', compact('report'));
     }
 
     public function edit($id)
     {
-        $user = auth()->user();
-        
         $report = SessionReport::findOrFail($id);
+        $this->authorize('update', $report);
 
-        // Verify doctor owns this report
-        if ($report->created_by != $user->id) {
-            abort(403, 'Unauthorized access to report');
-        }
-
-        // Cannot edit finalized reports
         if ($report->finalized_at) {
             return redirect()->route('doctor.session-reports.show', $report->id)
                 ->with('error', 'Cannot edit finalized report.');
         }
 
         $patient = $report->patient;
-        $patients = PatientProfile::where('doctor_id', $user->id)->with('user')->get();
-        
-        $sessions = Session::where('doctor_id', $user->id)
+        $patients = PatientProfile::where('doctor_id', auth()->id())->with('user')->get();
+
+        $sessions = Session::where('doctor_id', auth()->id())
             ->whereHas('days', function($q) use ($patient) {
                 $q->where('patient_id', $patient->id);
             })
@@ -169,16 +161,9 @@ class SessionReportController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = auth()->user();
-        
         $report = SessionReport::findOrFail($id);
+        $this->authorize('update', $report);
 
-        // Verify doctor owns this report
-        if ($report->created_by != $user->id) {
-            abort(403, 'Unauthorized access to report');
-        }
-
-        // Cannot edit finalized reports
         if ($report->finalized_at) {
             return redirect()->route('doctor.session-reports.show', $report->id)
                 ->with('error', 'Cannot edit finalized report.');
@@ -211,14 +196,8 @@ class SessionReportController extends Controller
 
     public function destroy($id)
     {
-        $user = auth()->user();
-        
         $report = SessionReport::findOrFail($id);
-
-        // Verify doctor owns this report
-        if ($report->created_by != $user->id) {
-            abort(403, 'Unauthorized access to report');
-        }
+        $this->authorize('delete', $report);
 
         // Cannot delete finalized reports
         if ($report->finalized_at) {
@@ -234,14 +213,8 @@ class SessionReportController extends Controller
 
     public function finalize(Request $request, $id)
     {
-        $user = auth()->user();
-        
         $report = SessionReport::findOrFail($id);
-
-        // Verify doctor owns this report
-        if ($report->created_by != $user->id) {
-            abort(403, 'Unauthorized access to report');
-        }
+        $this->authorize('finalize', $report);
 
         // Cannot finalize already finalized reports
         if ($report->finalized_at) {
@@ -251,23 +224,63 @@ class SessionReportController extends Controller
 
         $report->update([
             'finalized_at' => now(),
-            'status' => 'completed'
+            'status' => 'finalized',
         ]);
+
+        // Generate and store PDF when finalizing
+        app(SessionReportPdfService::class)->generateAndStore($report->fresh());
 
         return redirect()->route('doctor.session-reports.show', $report->id)
             ->with('success', 'Session report finalized successfully. It can no longer be edited.');
     }
 
+    /**
+     * Generate PDF for the report and store in system.
+     */
+    public function generatePdf(Request $request, $id)
+    {
+        $report = SessionReport::findOrFail($id);
+        $this->authorize('view', $report);
+
+        $path = app(SessionReportPdfService::class)->generateAndStore($report->fresh());
+
+        if (!$path) {
+            return redirect()->back()->with('error', 'Failed to generate PDF.');
+        }
+
+        return redirect()->back()->with('success', 'PDF generated and stored successfully.');
+    }
+
+    /**
+     * Download the report PDF (generates if not yet stored).
+     */
+    public function downloadPdf(Request $request, $id)
+    {
+        $report = SessionReport::with(['patient.user', 'createdByDoctor'])->findOrFail($id);
+        $this->authorize('view', $report);
+
+        $service = app(SessionReportPdfService::class);
+        if (!$report->pdf_path || !Storage::disk('public')->exists($report->pdf_path)) {
+            $service->generateAndStore($report);
+            $report->refresh();
+        }
+
+        if (!$report->pdf_path || !Storage::disk('public')->exists($report->pdf_path)) {
+            return redirect()->back()->with('error', 'Could not generate or find PDF.');
+        }
+
+        $filename = 'session-report-' . $report->id . '-' . $report->title . '.pdf';
+        $filename = preg_replace('/[^a-zA-Z0-9\-_.]/', '-', $filename);
+
+        return Storage::disk('public')->download($report->pdf_path, $filename, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
     public function share(Request $request, $id)
     {
-        $user = auth()->user();
-        
         $report = SessionReport::findOrFail($id);
-
-        // Verify doctor owns this report
-        if ($report->created_by != $user->id) {
-            abort(403, 'Unauthorized access to report');
-        }
+        $this->authorize('update', $report);
 
         $validated = $request->validate([
             'shared_with_patient' => 'boolean',
@@ -283,5 +296,51 @@ class SessionReportController extends Controller
 
         return redirect()->back()
             ->with('success', 'Sharing settings updated successfully.');
+    }
+
+    /**
+     * Get a signed URL for sharing the report PDF (valid 7 days).
+     */
+    public function shareLink($report)
+    {
+        $report = $report instanceof SessionReport ? $report : SessionReport::findOrFail($report);
+        $this->authorize('view', $report);
+
+        $link = URL::temporarySignedRoute(
+            'report.download-public',
+            now()->addDays(7),
+            ['report' => $report->id]
+        );
+
+        return response()->json(['url' => $link]);
+    }
+
+    /**
+     * Send report via email (to patient or custom address).
+     */
+    public function sendViaEmail(Request $request, $report)
+    {
+        $report = $report instanceof SessionReport ? $report : SessionReport::with(['patient.user', 'session'])->findOrFail($report);
+        $this->authorize('view', $report);
+
+        $validated = $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $service = app(SessionReportPdfService::class);
+        if (!$report->pdf_path || !Storage::disk('public')->exists($report->pdf_path)) {
+            $service->generateAndStore($report);
+            $report->refresh();
+        }
+
+        $shareLink = URL::temporarySignedRoute(
+            'report.download-public',
+            now()->addDays(7),
+            ['report' => $report->id]
+        );
+
+        Mail::to($validated['email'])->send(new SessionReportShared($report, $shareLink));
+
+        return redirect()->back()->with('success', 'Report link has been sent to ' . $validated['email']);
     }
 }

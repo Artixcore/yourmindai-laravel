@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PatientProfile;
 use App\Models\Patient;
 use App\Models\PatientJournalEntry;
 use Illuminate\Http\Request;
@@ -10,24 +9,14 @@ use Illuminate\Http\Request;
 class PatientJournalController extends Controller
 {
     /**
-     * Get patient ID from authenticated user
+     * Get patient ID for journal (patient_journal_entries.patient_id references patients.id only).
      */
     private function getPatientId()
     {
         $user = auth()->user();
-        
-        $patientProfile = PatientProfile::where('user_id', $user->id)->first();
         $patient = Patient::where('email', $user->email)->first();
-        
-        if ($patientProfile) {
-            return $patientProfile->id;
-        }
-        
-        if ($patient) {
-            return $patient->id;
-        }
-        
-        return null;
+
+        return $patient?->id;
     }
 
     /**
@@ -39,9 +28,9 @@ class PatientJournalController extends Controller
         
         if (!$patientId) {
             return redirect()->route('patient.dashboard')
-                ->with('error', 'Patient profile not found.');
+                ->with('error', 'Journal is not available. No patient record linked to your account.');
         }
-        
+
         $journalEntries = PatientJournalEntry::where('patient_id', $patientId)
             ->orderBy('entry_date', 'desc')
             ->orderBy('created_at', 'desc')
@@ -59,9 +48,9 @@ class PatientJournalController extends Controller
         
         if (!$patientId) {
             return redirect()->route('patient.dashboard')
-                ->with('error', 'Patient profile not found.');
+                ->with('error', 'Journal is not available. No patient record linked to your account.');
         }
-        
+
         $request->validate([
             'mood_score' => 'required|integer|min:1|max:10',
             'notes' => 'nullable|string|max:5000',

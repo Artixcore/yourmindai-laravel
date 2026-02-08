@@ -176,6 +176,26 @@
             <i class="bi bi-clipboard-check"></i>
             <span>Tests</span>
         </a>
+        <a href="{{ route('client.journal.index') }}" class="nav-item {{ request()->routeIs('client.journal.*') ? 'active' : '' }}">
+            <i class="bi bi-journal"></i>
+            <span>Journal</span>
+        </a>
+        <a href="{{ route('client.wellbeing.index') }}" class="nav-item {{ request()->routeIs('client.wellbeing.*') ? 'active' : '' }}">
+            <i class="bi bi-heart-pulse"></i>
+            <span>Wellbeing</span>
+        </a>
+        <a href="{{ route('client.lifestyle.index') }}" class="nav-item {{ request()->routeIs('client.lifestyle.*') ? 'active' : '' }}">
+            <i class="bi bi-activity"></i>
+            <span>Lifestyle</span>
+        </a>
+        <a href="{{ route('client.notes.index') }}" class="nav-item {{ request()->routeIs('client.notes.*') ? 'active' : '' }}">
+            <i class="bi bi-journal-text"></i>
+            <span>Notes</span>
+        </a>
+        <a href="{{ route('client.resources.index') }}" class="nav-item {{ request()->routeIs('client.resources.*') || request()->routeIs('client.feedback.*') ? 'active' : '' }}">
+            <i class="bi bi-folder"></i>
+            <span>Resources</span>
+        </a>
         <a href="{{ route('client.contingency.index') }}" class="nav-item {{ request()->routeIs('client.contingency.*') ? 'active' : '' }}">
             <i class="bi bi-shield-exclamation"></i>
             <span>Emergency</span>

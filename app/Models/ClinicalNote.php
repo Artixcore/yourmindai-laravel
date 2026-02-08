@@ -13,6 +13,7 @@ class ClinicalNote extends Model
         'author_id',
         'raw_text',
         'ai_summary',
+        'handwriting_path',
     ];
 
     protected $casts = [

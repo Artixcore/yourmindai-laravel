@@ -135,6 +135,7 @@ class SessionController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'session_type' => 'nullable|string|in:individual,group,skill_based,family,couple,parents,relapse_prevention,others',
             'notes' => 'nullable|string',
             'status' => 'required|in:active,closed',
         ]);

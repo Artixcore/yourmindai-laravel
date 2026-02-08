@@ -13,6 +13,10 @@ class Goal extends Model
         'title',
         'description',
         'status',
+        'start_date',
+        'end_date',
+        'frequency_per_day',
+        'duration_minutes',
         'visible_to_patient',
         'visible_to_parent',
     ];
@@ -20,6 +24,8 @@ class Goal extends Model
     protected $casts = [
         'visible_to_patient' => 'boolean',
         'visible_to_parent' => 'boolean',
+        'start_date' => 'date',
+        'end_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

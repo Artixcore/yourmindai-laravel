@@ -12,8 +12,10 @@ use App\Models\PatientPoints;
 use App\Models\ParentLink;
 use App\Services\OpenAIService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PatientController extends Controller
 {
@@ -151,6 +153,8 @@ class PatientController extends Controller
                         'authorId' => (string) $note->author_id,
                         'rawText' => $note->raw_text,
                         'aiSummary' => $note->ai_summary,
+                        'handwritingPath' => $note->handwriting_path,
+                        'handwritingUrl' => $note->handwriting_path ? Storage::url($note->handwriting_path) : null,
                         'createdAt' => $note->created_at->toISOString(),
                         'author' => $note->author ? [
                             'id' => (string) $note->author->id,
@@ -169,14 +173,24 @@ class PatientController extends Controller
      */
     public function createNote(Request $request, string $id)
     {
-        $validator = Validator::make($request->all(), [
-            'rawText' => 'required|string|min:10',
-        ]);
+        $rules = [
+            'rawText' => 'nullable|string|max:50000',
+            'handwriting' => 'nullable|file|image|mimes:jpeg,png,gif,webp|max:10240',
+        ];
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'error' => $validator->errors()->first(),
+            ], 400);
+        }
+
+        $rawText = $request->input('rawText', '');
+        if (empty(trim($rawText)) && !$request->hasFile('handwriting')) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Provide either note text or a handwriting/sketch image.',
             ], 400);
         }
 
@@ -197,20 +211,29 @@ class PatientController extends Controller
             ], 403);
         }
 
-        // Generate AI summary (non-blocking)
+        $handwritingPath = null;
+        if ($request->hasFile('handwriting')) {
+            $file = $request->file('handwriting');
+            $name = 'handwriting-' . $id . '-' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+            $handwritingPath = $file->storeAs('clinical-notes-handwriting', $name, 'public');
+        }
+
+        // Generate AI summary (non-blocking) when there is text
         $aiSummary = null;
-        try {
-            $aiSummary = $this->openAIService->summarizeClinicalNote($request->rawText);
-        } catch (\Exception $e) {
-            // Continue without summary - don't fail the whole request
-            \Log::error('AI summarization failed: ' . $e->getMessage());
+        if (!empty(trim($rawText))) {
+            try {
+                $aiSummary = $this->openAIService->summarizeClinicalNote($rawText);
+            } catch (\Exception $e) {
+                \Log::error('AI summarization failed: ' . $e->getMessage());
+            }
         }
 
         $note = ClinicalNote::create([
             'patient_id' => $id,
             'author_id' => $userId,
-            'raw_text' => $request->rawText,
+            'raw_text' => !empty(trim($rawText)) ? $rawText : null,
             'ai_summary' => $aiSummary,
+            'handwriting_path' => $handwritingPath,
         ]);
 
         $note->load('author');
@@ -224,9 +247,11 @@ class PatientController extends Controller
                     'authorId' => (string) $note->author_id,
                     'rawText' => $note->raw_text,
                     'aiSummary' => $note->ai_summary,
+                    'handwritingPath' => $note->handwriting_path,
+                    'handwritingUrl' => $note->handwriting_path ? Storage::url($note->handwriting_path) : null,
                     'createdAt' => $note->created_at->toISOString(),
                     'author' => $note->author ? [
-                        'id' => (string) $note->author->_id,
+                        'id' => (string) $note->author->id,
                         'email' => $note->author->email,
                         'role' => $note->author->role,
                     ] : null,
@@ -284,15 +309,68 @@ class PatientController extends Controller
 
     /**
      * POST /api/patients/{id}/goals
-     * Create a goal
+     * Create a goal (patient_id is patient_profiles.id)
      */
     public function createGoal(Request $request, string $id)
     {
-        // TODO: Implement goal creation
+        $userId = (string) $request->user()->id;
+        $role = $request->user()->role;
+
+        if (!$this->canAccessPatient($userId, $role, $id)) {
+            return response()->json([
+                'success' => false,
+                'error' => "You don't have permission to create goals for this patient.",
+            ], 403);
+        }
+
+        // Only doctors/therapists can create goals via API
+        if (!in_array($role, ['DOCTOR', 'THERAPIST'])) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Only doctors or therapists can create goals.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'nullable|string|in:active,completed,paused',
+            'visibleToPatient' => 'boolean',
+            'visibleToParent' => 'boolean',
+        ]);
+
+        $profile = PatientProfile::find($id);
+        if (!$profile) {
+            return response()->json(['success' => false, 'error' => 'Patient not found.'], 404);
+        }
+
+        $goal = Goal::create([
+            'patient_id' => (int) $id,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'status' => $validated['status'] ?? 'active',
+            'visible_to_patient' => $validated['visibleToPatient'] ?? false,
+            'visible_to_parent' => $validated['visibleToParent'] ?? false,
+        ]);
+
+        $g = $goal->fresh();
+
         return response()->json([
-            'success' => false,
-            'error' => 'Not implemented yet',
-        ], 501);
+            'success' => true,
+            'data' => [
+                'goal' => [
+                    'id' => (string) $g->id,
+                    'patientId' => (string) $g->patient_id,
+                    'title' => $g->title,
+                    'description' => $g->description,
+                    'status' => $g->status,
+                    'visibleToPatient' => $g->visible_to_patient,
+                    'visibleToParent' => $g->visible_to_parent,
+                    'createdAt' => $g->created_at->toISOString(),
+                    'updatedAt' => $g->updated_at->toISOString(),
+                ],
+            ],
+        ], 201);
     }
 
     /**

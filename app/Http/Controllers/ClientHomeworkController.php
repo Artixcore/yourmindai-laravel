@@ -82,10 +82,14 @@ class ClientHomeworkController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
-            'completion_percentage' => 'required|integer|min:0|max:100',
+            'homework_done' => 'required|in:yes,no',
+            'completion_percentage' => 'nullable|integer|min:0|max:100',
             'patient_notes' => 'nullable|string',
             'completion_data' => 'nullable|array',
         ]);
+
+        $isDone = $validated['homework_done'] === 'yes';
+        $percentage = isset($validated['completion_percentage']) ? (int) $validated['completion_percentage'] : ($isDone ? 100 : 0);
 
         // Create completion record
         $completion = HomeworkCompletion::updateOrCreate(
@@ -96,8 +100,8 @@ class ClientHomeworkController extends Controller
             ],
             [
                 'completion_time' => now()->format('H:i:s'),
-                'is_completed' => $validated['completion_percentage'] >= 100,
-                'completion_percentage' => $validated['completion_percentage'],
+                'is_completed' => $isDone,
+                'completion_percentage' => $percentage,
                 'patient_notes' => $validated['patient_notes'] ?? null,
                 'completion_data' => $validated['completion_data'] ?? null,
             ]
@@ -116,15 +120,15 @@ class ClientHomeworkController extends Controller
         $homework->addProgression(
             $patient->id,
             today()->format('Y-m-d'),
-            $validated['completion_percentage'],
-            $validated['completion_percentage'] >= 100 ? 'completed' : 'in_progress',
+            $percentage,
+            $isDone ? 'completed' : 'in_progress',
             'self',
             $user->id,
             $validated['patient_notes'] ?? null
         );
 
         // Update homework status
-        if ($validated['completion_percentage'] >= 100 && $homework->frequency === 'as_needed') {
+        if ($isDone && $homework->frequency === 'as_needed') {
             $homework->update(['status' => 'completed']);
         } else {
             $homework->update(['status' => 'in_progress']);

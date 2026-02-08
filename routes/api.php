@@ -28,11 +28,11 @@ Route::get('/health', function () {
     ]);
 });
 
-// Auth routes (public)
-Route::post('/auth/register-doctor', [AuthController::class, 'registerDoctor']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/register-patient', [AuthController::class, 'registerPatient']);
-Route::post('/auth/register-parent', [AuthController::class, 'registerParent']);
+// Auth routes (public, rate limited to reduce brute force)
+Route::post('/auth/register-doctor', [AuthController::class, 'registerDoctor'])->middleware('throttle:10,1');
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/auth/register-patient', [AuthController::class, 'registerPatient'])->middleware('throttle:10,1');
+Route::post('/auth/register-parent', [AuthController::class, 'registerParent'])->middleware('throttle:10,1');
 
 // Auth routes (protected)
 Route::middleware('jwt.auth')->group(function () {
@@ -81,12 +81,10 @@ Route::middleware('jwt.auth')->group(function () {
     Route::post('/patients/me/medications/{id}/log', [PatientMedicationController::class, 'logIntake']);
     Route::get('/patients/me/medications/{id}/history', [PatientMedicationController::class, 'history']);
     
-    // Patient Journal (JWT)
+    // Patient Journal (JWT) – index and store only; update/destroy not implemented
     Route::get('/patients/me/journal', [PatientJournalController::class, 'index']);
     Route::post('/patients/me/journal', [PatientJournalController::class, 'store']);
-    Route::put('/patients/me/journal/{id}', [PatientJournalController::class, 'update']);
-    Route::delete('/patients/me/journal/{id}', [PatientJournalController::class, 'destroy']);
-    
+
     // Patient Progress (JWT)
     Route::get('/patients/me/progress', [PatientProgressController::class, 'index']);
     Route::get('/patients/me/stats', [PatientProgressController::class, 'index']);
@@ -164,12 +162,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/patient/medications/{id}/log', [PatientMedicationController::class, 'logIntake']);
     Route::get('/patient/medications/{id}/history', [PatientMedicationController::class, 'history']);
     
-    // Patient Journal
+    // Patient Journal – index and store only
     Route::get('/patient/journal', [PatientJournalController::class, 'index']);
     Route::post('/patient/journal', [PatientJournalController::class, 'store']);
-    Route::put('/patient/journal/{id}', [PatientJournalController::class, 'update']);
-    Route::delete('/patient/journal/{id}', [PatientJournalController::class, 'destroy']);
-    
+
     // Patient Progress
     Route::get('/patient/progress', [PatientProgressController::class, 'index']);
 });

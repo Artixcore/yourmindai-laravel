@@ -27,6 +27,20 @@
         @yield('content')
     </main>
     
+    <!-- Background music control (optional, user-controllable) -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;" x-data="backgroundMusic()">
+        <div class="d-flex align-items-center gap-2 bg-white rounded-3 shadow-sm border border-stone-200 px-3 py-2">
+            <button type="button" class="btn btn-link text-stone-700 p-0 border-0" @click="toggle()" :title="playing ? 'Pause' : 'Play'">
+                <i class="bi fs-5" :class="playing ? 'bi-pause-circle-fill' : 'bi-play-circle-fill'"></i>
+            </button>
+            <div class="d-flex align-items-center gap-1" style="width: 80px;">
+                <i class="bi bi-volume-down text-stone-500 small"></i>
+                <input type="range" class="form-range form-range-sm" min="0" max="100" x-model="volumePercent" @input="setVolume($event.target.value)">
+            </div>
+        </div>
+        <audio id="bg-music" loop preload="metadata" src="{{ asset('audio/background.mp3') }}" x-ref="audio"></audio>
+    </div>
+    
     <x-footer />
     
     <!-- Bootstrap 5.3 JS Bundle -->
@@ -77,6 +91,43 @@
                     this.open = false;
                 },
             }));
+
+            Alpine.data('backgroundMusic', () => {
+                const stored = localStorage.getItem('bgMusic');
+                const prefs = stored ? JSON.parse(stored) : { volume: 0.4, muted: true };
+                return {
+                    playing: false,
+                    volumePercent: Math.round((prefs.volume ?? 0.4) * 100),
+                    get volume() { return this.volumePercent / 100; },
+                    init() {
+                        const audio = this.$refs.audio;
+                        if (!audio) return;
+                        audio.volume = this.volume;
+                        if (!prefs.muted) {
+                            audio.play().then(() => { this.playing = true; }).catch(() => {});
+                        }
+                        audio.addEventListener('play', () => { this.playing = true; });
+                        audio.addEventListener('pause', () => { this.playing = false; });
+                    },
+                    toggle() {
+                        const audio = this.$refs.audio;
+                        if (!audio) return;
+                        if (this.playing) {
+                            audio.pause();
+                            prefs.muted = true;
+                        } else {
+                            audio.volume = this.volume;
+                            audio.play().then(() => { prefs.muted = false; }).catch(() => {});
+                        }
+                        localStorage.setItem('bgMusic', JSON.stringify({ volume: this.volume, muted: prefs.muted }));
+                    },
+                    setVolume(val) {
+                        const v = parseInt(val, 10) / 100;
+                        if (this.$refs.audio) this.$refs.audio.volume = v;
+                        localStorage.setItem('bgMusic', JSON.stringify({ volume: v, muted: !this.playing }));
+                    },
+                };
+            });
         });
         
         // Initialize AOS

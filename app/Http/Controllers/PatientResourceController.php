@@ -14,26 +14,14 @@ use Illuminate\Support\Str;
 class PatientResourceController extends Controller
 {
     /**
-     * Get patient ID from authenticated user
-     * Prioritizes patients table since PatientResource uses Patient::class relationship
+     * Get patient ID for resources (PatientResource.patient_id references patients.id only).
      */
     private function getPatientId()
     {
         $user = auth()->user();
-        
-        // Prioritize patients table since PatientResource belongsTo Patient::class
         $patient = Patient::where('email', $user->email)->first();
-        if ($patient) {
-            return $patient->id;
-        }
-        
-        // Fallback to patient_profiles if patients record doesn't exist
-        $patientProfile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
-        if ($patientProfile) {
-            return $patientProfile->id;
-        }
-        
-        return null;
+
+        return $patient?->id;
     }
 
     /**
@@ -45,9 +33,9 @@ class PatientResourceController extends Controller
         
         if (!$patientId) {
             return redirect()->route('patient.dashboard')
-                ->with('error', 'Patient profile not found.');
+                ->with('error', 'No patient record linked to your account. Resources are not available.');
         }
-        
+
         $query = PatientResource::where('patient_id', $patientId)
             ->with(['doctor', 'session', 'sessionDay'])
             ->orderBy('created_at', 'desc');

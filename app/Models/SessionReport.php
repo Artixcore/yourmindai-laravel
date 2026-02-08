@@ -25,6 +25,7 @@ class SessionReport extends Model
         'shared_with_others',
         'status',
         'finalized_at',
+        'pdf_path',
     ];
 
     protected $casts = [

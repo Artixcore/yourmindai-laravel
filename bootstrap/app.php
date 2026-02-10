@@ -1,8 +1,17 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,5 +35,87 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->dontReport([
+            ValidationException::class,
+        ]);
+
+        $exceptions->context(fn () => [
+            'user_id' => auth()->id(),
+            'route' => request()->route()?->getName() ?? request()->path(),
+            'request' => sanitizeRequest(request()),
+        ]);
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+            $isApi = $request->expectsJson() || $request->is('api/*');
+
+            if (!$isApi) {
+                return null;
+            }
+
+            $debug = config('app.debug');
+            $code = 500;
+            $message = 'Something went wrong.';
+            $errors = [];
+
+            if ($e instanceof ValidationException) {
+                $code = 422;
+                $message = $e->getMessage() ?: 'The given data was invalid.';
+                $errors = $e->errors();
+            } elseif ($e instanceof AuthenticationException) {
+                $code = 401;
+                $message = 'Unauthenticated.';
+            } elseif ($e instanceof AuthorizationException) {
+                $code = 403;
+                $message = $e->getMessage() ?: 'This action is unauthorized.';
+            } elseif ($e instanceof ModelNotFoundException) {
+                $code = 404;
+                $message = 'The requested resource was not found.';
+            } elseif ($e instanceof QueryException) {
+                $code = 500;
+                $message = 'A database error occurred.';
+                if ($debug) {
+                    $message = $e->getMessage();
+                }
+            } elseif ($e instanceof HttpException) {
+                $code = $e->getStatusCode();
+                $msg = $e->getMessage();
+                $message = ($msg && !str_contains(strtolower($msg), 'exception') && !str_contains($msg, 'sql')) ? $msg : 'An error occurred.';
+            } else {
+                if ($debug) {
+                    $message = $e->getMessage();
+                }
+            }
+
+            if ($code >= 500) {
+                Log::error($e->getMessage(), [
+                    'exception' => get_class($e),
+                    'user_id' => auth()->id(),
+                    'route' => $request->route()?->getName() ?? $request->path(),
+                    'request' => sanitizeRequest($request),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+                'errors' => $errors,
+                'code' => $code,
+            ], $code);
+        });
     })->create();
+
+/**
+ * Sanitize request data for logging (strip secrets).
+ */
+function sanitizeRequest(Request $request): array
+{
+    $keys = ['password', 'password_hash', 'password_confirmation', 'token', 'api_token', '_token', 'secret'];
+    $all = $request->except($keys);
+    foreach ($keys as $key) {
+        if ($request->has($key)) {
+            $all[$key] = '[REDACTED]';
+        }
+    }
+    return $all;
+}

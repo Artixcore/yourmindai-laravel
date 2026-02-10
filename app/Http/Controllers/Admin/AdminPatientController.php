@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Patient;
 use App\Models\User;
+use App\Services\PatientTransferService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AdminPatientController extends Controller
 {
@@ -60,7 +62,40 @@ class AdminPatientController extends Controller
             ->latest()
             ->limit(5)
             ->get();
+
+        $doctors = User::where('role', 'doctor')->where('status', 'active')->orderBy('name')->get();
         
-        return view('admin.patients.show', compact('patient', 'sessionsSummary', 'recentActivity'));
+        return view('admin.patients.show', compact('patient', 'sessionsSummary', 'recentActivity', 'doctors'));
+    }
+
+    /**
+     * Transfer patient to another doctor. Admin only.
+     */
+    public function transfer(Request $request, Patient $patient)
+    {
+        $validated = $request->validate([
+            'new_doctor_id' => 'required|exists:users,id',
+            'reason' => 'nullable|string|max:1000',
+        ]);
+
+        $actor = $request->user();
+        if ($actor->role !== 'admin') {
+            abort(403, 'Only administrators can transfer patients.');
+        }
+
+        try {
+            app(PatientTransferService::class)->transfer(
+                $patient,
+                (int) $validated['new_doctor_id'],
+                $actor,
+                $validated['reason'] ?? null
+            );
+        } catch (\InvalidArgumentException $e) {
+            throw ValidationException::withMessages(['new_doctor_id' => $e->getMessage()]);
+        }
+
+        return redirect()
+            ->route('admin.patients.show', $patient)
+            ->with('success', 'Patient has been transferred to the selected doctor.');
     }
 }

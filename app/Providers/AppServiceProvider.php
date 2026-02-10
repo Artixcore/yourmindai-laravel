@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
@@ -69,6 +70,13 @@ class AppServiceProvider extends ServiceProvider
         
         if ($forceHttps) {
             URL::forceScheme('https');
+        }
+
+        // Test-only route to trigger 500 for API error contract tests
+        if ($this->app->runningUnitTests()) {
+            Route::get('/api/test/server-error', function () {
+                throw new \Exception('Intentional test exception');
+            });
         }
     }
 }

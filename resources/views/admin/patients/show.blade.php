@@ -117,6 +117,46 @@
         </div>
     </div>
 
+    <!-- Transfer to another doctor (Admin only) -->
+    @if(isset($doctors) && $doctors->isNotEmpty())
+    <div class="card border-0 shadow-sm mb-4 border-warning border-opacity-25">
+        <div class="card-header bg-transparent border-bottom py-3">
+            <h5 class="card-title mb-0 fw-semibold"><i class="bi bi-arrow-left-right me-2"></i>Transfer to another doctor</h5>
+        </div>
+        <div class="card-body p-4">
+            <form action="{{ route('admin.patients.transfer', $patient) }}" method="POST" class="row g-3">
+                @csrf
+                <div class="col-12 col-md-5">
+                    <label for="new_doctor_id" class="form-label">New assigned doctor</label>
+                    <select name="new_doctor_id" id="new_doctor_id" class="form-select @error('new_doctor_id') is-invalid @enderror" required>
+                        <option value="">— Select doctor —</option>
+                        @foreach($doctors as $doc)
+                            @if($doc->id != $patient->doctor_id)
+                                <option value="{{ $doc->id }}" {{ old('new_doctor_id') == $doc->id ? 'selected' : '' }}>
+                                    {{ $doc->name ?? $doc->email }} ({{ $doc->email }})
+                                </option>
+                            @endif
+                        @endforeach
+                    </select>
+                    @error('new_doctor_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-12 col-md-5">
+                    <label for="reason" class="form-label">Reason (optional)</label>
+                    <input type="text" name="reason" id="reason" class="form-control" value="{{ old('reason') }}" placeholder="e.g. Reassignment, leave coverage" maxlength="1000">
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Transfer this patient to the selected doctor? This will update the assigned doctor for this patient and any linked profiles.');">
+                        <i class="bi bi-arrow-left-right me-1"></i>Transfer
+                    </button>
+                </div>
+            </form>
+            <p class="small text-muted mb-0 mt-2">This updates the assigned doctor for this patient and any linked patient profiles. Sessions and other data remain with the patient.</p>
+        </div>
+    </div>
+    @endif
+
     <!-- Sessions Summary -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Patient;
 use App\Models\User;
 use App\Models\PatientProfile;
@@ -219,9 +220,11 @@ class WebPatientController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Patient $patient)
+    public function destroy(Request $request, Patient $patient)
     {
         $this->authorize('delete', $patient);
+
+        $previousStatus = $patient->status;
 
         // Delete photo if exists
         if ($patient->photo_path) {
@@ -230,6 +233,14 @@ class WebPatientController extends Controller
 
         // Soft delete by setting status to inactive
         $patient->update(['status' => 'inactive']);
+
+        AuditLog::log(
+            $request->user()->id,
+            'patient.deactivated',
+            'Patient',
+            (int) $patient->id,
+            ['previous_status' => $previousStatus]
+        );
 
         return redirect()
             ->route('patients.index')

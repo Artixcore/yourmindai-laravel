@@ -519,6 +519,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     // Patient Oversight
     Route::get('patients', [AdminPatientController::class, 'index'])->name('patients.index');
     Route::get('patients/{patient}', [AdminPatientController::class, 'show'])->name('patients.show');
+    Route::post('patients/{patient}/transfer', [AdminPatientController::class, 'transfer'])->name('patients.transfer');
     
     // Note: Admin can access patient sessions through shared routes in the admin/doctor middleware group
     // Routes: patients.sessions.index, patients.sessions.create, etc. (accessible to both admin and doctor)

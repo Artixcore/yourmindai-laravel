@@ -8,8 +8,10 @@ use App\Models\ArticleCategory;
 use App\Models\ArticleTag;
 use App\Services\ArticleSEOService;
 use App\Services\ArticleMediaService;
+use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -242,7 +244,13 @@ class ArticleController extends Controller
             $result = $this->mediaService->uploadImage($request->file('file'), null, auth()->id());
             return response()->json($result);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            Log::error('Article image upload failed', [
+                'user_id' => auth()->id(),
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return ApiResponse::error('An error occurred while processing your request.', 400);
         }
     }
 

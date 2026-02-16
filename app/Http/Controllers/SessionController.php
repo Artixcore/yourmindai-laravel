@@ -58,6 +58,8 @@ class SessionController extends Controller
             'title' => 'required|string|max:255',
             'notes' => 'nullable|string',
             'status' => 'nullable|in:active,closed',
+            'next_session_date' => 'nullable|date',
+            'reminder_at' => 'nullable|date',
         ]);
 
         $user = auth()->user();
@@ -71,6 +73,8 @@ class SessionController extends Controller
             'title' => $validated['title'],
             'notes' => $validated['notes'] ?? null,
             'status' => $validated['status'] ?? 'active',
+            'next_session_date' => $validated['next_session_date'] ?? null,
+            'reminder_at' => $validated['reminder_at'] ?? null,
         ]);
 
         return redirect()
@@ -138,6 +142,8 @@ class SessionController extends Controller
             'session_type' => 'nullable|string|in:individual,group,skill_based,family,couple,parents,relapse_prevention,others',
             'notes' => 'nullable|string',
             'status' => 'required|in:active,closed',
+            'next_session_date' => 'nullable|date',
+            'reminder_at' => 'nullable',
         ]);
 
         $session->update($validated);

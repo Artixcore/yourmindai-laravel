@@ -21,6 +21,7 @@ class User extends Model implements AuthenticatableContract, JWTSubject
         'password',
         'password_hash',
         'role',
+        'doctor_number',
         'phone',
         'address',
         'avatar',

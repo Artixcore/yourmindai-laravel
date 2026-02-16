@@ -12,7 +12,7 @@
                     Compassionate mental health care for your journey to wellness
                 </p>
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                    <a href="#appointment" class="btn btn-gradient-primary btn-lg px-5 py-3 shadow-soft-lg animate-pulse-soft">
+                    <a href="{{ route('appointment.book') }}" class="btn btn-gradient-primary btn-lg px-5 py-3 shadow-soft-lg animate-pulse-soft">
                         <i class="bi bi-calendar-check me-2"></i>Book Appointment
                     </a>
                     <a href="#about" class="btn btn-gradient-outline btn-lg px-5 py-3">

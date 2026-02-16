@@ -37,7 +37,7 @@ class ClientLifestyleController extends Controller
         $patient = PatientProfile::where('user_id', $user->id)->firstOrFail();
 
         $validated = $request->validate([
-            'type' => 'required|string|in:habit,diet,activity_note',
+            'type' => 'required|string|in:habit,diet,activity_note,lifestyle_error',
             'label' => 'nullable|string|max:255',
             'value' => 'nullable|string|max:2000',
             'logged_date' => 'required|date',

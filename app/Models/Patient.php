@@ -113,11 +113,34 @@ class Patient extends Model implements AuthenticatableContract
     }
 
     /**
+     * Get the behavior contingency plans for the patient.
+     */
+    public function behaviorContingencyPlans()
+    {
+        return $this->hasMany(BehaviorContingencyPlan::class, 'patient_id');
+    }
+
+    /**
      * Get the reviews written by the patient.
      */
     public function reviews()
     {
         return $this->hasMany(Review::class, 'patient_id');
+    }
+
+    /**
+     * Resolve Patient to PatientProfile for models that use patient_profile_id.
+     * Web-created patients have both Patient and PatientProfile linked via User (same email).
+     */
+    public function resolvePatientProfile(): ?PatientProfile
+    {
+        $user = User::where('email', $this->email)->first();
+        if (!$user) {
+            return null;
+        }
+        return PatientProfile::where('user_id', $user->id)
+            ->where('doctor_id', $this->doctor_id)
+            ->first();
     }
 
     /**

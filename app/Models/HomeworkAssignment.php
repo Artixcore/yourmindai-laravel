@@ -20,8 +20,11 @@ class HomeworkAssignment extends Model
         'instructions',
         'goals',
         'frequency',
+        'frequency_type',
+        'frequency_value',
         'start_date',
         'end_date',
+        'reminder_at',
         'status',
         'requires_parent_feedback',
         'requires_others_feedback',
@@ -31,6 +34,8 @@ class HomeworkAssignment extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'frequency_value' => 'array',
+        'reminder_at' => 'datetime',
         'goals' => 'array',
         'custom_fields' => 'array',
         'requires_parent_feedback' => 'boolean',
@@ -61,6 +66,14 @@ class HomeworkAssignment extends Model
     public function session()
     {
         return $this->belongsTo(Session::class, 'session_id');
+    }
+
+    /**
+     * Get media links (video/audio/podcast) for this homework.
+     */
+    public function media()
+    {
+        return $this->hasMany(HomeworkMedia::class, 'homework_assignment_id');
     }
 
     /**

@@ -18,6 +18,23 @@ use Illuminate\Support\Str;
 class AppointmentRequestController extends Controller
 {
     /**
+     * Show booking form (public). Optional doctor_number for direct booking.
+     */
+    public function showBookForm(?string $doctorNumber = null)
+    {
+        $doctor = null;
+        if ($doctorNumber) {
+            $doctor = User::where('role', 'doctor')
+                ->where('doctor_number', $doctorNumber)
+                ->where('status', 'active')
+                ->first();
+        }
+        $doctors = User::where('role', 'doctor')->where('status', 'active')->get();
+
+        return view('appointment.book', compact('doctor', 'doctors', 'doctorNumber'));
+    }
+
+    /**
      * Store a new appointment request (public, no auth required).
      */
     public function store(Request $request)
@@ -32,7 +49,17 @@ class AppointmentRequestController extends Controller
             'preferred_date' => 'required|date|after_or_equal:today',
             'preferred_time' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:2000',
+            'doctor_id' => 'nullable|exists:users,id',
+            'doctor_number' => 'nullable|string|max:50',
         ]);
+
+        $doctorId = $validated['doctor_id'] ?? null;
+        if (!$doctorId && !empty($validated['doctor_number'])) {
+            $doctor = User::where('role', 'doctor')->where('doctor_number', $validated['doctor_number'])->first();
+            if ($doctor) {
+                $doctorId = $doctor->id;
+            }
+        }
 
         try {
             $appointmentRequest = AppointmentRequest::create([
@@ -46,6 +73,7 @@ class AppointmentRequestController extends Controller
                 'preferred_time' => $validated['preferred_time'] ?? null,
                 'notes' => $validated['notes'] ?? null,
                 'status' => 'pending',
+                'doctor_id' => $doctorId,
             ]);
 
             Log::info('Appointment request created', [

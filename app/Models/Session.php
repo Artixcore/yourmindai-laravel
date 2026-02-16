@@ -17,6 +17,8 @@ class Session extends Model
         'session_type',
         'notes',
         'status',
+        'next_session_date',
+        'reminder_at',
     ];
 
     public static function sessionTypeOptions(): array
@@ -35,6 +37,8 @@ class Session extends Model
 
     protected $casts = [
         'status' => 'string',
+        'next_session_date' => 'date',
+        'reminder_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

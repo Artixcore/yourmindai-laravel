@@ -23,6 +23,8 @@ use App\Policies\FeedbackPolicy;
 use App\Policies\PracticeProgressionPolicy;
 use App\Policies\SessionReportPolicy;
 use App\Policies\ParentPermissionPolicy;
+use App\Models\BehaviorContingencyPlan;
+use App\Policies\BehaviorContingencyPlanPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -48,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(PracticeProgression::class, PracticeProgressionPolicy::class);
         Gate::policy(SessionReport::class, SessionReportPolicy::class);
         Gate::policy(ParentPermission::class, ParentPermissionPolicy::class);
+        Gate::policy(BehaviorContingencyPlan::class, BehaviorContingencyPlanPolicy::class);
 
         // Force HTTPS when:
         // 1. In production environment

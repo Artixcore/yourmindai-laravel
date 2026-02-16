@@ -57,7 +57,8 @@ class ClientHomeworkController extends Controller
                 'completions' => function ($query) {
                     $query->orderBy('completion_date', 'desc');
                 },
-                'assignedByDoctor'
+                'assignedByDoctor',
+                'media'
             ])
             ->firstOrFail();
 
@@ -86,10 +87,14 @@ class ClientHomeworkController extends Controller
             'completion_percentage' => 'nullable|integer|min:0|max:100',
             'patient_notes' => 'nullable|string',
             'completion_data' => 'nullable|array',
+            'scoring_choice' => 'nullable|in:self_action,others_help,not_working',
         ]);
 
         $isDone = $validated['homework_done'] === 'yes';
         $percentage = isset($validated['completion_percentage']) ? (int) $validated['completion_percentage'] : ($isDone ? 100 : 0);
+
+        $scoringChoice = $validated['scoring_choice'] ?? null;
+        $scoreValue = $scoringChoice ? HomeworkCompletion::getScoreForChoice($scoringChoice) : null;
 
         // Create completion record
         $completion = HomeworkCompletion::updateOrCreate(
@@ -104,6 +109,8 @@ class ClientHomeworkController extends Controller
                 'completion_percentage' => $percentage,
                 'patient_notes' => $validated['patient_notes'] ?? null,
                 'completion_data' => $validated['completion_data'] ?? null,
+                'scoring_choice' => $scoringChoice,
+                'score_value' => $scoreValue,
             ]
         );
 

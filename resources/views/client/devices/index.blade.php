@@ -8,12 +8,16 @@
     <p class="text-muted mb-0 small">Manage your registered devices</p>
 </div>
 
-<!-- Register New Device Button -->
+<!-- Add Device Buttons -->
 <div class="card mb-3">
-    <div class="card-body text-center">
+    <div class="card-body text-center d-flex flex-wrap gap-2 justify-content-center">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerDeviceModal">
-            <i class="bi bi-plus-circle me-2"></i>
-            Register New Device
+            <i class="bi bi-phone me-2"></i>
+            Register App Device
+        </button>
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSmartDeviceModal">
+            <i class="bi bi-smartwatch me-2"></i>
+            Add Smart Device
         </button>
     </div>
 </div>
@@ -56,8 +60,14 @@
                     @endif
                 </div>
                 <div class="small text-muted mt-2">
-                    Registered: {{ $device->registered_at->format('M d, Y') }}
+                    Registered: {{ $device->registered_at?->format('M d, Y') ?? '—' }}
+                    @if($device->device_source === 'manual')
+                        <span class="badge bg-secondary ms-1">Manual</span>
+                    @endif
                 </div>
+                @if($device->notes)
+                <div class="small text-muted mt-1">{{ Str::limit($device->notes, 60) }}</div>
+                @endif
             </div>
             <form method="POST" action="{{ route('client.devices.destroy', $device->id) }}" class="ms-2" onsubmit="return confirm('Are you sure you want to remove this device?');">
                 @csrf
@@ -82,6 +92,7 @@
             </div>
             <form method="POST" action="{{ route('client.devices.store') }}">
                 @csrf
+                <input type="hidden" name="device_source" value="app_registered">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Device Name</label>
@@ -121,6 +132,52 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Register Device</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Smart Device Modal (manual entry) -->
+<div class="modal fade" id="addSmartDeviceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Smart Device</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ route('client.devices.store') }}">
+                @csrf
+                <input type="hidden" name="device_source" value="manual">
+                <div class="modal-body">
+                    <p class="text-muted small">Add a wearable, smartwatch, or other device manually.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Device Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="device_name" required placeholder="e.g., Apple Watch, Fitbit">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Device Type</label>
+                        <select class="form-select" name="device_type" required>
+                            <option value="wearable">Wearable</option>
+                            <option value="smartwatch">Smartwatch</option>
+                            <option value="mobile">Mobile</option>
+                            <option value="tablet">Tablet</option>
+                            <option value="desktop">Desktop</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Identifier (optional)</label>
+                        <input type="text" class="form-control" name="device_identifier" placeholder="Serial number or model ID">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="2" placeholder="Any additional info..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Device</button>
                 </div>
             </form>
         </div>

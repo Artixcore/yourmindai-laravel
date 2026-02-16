@@ -527,6 +527,65 @@
         @endif
     </x-card>
 
+    <!-- Behavior Contingency Plans Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">Behavior Contingency Plans</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ route('patients.behavior-contingency-plans.create', $patient) }}" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Create Plan</span>
+                </a>
+                <a href="{{ route('patients.behavior-contingency-plans.index', $patient) }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>View All</span>
+                </a>
+            </div>
+        </div>
+        @php
+            $behaviorPlans = \App\Models\BehaviorContingencyPlan::with('items')
+                ->where(function($q) use ($patient) {
+                    $q->where('patient_id', $patient->id);
+                    $patientProfile = \App\Models\PatientProfile::where('doctor_id', $patient->doctor_id)
+                        ->where(function($pq) use ($patient) {
+                            $pq->where('full_name', $patient->name)->orWhere('phone', $patient->phone);
+                        })->first();
+                    if ($patientProfile) {
+                        $q->orWhere('patient_profile_id', $patientProfile->id);
+                    }
+                })->orderBy('created_at', 'desc')->take(5)->get();
+        @endphp
+        @if($behaviorPlans->isEmpty())
+        <div class="text-center py-4 text-stone-500">
+            <i class="bi bi-clipboard-check text-stone-400" style="font-size: 2rem;"></i>
+            <p class="mb-0 mt-2">No behavior contingency plans yet.</p>
+            <p class="small mt-1 mb-0">Create plans to track behaviors with rewards and punishments.</p>
+        </div>
+        @else
+        <div class="d-flex flex-column gap-2">
+            @foreach($behaviorPlans as $bp)
+            <div class="border border-stone-200 rounded p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="flex-grow-1">
+                        <strong class="text-stone-900">{{ $bp->title }}</strong>
+                        <div class="small text-stone-500 mt-1">
+                            {{ $bp->starts_at->format('M d, Y') }}
+                            @if($bp->ends_at)
+                            – {{ $bp->ends_at->format('M d, Y') }}
+                            @endif
+                            | {{ $bp->items->count() }} behavior(s)
+                        </div>
+                    </div>
+                    <a href="{{ route('patients.behavior-contingency-plans.show', [$patient, $bp]) }}" class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
+    </x-card>
+
     <!-- Routines Section -->
     <x-card class="mt-4">
         <div class="d-flex align-items-center justify-content-between mb-3">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Doctor;
 use App\Http\Controllers\Controller;
 use App\Models\PatientProfile;
 use App\Models\PsychometricAssessment;
+use App\Models\PsychometricReport;
 use App\Models\PsychometricScale;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -93,7 +94,9 @@ class PsychometricAssessmentController extends Controller
             ->limit(3)
             ->get();
 
-        return view('doctor.patients.psychometric.show', compact('patient', 'assessment', 'previousAssessments'));
+        $report = PsychometricReport::where('assessment_id', $assessment->id)->first();
+
+        return view('doctor.patients.psychometric.show', compact('patient', 'assessment', 'previousAssessments', 'report'));
     }
 
     public function compare(Request $request, PatientProfile $patient)

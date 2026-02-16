@@ -200,6 +200,10 @@
             <i class="bi bi-shield-exclamation"></i>
             <span>Emergency</span>
         </a>
+        <a href="{{ route('client.contingency-plans.index') }}" class="nav-item {{ request()->routeIs('client.contingency-plans.*') ? 'active' : '' }}">
+            <i class="bi bi-clipboard-check"></i>
+            <span>Contingency Plan</span>
+        </a>
     </nav>
     
     <!-- Bootstrap 5.3 JS Bundle -->

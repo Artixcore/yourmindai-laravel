@@ -28,6 +28,7 @@
                     <option value="habit">Habit</option>
                     <option value="diet">Diet / Nutrition</option>
                     <option value="activity_note">Activity note</option>
+                    <option value="lifestyle_error">Lifestyle error / Issue</option>
                 </select>
             </div>
             <div class="mb-2">

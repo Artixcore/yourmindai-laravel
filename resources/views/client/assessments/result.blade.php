@@ -69,6 +69,10 @@
 @endif
 
 <div class="d-grid gap-2">
+    <a href="{{ route('client.assessments.report', $assessment) }}" class="btn btn-primary">
+        <i class="bi bi-file-earmark-text me-2"></i>
+        {{ \App\Models\PsychometricReport::where('assessment_id', $assessment->id)->exists() ? 'View Report' : 'Generate Report' }}
+    </a>
     <a href="{{ route('client.assessments.index') }}" class="btn btn-outline-primary">
         <i class="bi bi-arrow-left me-2"></i>
         Back to Assessments

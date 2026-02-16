@@ -59,6 +59,22 @@
             <div class="mt-2">{{ $homework->instructions }}</div>
         </div>
         @endif
+
+        @if($homework->media && $homework->media->isNotEmpty())
+        <div class="mt-3 pt-3 border-top">
+            <small class="text-muted">Media Resources</small>
+            <ul class="list-unstyled mt-2 mb-0">
+                @foreach($homework->media as $media)
+                <li class="mb-1">
+                    <a href="{{ $media->url }}" target="_blank" rel="noopener" class="text-primary">
+                        <i class="bi bi-{{ $media->type === 'video' ? 'play-circle' : ($media->type === 'audio' ? 'music-note' : 'link-45deg') }} me-1"></i>
+                        {{ $media->title ?: $media->url }}
+                    </a>
+                </li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
     </div>
 </div>
 
@@ -98,6 +114,25 @@
                     <small class="text-muted">0%</small>
                     <small id="percentageLabel" class="fw-semibold">100%</small>
                     <small class="text-muted">100%</small>
+                </div>
+            </div>
+
+            <!-- Contingency Scoring (optional) -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">How did you complete this? (Optional)</label>
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check">
+                        <input type="radio" name="scoring_choice" id="scoring_self" value="self_action" class="form-check-input" {{ old('scoring_choice') === 'self_action' ? 'checked' : '' }}>
+                        <label for="scoring_self" class="form-check-label">Self action (+10)</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="scoring_choice" id="scoring_others" value="others_help" class="form-check-input" {{ old('scoring_choice') === 'others_help' ? 'checked' : '' }}>
+                        <label for="scoring_others" class="form-check-label">Others helped (+5)</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="scoring_choice" id="scoring_not" value="not_working" class="form-check-input" {{ old('scoring_choice') === 'not_working' ? 'checked' : '' }}>
+                        <label for="scoring_not" class="form-check-label">Not working (-10)</label>
+                    </div>
                 </div>
             </div>
 

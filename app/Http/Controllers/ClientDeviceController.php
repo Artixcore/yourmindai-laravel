@@ -62,20 +62,33 @@ class ClientDeviceController extends Controller
 
         $request->validate([
             'device_name' => 'required|string|max:255',
-            'device_type' => 'required|in:mobile,tablet,desktop',
-            'device_identifier' => 'required|string|max:100|unique:patient_devices,device_identifier',
+            'device_type' => 'required|in:mobile,tablet,desktop,wearable,smartwatch,other',
+            'device_identifier' => 'nullable|string|max:100',
             'os_type' => 'nullable|string|max:50',
             'os_version' => 'nullable|string|max:50',
             'app_version' => 'nullable|string|max:50',
+            'notes' => 'nullable|string|max:500',
+            'device_source' => 'nullable|in:app_registered,manual',
         ]);
+
+        $identifier = $request->device_identifier;
+        if (empty($identifier)) {
+            $identifier = \Illuminate\Support\Str::uuid()->toString();
+        }
+        // Ensure unique: append random suffix if collision
+        while (\App\Models\PatientDevice::where('device_identifier', $identifier)->exists()) {
+            $identifier = \Illuminate\Support\Str::uuid()->toString();
+        }
 
         $deviceData = [
             'device_name' => $request->device_name,
             'device_type' => $request->device_type,
-            'device_identifier' => $request->device_identifier,
+            'device_identifier' => $identifier,
+            'device_source' => $request->device_source ?? 'app_registered',
             'os_type' => $request->os_type,
             'os_version' => $request->os_version,
             'app_version' => $request->app_version,
+            'notes' => $request->notes,
             'last_active_at' => now(),
             'is_active' => true,
             'registered_at' => now(),

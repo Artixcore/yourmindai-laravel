@@ -39,7 +39,9 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 // Contact form (rate limited: 10 per minute per IP)
 Route::post('/contact', [LandingController::class, 'storeContact'])->name('contact.store')->middleware('throttle:10,1');
 
-// Public appointment request (rate limited: 10 per minute per IP)
+// Public appointment booking (rate limited: 10 per minute per IP)
+Route::get('/book', [\App\Http\Controllers\AppointmentRequestController::class, 'showBookForm'])->name('appointment.book');
+Route::get('/book/{doctor_number}', [\App\Http\Controllers\AppointmentRequestController::class, 'showBookForm'])->name('appointment.book.doctor');
 Route::post('/appointment-request', [\App\Http\Controllers\AppointmentRequestController::class, 'store'])->name('appointment-request.store')->middleware('throttle:10,1');
 
 // Public Digital Wellbeing (no auth required)
@@ -85,14 +87,24 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     Route::get('/assessments', [\App\Http\Controllers\ClientPsychometricController::class, 'index'])->name('assessments.index');
     Route::get('/assessments/{assessment}', [\App\Http\Controllers\ClientPsychometricController::class, 'show'])->name('assessments.show');
     Route::post('/assessments/{assessment}/complete', [\App\Http\Controllers\ClientPsychometricController::class, 'complete'])->name('assessments.complete');
+    Route::post('/assessments/{assessment}/report', [\App\Http\Controllers\ClientPsychometricController::class, 'generateReport'])->name('assessments.report.generate');
+    Route::get('/assessments/{assessment}/report', [\App\Http\Controllers\ClientPsychometricController::class, 'showReport'])->name('assessments.report');
     
-    // Contingency Management
+    // Contingency Management (crisis/emergency)
     Route::get('/contingency', [\App\Http\Controllers\ClientContingencyController::class, 'index'])->name('contingency.index');
     Route::get('/contingency/{plan}', [\App\Http\Controllers\ClientContingencyController::class, 'show'])->name('contingency.show');
     Route::post('/contingency/{plan}/activate', [\App\Http\Controllers\ClientContingencyController::class, 'activate'])->name('contingency.activate');
+
+    // Behavior Contingency Plans (daily check-ins)
+    Route::get('/contingency-plans', [\App\Http\Controllers\ClientBehaviorContingencyController::class, 'index'])->name('contingency-plans.index');
+    Route::get('/contingency-plans/{plan}', [\App\Http\Controllers\ClientBehaviorContingencyController::class, 'show'])->name('contingency-plans.show');
+    Route::post('/contingency-plans/{plan}/checkins', [\App\Http\Controllers\ClientBehaviorContingencyController::class, 'storeCheckin'])->name('contingency-plans.checkins.store');
+    Route::put('/contingency-plans/{plan}/checkins/{checkin}', [\App\Http\Controllers\ClientBehaviorContingencyController::class, 'updateCheckin'])->name('contingency-plans.checkins.update');
+    Route::get('/contingency-plans/{plan}/history', [\App\Http\Controllers\ClientBehaviorContingencyController::class, 'history'])->name('contingency-plans.history');
     
     // Digital Wellbeing
     Route::get('/wellbeing', [\App\Http\Controllers\ClientWellbeingController::class, 'index'])->name('wellbeing.index');
+    Route::post('/wellbeing', [\App\Http\Controllers\ClientWellbeingController::class, 'store'])->name('wellbeing.store');
     
     // Lifestyle Monitoring
     Route::get('/lifestyle', [\App\Http\Controllers\ClientLifestyleController::class, 'index'])->name('lifestyle.index');
@@ -327,10 +339,34 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::get('patients/{patient}/psychometric-assessments/{assessment}', [PsychometricAssessmentController::class, 'show'])
         ->name('patients.psychometric.show');
     
-    // Contingency Management
+    // Contingency Management (crisis/emergency)
     Route::resource('patients.contingency-plans', ContingencyPlanController::class);
     Route::post('patients/{patient}/contingency-plans/{contingencyPlan}/activate', [ContingencyPlanController::class, 'activate'])
         ->name('patients.contingency.activate');
+
+    // Behavior Contingency Plans
+    Route::get('patients/{patient}/behavior-contingency-plans', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'index'])
+        ->name('patients.behavior-contingency-plans.index');
+    Route::get('patients/{patient}/behavior-contingency-plans/create', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'create'])
+        ->name('patients.behavior-contingency-plans.create');
+    Route::post('patients/{patient}/behavior-contingency-plans', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'store'])
+        ->name('patients.behavior-contingency-plans.store');
+    Route::get('patients/{patient}/behavior-contingency-plans/{plan}', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'show'])
+        ->name('patients.behavior-contingency-plans.show');
+    Route::get('patients/{patient}/behavior-contingency-plans/{plan}/edit', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'edit'])
+        ->name('patients.behavior-contingency-plans.edit');
+    Route::put('patients/{patient}/behavior-contingency-plans/{plan}', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'update'])
+        ->name('patients.behavior-contingency-plans.update');
+    Route::delete('patients/{patient}/behavior-contingency-plans/{plan}', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'destroy'])
+        ->name('patients.behavior-contingency-plans.destroy');
+
+    // Behavior Contingency Check-in Reviews
+    Route::get('behavior-contingency/checkin-reviews', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'checkinReviewsIndex'])
+        ->name('behavior-contingency.checkin-reviews.index');
+    Route::get('behavior-contingency/checkin-reviews/{plan}', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'checkinReviewsShow'])
+        ->name('behavior-contingency.checkin-reviews.show');
+    Route::put('behavior-contingency/checkins/{checkin}', [\App\Http\Controllers\Doctor\BehaviorContingencyController::class, 'checkinReviewUpdate'])
+        ->name('behavior-contingency.checkins.update');
     
     // General Assessments Management (Phase 3)
     Route::get('patients/{patient}/general-assessments', [\App\Http\Controllers\Doctor\GeneralAssessmentController::class, 'index'])
@@ -353,6 +389,8 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
         ->name('patients.homework.show');
     Route::put('patients/{patient}/homework/{homework}', [\App\Http\Controllers\Doctor\HomeworkController::class, 'update'])
         ->name('patients.homework.update');
+    Route::put('patients/{patient}/homework/{homework}/completions/{completion}', [\App\Http\Controllers\Doctor\HomeworkController::class, 'reviewCompletion'])
+        ->name('patients.homework.completions.review');
     
     // Goals Management
     Route::get('patients/{patient}/goals', [\App\Http\Controllers\Doctor\GoalController::class, 'index'])
@@ -496,6 +534,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     // Sessions Explorer
     Route::get('sessions', [AdminSessionController::class, 'index'])->name('sessions.index');
     Route::get('sessions/{session}', [AdminSessionController::class, 'show'])->name('sessions.show');
+
+    // Behavior Contingency Plans
+    Route::get('behavior-contingency-plans', [\App\Http\Controllers\Admin\BehaviorContingencyController::class, 'index'])
+        ->name('behavior-contingency-plans.index');
+    Route::get('behavior-contingency/checkin-reviews', [\App\Http\Controllers\Admin\BehaviorContingencyController::class, 'checkinReviewsIndex'])
+        ->name('behavior-contingency.checkin-reviews.index');
+    Route::get('behavior-contingency/checkin-reviews/{plan}', [\App\Http\Controllers\Admin\BehaviorContingencyController::class, 'checkinReviewsShow'])
+        ->name('behavior-contingency.checkin-reviews.show');
+    Route::put('behavior-contingency/checkins/{checkin}', [\App\Http\Controllers\Admin\BehaviorContingencyController::class, 'checkinReviewUpdate'])
+        ->name('behavior-contingency.checkins.update');
     
     // Analytics
     Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');

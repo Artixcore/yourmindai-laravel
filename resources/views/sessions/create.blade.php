@@ -80,6 +80,32 @@
                     @enderror
                 </div>
 
+                <!-- Next Session Date -->
+                <div class="mb-3">
+                    <label for="next_session_date" class="form-label text-stone-700">
+                        Next Session Date
+                    </label>
+                    <input type="date" id="next_session_date" name="next_session_date"
+                           class="form-control @error('next_session_date') is-invalid @enderror"
+                           value="{{ old('next_session_date') }}">
+                    @error('next_session_date')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <!-- Reminder At -->
+                <div class="mb-3">
+                    <label for="reminder_at" class="form-label text-stone-700">
+                        Reminder Date/Time
+                    </label>
+                    <input type="datetime-local" id="reminder_at" name="reminder_at"
+                           class="form-control @error('reminder_at') is-invalid @enderror"
+                           value="{{ old('reminder_at') }}">
+                    @error('reminder_at')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <!-- Status -->
                 <div class="mb-3">
                     <label for="status" class="form-label text-stone-700">

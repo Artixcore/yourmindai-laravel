@@ -205,6 +205,10 @@
                 <i class="bi bi-calendar-check me-2"></i>
                 Daily Routine
             </a>
+            <a href="{{ route('appointment.book') }}" class="btn btn-outline-primary">
+                <i class="bi bi-calendar-plus me-2"></i>
+                Book Appointment
+            </a>
             <a href="{{ route('client.contingency.index') }}" class="btn btn-outline-danger">
                 <i class="bi bi-shield-exclamation me-2"></i>
                 Emergency Plans

@@ -113,6 +113,19 @@
             </div>
         </div>
         @endif
+
+        @if($assessment->status === 'completed' && isset($report) && $report)
+        <!-- Generated Report -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-semibold">Assessment Report</h5>
+                <small class="text-muted">Generated {{ $report->generated_at?->format('M d, Y') }}</small>
+            </div>
+            <div class="card-body">
+                <pre class="mb-0 bg-light p-3 rounded" style="white-space: pre-wrap; font-family: inherit;">{{ $report->summary }}</pre>
+            </div>
+        </div>
+        @endif
         @else
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-5">
@@ -132,16 +145,16 @@
             <div class="card-body">
                 <p class="mb-2">
                     <strong>Name:</strong><br>
-                    {{ $patient->name }}
+                    {{ $patient->user->name ?? $patient->full_name ?? 'Patient' }}
                 </p>
                 <p class="mb-0">
                     <strong>Email:</strong><br>
-                    {{ $patient->email }}
+                    {{ $patient->user->email ?? $patient->phone ?? 'N/A' }}
                 </p>
-                @if($patientProfile)
+                @if($patient->patient_number ?? null)
                 <p class="mb-0 mt-2">
                     <strong>Patient Number:</strong><br>
-                    {{ $patientProfile->patient_number ?? 'N/A' }}
+                    {{ $patient->patient_number ?? 'N/A' }}
                 </p>
                 @endif
             </div>

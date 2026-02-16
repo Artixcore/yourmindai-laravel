@@ -96,4 +96,12 @@ class PatientProfile extends Model
     {
         return $this->hasMany(ContingencyActivation::class, 'patient_profile_id');
     }
+
+    /**
+     * Get the behavior contingency plans for the patient profile.
+     */
+    public function behaviorContingencyPlans()
+    {
+        return $this->hasMany(BehaviorContingencyPlan::class, 'patient_profile_id');
+    }
 }

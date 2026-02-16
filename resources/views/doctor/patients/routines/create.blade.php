@@ -9,18 +9,18 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? 'Patient' }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.routines.index', $patient->id) }}">Routines</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.routines.index', $patient) }}">Routines</a></li>
                     <li class="breadcrumb-item active">Create New</li>
                 </ol>
             </nav>
             
             <h2 class="mb-1">Create Daily Routine</h2>
-            <p class="text-muted">Create structured daily routine for {{ $patient->user->name ?? 'Patient' }}</p>
+            <p class="text-muted">Create structured daily routine for {{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</p>
         </div>
     </div>
 
-    <form action="{{ route('patients.routines.store', $patient->id) }}" method="POST" id="routineForm">
+    <form action="{{ route('patients.routines.store', $patient) }}" method="POST" id="routineForm">
         @csrf
         
         <div class="row">
@@ -102,7 +102,7 @@
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="bi bi-check-lg me-2"></i>Create Routine
                     </button>
-                    <a href="{{ route('patients.routines.index', $patient->id) }}" class="btn btn-outline-secondary btn-lg ms-2">
+                    <a href="{{ route('patients.routines.index', $patient) }}" class="btn btn-outline-secondary btn-lg ms-2">
                         Cancel
                     </a>
                 </div>

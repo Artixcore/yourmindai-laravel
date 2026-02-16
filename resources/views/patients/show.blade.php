@@ -3,6 +3,9 @@
 @section('title', $patient->name)
 
 @section('content')
+@php
+    $patientProfile = $patient->resolvePatientProfile();
+@endphp
 <div class="container-fluid" style="max-width: 1024px;">
     <!-- Header -->
     <div class="mb-4 d-flex align-items-center justify-content-between">
@@ -388,10 +391,12 @@
         </div>
 
         @php
-            $generalAssessments = \App\Models\GeneralAssessment::where('patient_id', $patient->id)
-                ->orderBy('assigned_at', 'desc')
-                ->take(3)
-                ->get();
+            $generalAssessments = $patientProfile
+                ? \App\Models\GeneralAssessment::where('patient_id', $patientProfile->id)
+                    ->orderBy('assigned_at', 'desc')
+                    ->take(3)
+                    ->get()
+                : collect();
         @endphp
 
         @if($generalAssessments->isEmpty())
@@ -447,11 +452,13 @@
         </div>
 
         @php
-            $homework = \App\Models\HomeworkAssignment::where('patient_id', $patient->id)
-                ->whereIn('status', ['assigned', 'in_progress'])
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get();
+            $homework = $patientProfile
+                ? \App\Models\HomeworkAssignment::where('patient_id', $patientProfile->id)
+                    ->whereIn('status', ['assigned', 'in_progress'])
+                    ->orderBy('created_at', 'desc')
+                    ->take(5)
+                    ->get()
+                : collect();
         @endphp
 
         @if($homework->isEmpty())
@@ -500,7 +507,9 @@
             </div>
         </div>
         @php
-            $goals = \App\Models\Goal::where('patient_id', $patient->id)->orderBy('start_date', 'desc')->take(5)->get();
+            $goals = $patientProfile
+                ? \App\Models\Goal::where('patient_id', $patientProfile->id)->orderBy('start_date', 'desc')->take(5)->get()
+                : collect();
         @endphp
         @if($goals->isEmpty())
             <div class="text-center py-4 text-stone-500">
@@ -603,11 +612,13 @@
         </div>
 
         @php
-            $routines = \App\Models\Routine::where('patient_id', $patient->id)
-                ->where('is_active', true)
-                ->with('items')
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $routines = $patientProfile
+                ? \App\Models\Routine::where('patient_id', $patientProfile->id)
+                    ->where('is_active', true)
+                    ->with('items')
+                    ->orderBy('created_at', 'desc')
+                    ->get()
+                : collect();
         @endphp
 
         @if($routines->isEmpty())
@@ -656,8 +667,8 @@
                             <strong>Mood Logs</strong>
                         </div>
                         @php
-                            $moodCount = \App\Models\MoodLog::where('patient_id', $patient->id)->count();
-                            $avgMood = \App\Models\MoodLog::where('patient_id', $patient->id)->avg('mood_rating');
+                            $moodCount = $patientProfile ? \App\Models\MoodLog::where('patient_id', $patientProfile->id)->count() : 0;
+                            $avgMood = $patientProfile ? \App\Models\MoodLog::where('patient_id', $patientProfile->id)->avg('mood_rating') : null;
                         @endphp
                         <div class="small text-muted">{{ $moodCount }} entries</div>
                         @if($avgMood)
@@ -675,8 +686,8 @@
                             <strong>Sleep Logs</strong>
                         </div>
                         @php
-                            $sleepCount = \App\Models\SleepLog::where('patient_id', $patient->id)->count();
-                            $avgSleep = \App\Models\SleepLog::where('patient_id', $patient->id)->avg('hours_slept');
+                            $sleepCount = $patientProfile ? \App\Models\SleepLog::where('patient_id', $patientProfile->id)->count() : 0;
+                            $avgSleep = $patientProfile ? \App\Models\SleepLog::where('patient_id', $patientProfile->id)->avg('hours_slept') : null;
                         @endphp
                         <div class="small text-muted">{{ $sleepCount }} entries</div>
                         @if($avgSleep)
@@ -694,8 +705,8 @@
                             <strong>Exercise Logs</strong>
                         </div>
                         @php
-                            $exerciseCount = \App\Models\ExerciseLog::where('patient_id', $patient->id)->count();
-                            $totalMinutes = \App\Models\ExerciseLog::where('patient_id', $patient->id)->sum('duration_minutes');
+                            $exerciseCount = $patientProfile ? \App\Models\ExerciseLog::where('patient_id', $patientProfile->id)->count() : 0;
+                            $totalMinutes = $patientProfile ? \App\Models\ExerciseLog::where('patient_id', $patientProfile->id)->sum('duration_minutes') : 0;
                         @endphp
                         <div class="small text-muted">{{ $exerciseCount }} entries</div>
                         @if($totalMinutes)

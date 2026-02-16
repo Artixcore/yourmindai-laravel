@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\HomeworkAssignment;
 use App\Models\HomeworkCompletion;
+use App\Models\Patient;
 use App\Models\PatientProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,6 +53,17 @@ class HomeworkContingencyScoringTest extends TestCase
         ]);
     }
 
+    protected function createPatient(User $doctor, User $patientUser): Patient
+    {
+        return Patient::create([
+            'doctor_id' => $doctor->id,
+            'name' => 'Test Patient',
+            'email' => $patientUser->email,
+            'phone' => '1234567890',
+            'status' => 'active',
+        ]);
+    }
+
     /** @test */
     public function client_can_complete_homework_with_scoring_choice(): void
     {
@@ -89,6 +101,7 @@ class HomeworkContingencyScoringTest extends TestCase
         $doctor = $this->createDoctor();
         $patientUser = $this->createPatientUser();
         $patientProfile = $this->createPatientProfile($doctor, $patientUser);
+        $patient = $this->createPatient($doctor, $patientUser);
 
         $homework = HomeworkAssignment::create([
             'patient_id' => $patientProfile->id,
@@ -111,9 +124,9 @@ class HomeworkContingencyScoringTest extends TestCase
         ]);
 
         $response = $this->actingAs($doctor)->put(route('patients.homework.completions.review', [
-            $patientProfile->id,
-            $homework->id,
-            $completion->id,
+            $patient,
+            $homework,
+            $completion,
         ]), [
             'score_value' => 10,
         ]);

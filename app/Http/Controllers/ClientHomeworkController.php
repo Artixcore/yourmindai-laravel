@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\HomeworkAssignment;
 use App\Models\HomeworkCompletion;
 use App\Models\PatientProfile;
@@ -96,49 +98,62 @@ class ClientHomeworkController extends Controller
         $scoringChoice = $validated['scoring_choice'] ?? null;
         $scoreValue = $scoringChoice ? HomeworkCompletion::getScoreForChoice($scoringChoice) : null;
 
-        // Create completion record
-        $completion = HomeworkCompletion::updateOrCreate(
-            [
-                'homework_assignment_id' => $homework->id,
+        try {
+            DB::transaction(function () use ($homework, $patient, $user, $validated, $isDone, $percentage, $scoringChoice, $scoreValue) {
+                // Create completion record
+                HomeworkCompletion::updateOrCreate(
+                    [
+                        'homework_assignment_id' => $homework->id,
+                        'patient_id' => $patient->id,
+                        'completion_date' => today(),
+                    ],
+                    [
+                        'completion_time' => now()->format('H:i:s'),
+                        'is_completed' => $isDone,
+                        'completion_percentage' => $percentage,
+                        'patient_notes' => $validated['patient_notes'] ?? null,
+                        'completion_data' => $validated['completion_data'] ?? null,
+                        'scoring_choice' => $scoringChoice,
+                        'score_value' => $scoreValue,
+                    ]
+                );
+
+                // Add self-feedback and progression
+                $homework->addFeedback(
+                    $patient->id,
+                    'self',
+                    $user->id,
+                    $validated['patient_notes'] ?? 'Completed',
+                    null,
+                    $validated['completion_data'] ?? null
+                );
+
+                $homework->addProgression(
+                    $patient->id,
+                    today()->format('Y-m-d'),
+                    $percentage,
+                    $isDone ? 'completed' : 'in_progress',
+                    'self',
+                    $user->id,
+                    $validated['patient_notes'] ?? null
+                );
+
+                // Update homework status
+                if ($isDone && $homework->frequency === 'as_needed') {
+                    $homework->update(['status' => 'completed']);
+                } else {
+                    $homework->update(['status' => 'in_progress']);
+                }
+            });
+        } catch (\Exception $e) {
+            Log::error('Homework complete failed', [
+                'user_id' => $user->id,
+                'homework_id' => $homework->id,
                 'patient_id' => $patient->id,
-                'completion_date' => today(),
-            ],
-            [
-                'completion_time' => now()->format('H:i:s'),
-                'is_completed' => $isDone,
-                'completion_percentage' => $percentage,
-                'patient_notes' => $validated['patient_notes'] ?? null,
-                'completion_data' => $validated['completion_data'] ?? null,
-                'scoring_choice' => $scoringChoice,
-                'score_value' => $scoreValue,
-            ]
-        );
-
-        // Add self-feedback and progression
-        $homework->addFeedback(
-            $patient->id,
-            'self',
-            $user->id,
-            $validated['patient_notes'] ?? 'Completed',
-            null,
-            $validated['completion_data'] ?? null
-        );
-
-        $homework->addProgression(
-            $patient->id,
-            today()->format('Y-m-d'),
-            $percentage,
-            $isDone ? 'completed' : 'in_progress',
-            'self',
-            $user->id,
-            $validated['patient_notes'] ?? null
-        );
-
-        // Update homework status
-        if ($isDone && $homework->frequency === 'as_needed') {
-            $homework->update(['status' => 'completed']);
-        } else {
-            $homework->update(['status' => 'in_progress']);
+                'route' => 'client.homework.complete',
+                'error' => $e->getMessage(),
+            ]);
+            return back()->withInput()->with('error', 'Failed to save homework completion. Please try again.');
         }
 
         return redirect()->route('client.homework.show', $homework->id)

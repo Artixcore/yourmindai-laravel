@@ -9,8 +9,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? 'Patient' }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.homework.index', $patient->id) }}">Homework</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.homework.index', $patient) }}">Homework</a></li>
                     <li class="breadcrumb-item active">{{ Str::limit($homework->title, 30) }}</li>
                 </ol>
             </nav>
@@ -25,7 +25,7 @@
                         @endif
                     </p>
                 </div>
-                <a href="{{ route('patients.homework.index', $patient->id) }}" class="btn btn-outline-secondary">
+                <a href="{{ route('patients.homework.index', $patient) }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Back to Homework
                 </a>
             </div>
@@ -116,7 +116,7 @@
                                     </div>
                                 </div>
                                 @if(!$completion->reviewed_at)
-                                    <form action="{{ route('patients.homework.completions.review', [$patient->id, $homework->id, $completion->id]) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('patients.homework.completions.review', [$patient, $homework, $completion]) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PUT')
                                         <button type="submit" class="btn btn-sm btn-primary">Mark Reviewed</button>
@@ -144,7 +144,7 @@
                     <h5 class="mb-0">Actions</h5>
                 </div>
                 <div class="card-body">
-                    <a href="{{ route('patients.homework.index', $patient->id) }}" class="btn btn-outline-primary w-100 mb-2">
+                    <a href="{{ route('patients.homework.index', $patient) }}" class="btn btn-outline-primary w-100 mb-2">
                         <i class="bi bi-arrow-left me-2"></i>Back to List
                     </a>
                 </div>

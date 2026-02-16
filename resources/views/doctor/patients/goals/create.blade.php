@@ -9,13 +9,13 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? $patient->full_name ?? 'Patient' }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.goals.index', $patient->id) }}">Goals</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.goals.index', $patient) }}">Goals</a></li>
                     <li class="breadcrumb-item active">New Goal</li>
                 </ol>
             </nav>
             <h2 class="mb-1">New Goal</h2>
-            <p class="text-muted">Set a goal for {{ $patient->user->name ?? $patient->full_name ?? 'Patient' }}</p>
+            <p class="text-muted">Set a goal for {{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</p>
         </div>
     </div>
 
@@ -23,7 +23,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('patients.goals.store', $patient->id) }}" method="POST">
+                    <form action="{{ route('patients.goals.store', $patient) }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
@@ -76,7 +76,7 @@
                         </div>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Create Goal</button>
-                            <a href="{{ route('patients.goals.index', $patient->id) }}" class="btn btn-outline-secondary">Cancel</a>
+                            <a href="{{ route('patients.goals.index', $patient) }}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

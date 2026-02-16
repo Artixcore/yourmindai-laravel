@@ -32,7 +32,19 @@ class HomeworkController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('doctor.patients.homework.index', compact('patient', 'homework'));
+        return view('doctor.patients.homework.index', compact('patient', 'patientProfile', 'homework'));
+    }
+
+    /**
+     * Resolve Patient to PatientProfile for models that use patient_profile_id.
+     */
+    private function resolvePatientProfile(Patient $patient): PatientProfile
+    {
+        $profile = $patient->resolvePatientProfile();
+        if (!$profile) {
+            abort(404, 'Patient profile not found for this patient.');
+        }
+        return $profile;
     }
 
     /**
@@ -68,7 +80,7 @@ class HomeworkController extends Controller
             'self_help_tools' => 'Self-Help Tools',
         ];
 
-        return view('doctor.patients.homework.create', compact('patient', 'sessions', 'homeworkTypes'));
+        return view('doctor.patients.homework.create', compact('patient', 'patientProfile', 'sessions', 'homeworkTypes'));
     }
 
     /**
@@ -112,72 +124,73 @@ class HomeworkController extends Controller
         DB::transaction(function () use ($request, $patientProfile, $validated, $frequencyValue) {
             $homework = HomeworkAssignment::create([
                 'patient_id' => $patientProfile->id,
-            'assigned_by' => $request->user()->id,
-            'session_id' => $validated['session_id'] ?? null,
-            'homework_type' => $validated['homework_type'],
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'instructions' => $validated['instructions'] ?? null,
-            'goals' => $validated['goals'] ?? null,
-            'frequency' => $validated['frequency'],
-            'frequency_type' => $validated['frequency_type'] ?? null,
-            'frequency_value' => $frequencyValue,
-            'start_date' => $validated['start_date'],
-            'end_date' => $validated['end_date'] ?? null,
-            'reminder_at' => isset($validated['reminder_at']) ? $validated['reminder_at'] : null,
-            'status' => 'assigned',
-            'requires_parent_feedback' => $validated['requires_parent_feedback'] ?? false,
-            'requires_others_feedback' => $validated['requires_others_feedback'] ?? false,
-        ]);
+                'assigned_by' => $request->user()->id,
+                'session_id' => $validated['session_id'] ?? null,
+                'homework_type' => $validated['homework_type'],
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'instructions' => $validated['instructions'] ?? null,
+                'goals' => $validated['goals'] ?? null,
+                'frequency' => $validated['frequency'],
+                'frequency_type' => $validated['frequency_type'] ?? null,
+                'frequency_value' => $frequencyValue,
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'] ?? null,
+                'reminder_at' => isset($validated['reminder_at']) ? $validated['reminder_at'] : null,
+                'status' => 'assigned',
+                'requires_parent_feedback' => $validated['requires_parent_feedback'] ?? false,
+                'requires_others_feedback' => $validated['requires_others_feedback'] ?? false,
+            ]);
 
-        if (!empty($validated['media'])) {
-            foreach ($validated['media'] as $mediaItem) {
-                if (!empty($mediaItem['url'])) {
-                    HomeworkMedia::create([
-                        'homework_assignment_id' => $homework->id,
-                        'type' => $mediaItem['type'],
-                        'url' => $mediaItem['url'],
-                        'title' => $mediaItem['title'] ?? null,
-                    ]);
+            if (!empty($validated['media'])) {
+                foreach ($validated['media'] as $mediaItem) {
+                    if (!empty($mediaItem['url'])) {
+                        HomeworkMedia::create([
+                            'homework_assignment_id' => $homework->id,
+                            'type' => $mediaItem['type'],
+                            'url' => $mediaItem['url'],
+                            'title' => $mediaItem['title'] ?? null,
+                        ]);
+                    }
                 }
             }
-        }
+        });
 
-        return redirect()->route('patients.homework.index', $patient->id)
+        return redirect()->route('patients.homework.index', $patient)
             ->with('success', 'Homework assigned successfully!');
     }
 
     /**
      * Show specific homework details.
      */
-    public function show(Request $request, $patientId, $homeworkId)
+    public function show(Request $request, Patient $patient, $homeworkId)
     {
-        $patient = PatientProfile::with('user')->findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
         $homework = HomeworkAssignment::where('id', $homeworkId)
-            ->where('patient_id', $patientId)
+            ->where('patient_id', $patientProfile->id)
             ->with(['completions' => fn ($q) => $q->with('reviewer'), 'feedback', 'practiceProgressions', 'session'])
             ->firstOrFail();
 
         // Check authorization
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        return view('doctor.patients.homework.show', compact('patient', 'homework'));
+        return view('doctor.patients.homework.show', compact('patient', 'patientProfile', 'homework'));
     }
 
     /**
      * Update homework assignment.
      */
-    public function update(Request $request, $patientId, $homeworkId)
+    public function update(Request $request, Patient $patient, $homeworkId)
     {
-        $patient = PatientProfile::findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
         $homework = HomeworkAssignment::where('id', $homeworkId)
-            ->where('patient_id', $patientId)
+            ->where('patient_id', $patientProfile->id)
             ->firstOrFail();
 
         // Check authorization
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
@@ -188,24 +201,24 @@ class HomeworkController extends Controller
 
         $homework->update($validated);
 
-        return redirect()->route('patients.homework.show', [$patient->id, $homework->id])
+        return redirect()->route('patients.homework.show', [$patient, $homework])
             ->with('success', 'Homework updated successfully!');
     }
 
     /**
      * Review a homework completion (mark reviewed, optionally override score).
      */
-    public function reviewCompletion(Request $request, $patientId, $homeworkId, $completionId)
+    public function reviewCompletion(Request $request, Patient $patient, $homeworkId, $completionId)
     {
-        $patient = PatientProfile::findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
         $homework = HomeworkAssignment::where('id', $homeworkId)
-            ->where('patient_id', $patientId)
+            ->where('patient_id', $patientProfile->id)
             ->firstOrFail();
         $completion = HomeworkCompletion::where('id', $completionId)
             ->where('homework_assignment_id', $homework->id)
             ->firstOrFail();
 
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
@@ -220,7 +233,7 @@ class HomeworkController extends Controller
             'score_value' => $validated['score_value'] ?? $completion->score_value,
         ]);
 
-        return redirect()->route('patients.homework.show', [$patient->id, $homework->id])
+        return redirect()->route('patients.homework.show', [$patient, $homework])
             ->with('success', 'Completion reviewed successfully!');
     }
 

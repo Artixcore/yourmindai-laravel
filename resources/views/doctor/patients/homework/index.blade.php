@@ -9,7 +9,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
                     <li class="breadcrumb-item active">Homework & Techniques</li>
                 </ol>
             </nav>
@@ -17,9 +17,9 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="mb-1">Homework & Techniques</h2>
-                    <p class="text-muted mb-0">Manage therapy assignments for {{ $patient->user->name ?? 'Patient' }}</p>
+                    <p class="text-muted mb-0">Manage therapy assignments for {{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</p>
                 </div>
-                <a href="{{ route('patients.homework.create', $patient->id) }}" class="btn btn-primary">
+                <a href="{{ route('patients.homework.create', $patient) }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-2"></i>Assign New Homework
                 </a>
             </div>
@@ -115,7 +115,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="{{ route('patients.homework.show', [$patient->id, $assignment->id]) }}" 
+                                    <a href="{{ route('patients.homework.show', [$patient, $assignment]) }}" 
                                        class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i>
                                     </a>
@@ -134,7 +134,7 @@
                 <i class="bi bi-clipboard-check text-muted" style="font-size: 3rem;"></i>
                 <p class="text-muted mt-3 mb-2">No homework assigned yet</p>
                 <p class="text-muted small mb-4">Start by assigning therapy techniques to this patient.</p>
-                <a href="{{ route('patients.homework.create', $patient->id) }}" class="btn btn-primary">
+                <a href="{{ route('patients.homework.create', $patient) }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-2"></i>Assign First Homework
                 </a>
             </div>

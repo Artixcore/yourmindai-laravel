@@ -9,8 +9,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? $patient->full_name ?? 'Patient' }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.goals.index', $patient->id) }}">Goals</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.goals.index', $patient) }}">Goals</a></li>
                     <li class="breadcrumb-item active">Edit Goal</li>
                 </ol>
             </nav>
@@ -23,7 +23,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('patients.goals.update', [$patient->id, $goal]) }}" method="POST">
+                    <form action="{{ route('patients.goals.update', [$patient, $goal]) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="mb-3">
@@ -77,7 +77,7 @@
                         </div>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Update Goal</button>
-                            <a href="{{ route('patients.goals.index', $patient->id) }}" class="btn btn-outline-secondary">Cancel</a>
+                            <a href="{{ route('patients.goals.index', $patient) }}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

@@ -69,4 +69,30 @@ class AppointmentBookingTest extends TestCase
         $response->assertOk();
         $response->assertSee($doctor->name ?? $doctor->email);
     }
+
+    /** @test */
+    public function booking_validates_required_fields(): void
+    {
+        $response = $this->post(route('appointment-request.store'), [
+            'first_name' => '',
+            'last_name' => '',
+            'email' => 'invalid-email',
+            'preferred_date' => '2020-01-01',
+        ]);
+
+        $response->assertSessionHasErrors(['first_name', 'last_name', 'email', 'preferred_date']);
+    }
+
+    /** @test */
+    public function booking_rejects_past_date(): void
+    {
+        $response = $this->post(route('appointment-request.store'), [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@test.com',
+            'preferred_date' => now()->subDay()->format('Y-m-d'),
+        ]);
+
+        $response->assertSessionHasErrors(['preferred_date']);
+    }
 }

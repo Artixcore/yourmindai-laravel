@@ -54,17 +54,21 @@ class SessionController extends Controller
         $this->authorize('view', $patient);
         $this->authorize('create', Session::class);
 
-        $validated = $request->validate([
+        $user = auth()->user();
+        $rules = [
             'title' => 'required|string|max:255',
             'notes' => 'nullable|string',
             'status' => 'nullable|in:active,closed',
             'next_session_date' => 'nullable|date',
             'reminder_at' => 'nullable|date',
-        ]);
+        ];
+        if ($user->role === 'admin') {
+            $rules['doctor_id'] = 'nullable|exists:users,id';
+        }
+        $validated = $request->validate($rules);
 
-        $user = auth()->user();
-        $doctorId = $user->role === 'admin' && $request->doctor_id 
-            ? $request->doctor_id 
+        $doctorId = $user->role === 'admin' && !empty($validated['doctor_id'])
+            ? $validated['doctor_id']
             : $user->id;
 
         $session = Session::create([
@@ -143,7 +147,7 @@ class SessionController extends Controller
             'notes' => 'nullable|string',
             'status' => 'required|in:active,closed',
             'next_session_date' => 'nullable|date',
-            'reminder_at' => 'nullable',
+            'reminder_at' => 'nullable|date',
         ]);
 
         $session->update($validated);

@@ -7,6 +7,7 @@ use App\Models\PatientProfile;
 use App\Models\Patient;
 use App\Models\WellbeingLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ClientWellbeingController extends Controller
 {
@@ -58,17 +59,26 @@ class ClientWellbeingController extends Controller
             'lifestyle_errors' => 'nullable|array',
         ]);
 
-        WellbeingLog::updateOrCreate(
-            [
-                'patient_profile_id' => $patient->id,
-                'log_date' => $validated['log_date'],
-            ],
-            [
-                'screentime_minutes' => $validated['screentime_minutes'] ?? null,
-                'details' => $validated['details'] ?? null,
-                'lifestyle_errors' => $validated['lifestyle_errors'] ?? null,
-            ]
-        );
+        try {
+            WellbeingLog::updateOrCreate(
+                [
+                    'patient_profile_id' => $patient->id,
+                    'log_date' => $validated['log_date'],
+                ],
+                [
+                    'screentime_minutes' => $validated['screentime_minutes'] ?? null,
+                    'details' => $validated['details'] ?? null,
+                    'lifestyle_errors' => $validated['lifestyle_errors'] ?? null,
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::error('Wellbeing log store failed', [
+                'user_id' => auth()->id(),
+                'route' => 'client.wellbeing.store',
+                'error' => $e->getMessage(),
+            ]);
+            return back()->withInput()->with('error', 'Failed to save wellbeing log. Please try again.');
+        }
 
         return redirect()->route('client.wellbeing.index')
             ->with('success', 'Wellbeing log saved.');

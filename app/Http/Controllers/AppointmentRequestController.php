@@ -326,6 +326,12 @@ class AppointmentRequestController extends Controller
                 ->with('success', 'Patient created successfully from appointment request!');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Appointment request storePatient failed', [
+                'user_id' => auth()->id(),
+                'appointment_request_id' => $appointmentRequest->id,
+                'route' => 'appointment-requests.store-patient',
+                'error' => $e->getMessage(),
+            ]);
             return back()
                 ->withInput()
                 ->withErrors(['error' => 'Failed to create patient: ' . $e->getMessage()]);

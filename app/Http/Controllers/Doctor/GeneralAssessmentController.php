@@ -6,55 +6,65 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\GeneralAssessment;
 use App\Models\GeneralAssessmentQuestion;
+use App\Models\Patient;
 use App\Models\PatientProfile;
 use App\Models\User;
 
 class GeneralAssessmentController extends Controller
 {
+    private function resolvePatientProfile(Patient $patient): PatientProfile
+    {
+        $profile = $patient->resolvePatientProfile();
+        if (!$profile) {
+            abort(404, 'Patient profile not found for this patient.');
+        }
+        return $profile;
+    }
+
     /**
      * Show all general assessments for a patient.
      */
-    public function index(Request $request, $patientId)
+    public function index(Request $request, Patient $patient)
     {
-        $patient = PatientProfile::with('user')->findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
         
         // Check authorization
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        $assessments = GeneralAssessment::where('patient_id', $patientId)
+        $assessments = GeneralAssessment::where('patient_id', $patientProfile->id)
             ->with(['questions', 'responses', 'assignedByDoctor'])
             ->orderBy('assigned_at', 'desc')
             ->get();
 
-        return view('doctor.patients.general-assessments.index', compact('patient', 'assessments'));
+        return view('doctor.patients.general-assessments.index', compact('patient', 'patientProfile', 'assessments'));
     }
 
     /**
      * Show form to create new assessment for patient.
      */
-    public function create(Request $request, $patientId)
+    public function create(Request $request, Patient $patient)
     {
-        $patient = PatientProfile::with('user')->findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
         
         // Check authorization
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        return view('doctor.patients.general-assessments.create', compact('patient'));
+        return view('doctor.patients.general-assessments.create', compact('patient', 'patientProfile'));
     }
 
     /**
      * Store new assessment for patient.
      */
-    public function store(Request $request, $patientId)
+    public function store(Request $request, Patient $patient)
     {
-        $patient = PatientProfile::findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
         
         // Check authorization
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
@@ -70,7 +80,7 @@ class GeneralAssessmentController extends Controller
 
         // Create assessment
         $assessment = GeneralAssessment::create([
-            'patient_id' => $patient->id,
+            'patient_id' => $patientProfile->id,
             'assigned_by' => $request->user()->id,
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
@@ -90,27 +100,27 @@ class GeneralAssessmentController extends Controller
             ]);
         }
 
-        return redirect()->route('patients.general-assessments.index', $patient->id)
+        return redirect()->route('patients.general-assessments.index', $patient)
             ->with('success', 'General assessment created and assigned successfully!');
     }
 
     /**
      * Show specific assessment details.
      */
-    public function show(Request $request, $patientId, $assessmentId)
+    public function show(Request $request, Patient $patient, $assessmentId)
     {
-        $patient = PatientProfile::with('user')->findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
         $assessment = GeneralAssessment::where('id', $assessmentId)
-            ->where('patient_id', $patientId)
+            ->where('patient_id', $patientProfile->id)
             ->with(['questions', 'responses', 'feedback'])
             ->firstOrFail();
 
         // Check authorization
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        return view('doctor.patients.general-assessments.show', compact('patient', 'assessment'));
+        return view('doctor.patients.general-assessments.show', compact('patient', 'patientProfile', 'assessment'));
     }
 
     /**

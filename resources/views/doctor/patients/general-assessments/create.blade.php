@@ -9,14 +9,14 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? 'Patient' }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.general-assessments.index', $patient->id) }}">General Assessments</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.general-assessments.index', $patient) }}">General Assessments</a></li>
                     <li class="breadcrumb-item active">Create New</li>
                 </ol>
             </nav>
             
             <h2 class="mb-1">Create General Assessment</h2>
-            <p class="text-muted">Create custom assessment for {{ $patient->user->name ?? 'Patient' }}</p>
+            <p class="text-muted">Create custom assessment for {{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</p>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('patients.general-assessments.store', $patient->id) }}" method="POST" id="assessmentForm">
+                    <form action="{{ route('patients.general-assessments.store', $patient) }}" method="POST" id="assessmentForm">
                         @csrf
                         
                         <!-- Assessment Title -->
@@ -71,7 +71,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg me-2"></i>Create & Assign Assessment
                             </button>
-                            <a href="{{ route('patients.general-assessments.index', $patient->id) }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('patients.general-assessments.index', $patient) }}" class="btn btn-outline-secondary">
                                 Cancel
                             </a>
                         </div>

@@ -6,6 +6,7 @@ use App\Models\PatientProfile;
 use App\Models\Patient;
 use App\Models\PatientDevice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ClientDeviceController extends Controller
 {
@@ -100,7 +101,16 @@ class ClientDeviceController extends Controller
             $deviceData['patient_id'] = $patientInfo['id'];
         }
 
-        PatientDevice::create($deviceData);
+        try {
+            PatientDevice::create($deviceData);
+        } catch (\Exception $e) {
+            Log::error('Device registration failed', [
+                'user_id' => $request->user()->id,
+                'route' => 'client.devices.store',
+                'error' => $e->getMessage(),
+            ]);
+            return back()->withInput()->with('error', 'Failed to register device. Please try again.');
+        }
 
         return redirect()->route('client.devices.index')
             ->with('success', 'Device registered successfully.');

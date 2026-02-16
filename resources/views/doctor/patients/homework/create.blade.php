@@ -9,14 +9,14 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? 'Patient' }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.homework.index', $patient->id) }}">Homework</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.homework.index', $patient) }}">Homework</a></li>
                     <li class="breadcrumb-item active">Assign New</li>
                 </ol>
             </nav>
             
             <h2 class="mb-1">Assign Homework/Technique</h2>
-            <p class="text-muted">Assign therapy technique to {{ $patient->user->name ?? 'Patient' }}</p>
+            <p class="text-muted">Assign therapy technique to {{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</p>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('patients.homework.store', $patient->id) }}" method="POST">
+                    <form action="{{ route('patients.homework.store', $patient) }}" method="POST">
                         @csrf
                         
                         <!-- Homework Type -->
@@ -160,7 +160,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg me-2"></i>Assign Homework
                             </button>
-                            <a href="{{ route('patients.homework.index', $patient->id) }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('patients.homework.index', $patient) }}" class="btn btn-outline-secondary">
                                 Cancel
                             </a>
                         </div>

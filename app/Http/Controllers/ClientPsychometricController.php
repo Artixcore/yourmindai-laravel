@@ -7,6 +7,8 @@ use App\Models\Patient;
 use App\Models\PsychometricAssessment;
 use App\Models\PsychometricReport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ClientPsychometricController extends Controller
 {
@@ -157,14 +159,26 @@ class ClientPsychometricController extends Controller
                 ->with('info', 'Report already exists.');
         }
 
-        $summary = $this->buildReportSummary($assessment);
-        PsychometricReport::create([
-            'assessment_id' => $assessment->id,
-            'patient_profile_id' => $patientInfo['is_profile'] ? $patientInfo['id'] : null,
-            'patient_id' => $patientInfo['is_profile'] ? null : $patientInfo['id'],
-            'summary' => $summary,
-            'generated_at' => now(),
-        ]);
+        try {
+            DB::transaction(function () use ($assessment, $patientInfo) {
+                $summary = $this->buildReportSummary($assessment);
+                PsychometricReport::create([
+                    'assessment_id' => $assessment->id,
+                    'patient_profile_id' => $patientInfo['is_profile'] ? $patientInfo['id'] : null,
+                    'patient_id' => $patientInfo['is_profile'] ? null : $patientInfo['id'],
+                    'summary' => $summary,
+                    'generated_at' => now(),
+                ]);
+            });
+        } catch (\Exception $e) {
+            Log::error('Psychometric report generation failed', [
+                'user_id' => auth()->id(),
+                'assessment_id' => $assessment->id,
+                'route' => 'client.assessments.report.generate',
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'Failed to generate report. Please try again.');
+        }
 
         return redirect()->route('client.assessments.report', $assessment)
             ->with('success', 'Report generated successfully.');
@@ -200,7 +214,7 @@ class ClientPsychometricController extends Controller
     private function buildReportSummary(PsychometricAssessment $assessment): string
     {
         $parts = [];
-        $parts[] = 'Assessment: ' . ($assessment->scale->name ?? 'Psychometric Assessment');
+        $parts[] = 'Assessment: ' . ($assessment->scale?->name ?? 'Psychometric Assessment');
         $parts[] = 'Completed: ' . ($assessment->completed_at?->format('F j, Y') ?? 'N/A');
         $parts[] = '';
         $parts[] = 'Total Score: ' . ($assessment->total_score ?? 'N/A');

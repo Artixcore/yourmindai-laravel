@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'General Assessments - ' . ($patient->user->name ?? 'Patient'))
+@section('title', 'General Assessments - ' . ($patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient'))
 
 @section('content')
 <div class="container-fluid">
@@ -9,7 +9,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('patients.index') }}">Patients</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient->id) }}">{{ $patient->user->name ?? 'Patient' }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('patients.show', $patient) }}">{{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</a></li>
                     <li class="breadcrumb-item active">General Assessments</li>
                 </ol>
             </nav>
@@ -17,9 +17,9 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="mb-1">General Assessments</h2>
-                    <p class="text-muted mb-0">Manage custom assessments for {{ $patient->user->name ?? 'Patient' }}</p>
+                    <p class="text-muted mb-0">Manage custom assessments for {{ $patientProfile->user->name ?? $patientProfile->full_name ?? $patient->name ?? 'Patient' }}</p>
                 </div>
-                <a href="{{ route('patients.general-assessments.create', $patient->id) }}" class="btn btn-primary">
+                <a href="{{ route('patients.general-assessments.create', $patient) }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-2"></i>Create Assessment
                 </a>
             </div>
@@ -87,7 +87,7 @@
                     </div>
                     
                     <div class="flex-shrink-0 ms-3">
-                        <a href="{{ route('patients.general-assessments.show', [$patient->id, $assessment->id]) }}" 
+                        <a href="{{ route('patients.general-assessments.show', [$patient, $assessment->id]) }}" 
                            class="btn btn-outline-primary">
                             <i class="bi bi-eye me-1"></i>View Details
                         </a>
@@ -102,7 +102,7 @@
                 <i class="bi bi-clipboard-data text-muted" style="font-size: 3rem;"></i>
                 <p class="text-muted mt-3 mb-2">No general assessments created yet</p>
                 <p class="text-muted small mb-4">Create custom assessments to evaluate this patient's progress and needs.</p>
-                <a href="{{ route('patients.general-assessments.create', $patient->id) }}" class="btn btn-primary">
+                <a href="{{ route('patients.general-assessments.create', $patient) }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-2"></i>Create First Assessment
                 </a>
             </div>

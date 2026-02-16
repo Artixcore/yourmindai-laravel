@@ -4,43 +4,53 @@ namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Goal;
+use App\Models\Patient;
 use App\Models\PatientProfile;
 use Illuminate\Http\Request;
 
 class GoalController extends Controller
 {
-    public function index(Request $request, $patientId)
+    public function index(Request $request, Patient $patient)
     {
-        $patient = PatientProfile::with('user')->findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
 
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        $goals = Goal::where('patient_id', $patient->id)
+        $goals = Goal::where('patient_id', $patientProfile->id)
             ->orderBy('start_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('doctor.patients.goals.index', compact('patient', 'goals'));
+        return view('doctor.patients.goals.index', compact('patient', 'patientProfile', 'goals'));
     }
 
-    public function create(Request $request, $patientId)
+    private function resolvePatientProfile(Patient $patient): PatientProfile
     {
-        $patient = PatientProfile::with('user')->findOrFail($patientId);
+        $profile = $patient->resolvePatientProfile();
+        if (!$profile) {
+            abort(404, 'Patient profile not found for this patient.');
+        }
+        return $profile;
+    }
 
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+    public function create(Request $request, Patient $patient)
+    {
+        $patientProfile = $this->resolvePatientProfile($patient);
+
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        return view('doctor.patients.goals.create', compact('patient'));
+        return view('doctor.patients.goals.create', compact('patient', 'patientProfile'));
     }
 
-    public function store(Request $request, $patientId)
+    public function store(Request $request, Patient $patient)
     {
-        $patient = PatientProfile::findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
 
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
@@ -56,40 +66,40 @@ class GoalController extends Controller
             'visible_to_parent' => 'boolean',
         ]);
 
-        $validated['patient_id'] = $patient->id;
+        $validated['patient_id'] = $patientProfile->id;
         $validated['visible_to_patient'] = $request->boolean('visible_to_patient');
         $validated['visible_to_parent'] = $request->boolean('visible_to_parent');
 
         Goal::create($validated);
 
-        return redirect()->route('patients.goals.index', $patient->id)
+        return redirect()->route('patients.goals.index', $patient)
             ->with('success', 'Goal created successfully.');
     }
 
-    public function edit(Request $request, $patientId, Goal $goal)
+    public function edit(Request $request, Patient $patient, Goal $goal)
     {
-        $patient = PatientProfile::with('user')->findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
 
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        if ($goal->patient_id != $patient->id) {
+        if ($goal->patient_id != $patientProfile->id) {
             abort(404);
         }
 
-        return view('doctor.patients.goals.edit', compact('patient', 'goal'));
+        return view('doctor.patients.goals.edit', compact('patient', 'patientProfile', 'goal'));
     }
 
-    public function update(Request $request, $patientId, Goal $goal)
+    public function update(Request $request, Patient $patient, Goal $goal)
     {
-        $patient = PatientProfile::findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
 
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        if ($goal->patient_id != $patient->id) {
+        if ($goal->patient_id != $patientProfile->id) {
             abort(404);
         }
 
@@ -110,25 +120,25 @@ class GoalController extends Controller
 
         $goal->update($validated);
 
-        return redirect()->route('patients.goals.index', $patient->id)
+        return redirect()->route('patients.goals.index', $patient)
             ->with('success', 'Goal updated successfully.');
     }
 
-    public function destroy(Request $request, $patientId, Goal $goal)
+    public function destroy(Request $request, Patient $patient, Goal $goal)
     {
-        $patient = PatientProfile::findOrFail($patientId);
+        $patientProfile = $this->resolvePatientProfile($patient);
 
-        if (!$this->canAccessPatient($request->user(), $patient)) {
+        if (!$this->canAccessPatient($request->user(), $patientProfile)) {
             abort(403);
         }
 
-        if ($goal->patient_id != $patient->id) {
+        if ($goal->patient_id != $patientProfile->id) {
             abort(404);
         }
 
         $goal->delete();
 
-        return redirect()->route('patients.goals.index', $patient->id)
+        return redirect()->route('patients.goals.index', $patient)
             ->with('success', 'Goal deleted successfully.');
     }
 

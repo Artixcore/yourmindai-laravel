@@ -18,6 +18,35 @@ use Illuminate\Support\Str;
 class AppointmentRequestController extends Controller
 {
     /**
+     * Get doctor availability (overloaded days: count >= 5).
+     * GET /appointments/doctor/{doctor}/availability?month=2025-01
+     */
+    public function doctorAvailability(Request $request, $doctorId)
+    {
+        $doctor = User::where('role', 'doctor')->where('id', $doctorId)->firstOrFail();
+        $month = $request->get('month', now()->format('Y-m'));
+        $start = Carbon::parse($month . '-01')->startOfMonth();
+        $end = $start->copy()->endOfMonth();
+
+        $slotService = app(AppointmentSlotService::class);
+        $overloaded = [];
+
+        for ($d = $start->copy(); $d->lte($end); $d->addDay()) {
+            $dateStr = $d->toDateString();
+            $count = $slotService->countOnDate((int) $doctor->id, $dateStr);
+            if ($count >= AppointmentSlotService::MAX_APPOINTMENTS_PER_DOCTOR_PER_DAY) {
+                $overloaded[] = [
+                    'date' => $dateStr,
+                    'count' => $count,
+                    'overloaded' => true,
+                ];
+            }
+        }
+
+        return response()->json($overloaded);
+    }
+
+    /**
      * Show booking form (public). Optional doctor_number for direct booking.
      */
     public function showBookForm(?string $doctorNumber = null)
@@ -53,12 +82,38 @@ class AppointmentRequestController extends Controller
             'doctor_number' => 'nullable|string|max:50',
         ]);
 
-        $doctorId = $validated['doctor_id'] ?? null;
+        $doctorId = !empty($validated['doctor_id']) ? (int) $validated['doctor_id'] : null;
         if (!$doctorId && !empty($validated['doctor_number'])) {
-            $doctor = User::where('role', 'doctor')->where('doctor_number', $validated['doctor_number'])->first();
-            if ($doctor) {
-                $doctorId = $doctor->id;
+            $doctorUser = User::where('role', 'doctor')->where('doctor_number', $validated['doctor_number'])->first();
+            if ($doctorUser) {
+                $doctorId = (int) $doctorUser->id;
             }
+        }
+        if (!$doctorId) {
+            $msg = 'Please select a doctor.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                    'errors' => ['doctor_id' => [$msg]],
+                ], 422);
+            }
+            return back()->withInput()->withErrors(['doctor_id' => $msg]);
+        }
+
+        // Daily limit: block if doctor already has 5+ appointments on selected date
+        $slotService = app(AppointmentSlotService::class);
+        $dateStr = Carbon::parse($validated['preferred_date'])->toDateString();
+        if ($slotService->isDayFull($doctorId, $dateStr)) {
+            $msg = 'Doctor is fully booked for this day.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                    'errors' => ['preferred_date' => [$msg]],
+                ], 422);
+            }
+            return back()->withInput()->withErrors(['preferred_date' => $msg]);
         }
 
         try {

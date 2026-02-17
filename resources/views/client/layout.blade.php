@@ -28,7 +28,7 @@
         
         body {
             background: #f8f9fa;
-            padding-bottom: 80px; /* Space for bottom nav */
+            padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
         }
         
         .client-header {
@@ -49,12 +49,18 @@
             background: white;
             border-top: 1px solid #e5e7eb;
             padding: 0.5rem 0;
+            padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
             z-index: 1000;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-wrap: nowrap;
         }
         
         .nav-item {
-            flex: 1;
+            flex: 0 0 auto;
+            min-width: 3.5rem;
             text-align: center;
             padding: 0.5rem;
             color: #6b7280;

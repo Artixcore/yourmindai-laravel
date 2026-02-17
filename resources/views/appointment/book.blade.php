@@ -41,9 +41,9 @@
                         <input type="hidden" name="doctor_number" value="{{ $doctor->doctor_number }}">
                     @elseif($doctors->isNotEmpty())
                         <div class="mb-4">
-                            <label for="doctor_id" class="form-label fw-semibold">Select Doctor</label>
-                            <select name="doctor_id" id="doctor_id" class="form-select">
-                                <option value="">Any available doctor</option>
+                            <label for="doctor_id" class="form-label fw-semibold">Select Doctor <span class="text-danger">*</span></label>
+                            <select name="doctor_id" id="doctor_id" class="form-select" required>
+                                <option value="">Select a doctor</option>
                                 @foreach($doctors as $d)
                                     <option value="{{ $d->id }}" {{ old('doctor_id') == $d->id ? 'selected' : '' }}>
                                         {{ $d->name ?? $d->full_name ?? 'Doctor' }}
@@ -89,7 +89,13 @@
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Preferred Date <span class="text-danger">*</span></label>
-                            <input type="date" name="preferred_date" class="form-control" value="{{ old('preferred_date') }}" min="{{ date('Y-m-d') }}" required>
+                            <input type="date" name="preferred_date" id="preferred_date" class="form-control" value="{{ old('preferred_date') }}" min="{{ date('Y-m-d') }}" required>
+                            @if($doctors->isNotEmpty() || $doctor)
+                                <div id="appointment-calendar-wrap" class="mt-3 {{ $doctor ? '' : 'd-none' }}">
+                                    <div class="small text-muted mb-2">Select a date — <span class="day-overloaded-dot d-inline-block rounded-circle bg-danger me-1" style="width:8px;height:8px;"></span> = fully booked</div>
+                                    <div id="appointment-calendar" class="appointment-calendar border rounded p-2 bg-white"></div>
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Preferred Time</label>
@@ -114,4 +120,138 @@
         </div>
     </div>
 </section>
+
+@if($doctors->isNotEmpty() || $doctor)
+<style>
+.appointment-calendar { font-size: 0.85rem; }
+.appointment-calendar .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.appointment-calendar .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.appointment-calendar .cal-dow { font-weight: 600; color: #6b7280; padding: 0.25rem 0; }
+.appointment-calendar .cal-day { padding: 0.35rem; cursor: pointer; border-radius: 4px; }
+.appointment-calendar .cal-day:hover:not(.other-month):not(.day-overloaded) { background: #e5e7eb; }
+.appointment-calendar .cal-day.other-month { color: #d1d5db; cursor: default; }
+.appointment-calendar .cal-day.day-overloaded { background-color: rgba(255, 0, 0, 0.2); border: 1px solid #dc2626; }
+.appointment-calendar .cal-day.selected { background: #3b82f6; color: white; }
+.appointment-calendar .cal-day.past { color: #9ca3af; cursor: not-allowed; }
+</style>
+<script>
+(function() {
+    var doctorId = {{ $doctor ? $doctor->id : 'null' }};
+    var lastOverloaded = [];
+    var calendarWrap = document.getElementById('appointment-calendar-wrap');
+    var calendarEl = document.getElementById('appointment-calendar');
+    var dateInput = document.getElementById('preferred_date');
+    var doctorSelect = document.getElementById('doctor_id');
+    if (!calendarEl || !dateInput) return;
+
+    function getDoctorId() {
+        if (doctorId) return doctorId;
+        if (doctorSelect && doctorSelect.value) return parseInt(doctorSelect.value, 10);
+        return null;
+    }
+
+    function renderCalendar(year, month, overloadedDates) {
+        overloadedDates = overloadedDates || [];
+        var first = new Date(year, month - 1, 1);
+        var last = new Date(year, month, 0);
+        var startPad = first.getDay();
+        var daysInMonth = last.getDate();
+        var today = new Date();
+        today.setHours(0,0,0,0);
+
+        var html = '<div class="cal-header">';
+        html += '<button type="button" class="btn btn-sm btn-outline-secondary" data-nav="-1">&laquo;</button>';
+        html += '<span class="fw-semibold">' + first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + '</span>';
+        html += '<button type="button" class="btn btn-sm btn-outline-secondary" data-nav="1">&raquo;</button>';
+        html += '</div>';
+        html += '<div class="cal-grid">';
+        ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(d) { html += '<div class="cal-dow">' + d + '</div>'; });
+        for (var i = 0; i < startPad; i++) {
+            var prevMonthDay = new Date(year, month - 1, -(startPad - i - 1));
+            html += '<div class="cal-day other-month">' + prevMonthDay.getDate() + '</div>';
+        }
+        for (var d = 1; d <= daysInMonth; d++) {
+            var dateStr = year + '-' + String(month).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+            var isOverloaded = overloadedDates.indexOf(dateStr) >= 0;
+            var dateObj = new Date(year, month - 1, d);
+            var isPast = dateObj < today;
+            var isSelected = dateInput.value === dateStr;
+            var cls = 'cal-day';
+            if (isOverloaded) cls += ' day-overloaded';
+            if (isPast) cls += ' past';
+            if (isSelected) cls += ' selected';
+            html += '<div class="' + cls + '" data-date="' + dateStr + '">' + d + '</div>';
+        }
+        var remaining = 42 - startPad - daysInMonth;
+        for (var j = 0; j < remaining; j++) {
+            html += '<div class="cal-day other-month">' + (j + 1) + '</div>';
+        }
+        html += '</div>';
+        calendarEl.innerHTML = html;
+
+        calendarEl.querySelectorAll('.cal-day:not(.other-month):not(.past)').forEach(function(cell) {
+            cell.addEventListener('click', function() {
+                if (this.classList.contains('day-overloaded')) return;
+                var d = this.getAttribute('data-date');
+                if (d) { dateInput.value = d; renderCalendar(year, month, overloadedDates); }
+            });
+        });
+        calendarEl.querySelectorAll('[data-nav]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var delta = parseInt(this.getAttribute('data-nav'), 10);
+                month += delta;
+                if (month > 12) { month = 1; year++; }
+                if (month < 1) { month = 12; year--; }
+                fetchAndRender(year, month);
+            });
+        });
+    }
+
+    function fetchAndRender(year, month) {
+        var did = getDoctorId();
+        if (!did) { lastOverloaded = []; renderCalendar(year, month, []); return; }
+        var monthStr = year + '-' + String(month).padStart(2,'0');
+        jQuery.get('{{ url("/appointments/doctor") }}/' + did + '/availability?month=' + monthStr)
+            .done(function(data) {
+                lastOverloaded = Array.isArray(data) ? data.map(function(x) { return x.date; }) : [];
+                renderCalendar(year, month, lastOverloaded);
+            })
+            .fail(function() { lastOverloaded = []; renderCalendar(year, month, []); });
+    }
+
+    var now = new Date();
+    var y = now.getFullYear(), m = now.getMonth() + 1;
+    if (dateInput.value) {
+        var p = dateInput.value.split('-');
+        if (p.length === 3) { y = parseInt(p[0],10); m = parseInt(p[1],10); }
+    }
+
+    if (doctorSelect) {
+        doctorSelect.addEventListener('change', function() {
+            doctorId = null;
+            var did = getDoctorId();
+            if (did) {
+                calendarWrap.classList.remove('d-none');
+                fetchAndRender(y, m);
+            } else {
+                calendarWrap.classList.add('d-none');
+            }
+        });
+    }
+
+    if (getDoctorId()) {
+        fetchAndRender(y, m);
+    } else {
+        renderCalendar(y, m, []);
+    }
+
+    dateInput.addEventListener('change', function() {
+        if (dateInput.value) {
+            var p = dateInput.value.split('-');
+            if (p.length === 3) { y = parseInt(p[0],10); m = parseInt(p[1],10); renderCalendar(y, m, lastOverloaded); }
+        }
+    });
+})();
+</script>
+@endif
 @endsection

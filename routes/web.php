@@ -42,6 +42,7 @@ Route::post('/contact', [LandingController::class, 'storeContact'])->name('conta
 // Public appointment booking (rate limited: 10 per minute per IP)
 Route::get('/book', [\App\Http\Controllers\AppointmentRequestController::class, 'showBookForm'])->name('appointment.book');
 Route::get('/book/{doctor_number}', [\App\Http\Controllers\AppointmentRequestController::class, 'showBookForm'])->name('appointment.book.doctor');
+Route::get('/appointments/doctor/{doctor}/availability', [\App\Http\Controllers\AppointmentRequestController::class, 'doctorAvailability'])->name('appointments.doctor.availability');
 Route::post('/appointment-request', [\App\Http\Controllers\AppointmentRequestController::class, 'store'])->name('appointment-request.store')->middleware('throttle:10,1');
 
 // Public Digital Wellbeing (no auth required)

@@ -87,6 +87,11 @@ Route::get('/parent/login', [\App\Http\Controllers\ParentLoginController::class,
 Route::post('/parent/login', [\App\Http\Controllers\ParentLoginController::class, 'login'])->name('parent.login.post')->middleware('guest');
 Route::post('/parent/logout', [\App\Http\Controllers\ParentLoginController::class, 'logout'])->name('parent.logout')->middleware('auth');
 
+// Supervision login routes
+Route::get('/supervision/login', [\App\Http\Controllers\SupervisionLoginController::class, 'showLoginForm'])->name('supervision.login')->middleware('guest');
+Route::post('/supervision/login', [\App\Http\Controllers\SupervisionLoginController::class, 'login'])->name('supervision.login.post')->middleware('guest');
+Route::post('/supervision/logout', [\App\Http\Controllers\SupervisionLoginController::class, 'logout'])->name('supervision.logout')->middleware('auth');
+
 // Client dashboard routes (for webview app)
 Route::prefix('client')->name('client.')->middleware(['auth'])->group(function () {
     // Dashboard
@@ -225,6 +230,14 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'blade.role:parent
     // Permissions
     Route::get('/permissions', [\App\Http\Controllers\ParentPermissionController::class, 'index'])->name('permissions.index');
     Route::post('/permissions', [\App\Http\Controllers\ParentPermissionController::class, 'update'])->name('permissions.update');
+});
+
+// Supervision routes (verify tasks + remarks)
+Route::prefix('supervision')->name('supervision.')->middleware(['auth', 'blade.role:supervision'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\SupervisionDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/tasks', [\App\Http\Controllers\SupervisionTaskController::class, 'index'])->name('tasks.index');
+    Route::get('/child/{patient}/tasks', [\App\Http\Controllers\SupervisionTaskController::class, 'childTasks'])->name('child.tasks');
+    Route::post('/tasks/{task}/verify', [\App\Http\Controllers\SupervisionTaskController::class, 'verify'])->name('tasks.verify');
 });
 
 // Others/Experts routes (Phase 1)
@@ -637,6 +650,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     
     // Parent Permission Management (Phase 6)
     Route::resource('parent-permissions', \App\Http\Controllers\Admin\ParentPermissionController::class);
+
+    // Supervisor Links (task verification + remarks)
+    Route::get('supervisor-links', [\App\Http\Controllers\Admin\SupervisorLinkController::class, 'index'])->name('supervisor-links.index');
+    Route::get('supervisor-links/create', [\App\Http\Controllers\Admin\SupervisorLinkController::class, 'create'])->name('supervisor-links.create');
+    Route::post('supervisor-links', [\App\Http\Controllers\Admin\SupervisorLinkController::class, 'store'])->name('supervisor-links.store');
+    Route::delete('supervisor-links/{supervisorLink}', [\App\Http\Controllers\Admin\SupervisorLinkController::class, 'destroy'])->name('supervisor-links.destroy');
     
     // Psychometric Scales Management (Phase 6 - Enhanced)
     Route::resource('psychometric-scales', \App\Http\Controllers\Admin\PsychometricScaleController::class);

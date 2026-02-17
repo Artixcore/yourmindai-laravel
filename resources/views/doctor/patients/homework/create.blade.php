@@ -136,6 +136,29 @@
                             </div>
                         </div>
 
+                        <!-- Contingency Points (shown when type is contingency) -->
+                        <div class="mb-3" id="contingency-points-group" style="display: {{ old('homework_type') === 'contingency' ? 'block' : 'none' }};">
+                            <label class="form-label fw-semibold">Contingency Scoring Points</label>
+                            <p class="small text-muted mb-2">Set points for each completion choice. Leave blank to use defaults (+10, +5, -10).</p>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label small">Self action</label>
+                                    <input type="number" name="contingency_self_action_points" class="form-control form-control-sm" 
+                                           value="{{ old('contingency_self_action_points', 10) }}" min="-100" max="100" placeholder="10">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">Others helped</label>
+                                    <input type="number" name="contingency_others_help_points" class="form-control form-control-sm" 
+                                           value="{{ old('contingency_others_help_points', 5) }}" min="-100" max="100" placeholder="5">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">Not working</label>
+                                    <input type="number" name="contingency_not_working_points" class="form-control form-control-sm" 
+                                           value="{{ old('contingency_not_working_points', -10) }}" min="-100" max="100" placeholder="-10">
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Feedback Requirements -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Feedback Requirements</label>
@@ -202,4 +225,19 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var typeSelect = document.getElementById('homework_type');
+    var pointsGroup = document.getElementById('contingency-points-group');
+    if (typeSelect && pointsGroup) {
+        function toggleContingencyPoints() {
+            pointsGroup.style.display = typeSelect.value === 'contingency' ? 'block' : 'none';
+        }
+        typeSelect.addEventListener('change', toggleContingencyPoints);
+    }
+});
+</script>
+@endpush
 @endsection

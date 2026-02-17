@@ -40,6 +40,9 @@ class StoreHomeworkRequest extends FormRequest
             'media.*.type' => 'required_with:media|in:video,audio,podcast,link',
             'media.*.url' => 'required_with:media|url',
             'media.*.title' => 'nullable|string|max:255',
+            'contingency_self_action_points' => 'nullable|integer|min:-100|max:100',
+            'contingency_others_help_points' => 'nullable|integer|min:-100|max:100',
+            'contingency_not_working_points' => 'nullable|integer|min:-100|max:100',
         ];
     }
 }

@@ -72,6 +72,8 @@
                             <option value="">Select Role</option>
                             <option value="doctor" {{ old('role') == 'doctor' ? 'selected' : '' }}>Doctor</option>
                             <option value="assistant" {{ old('role') == 'assistant' ? 'selected' : '' }}>Assistant</option>
+                            <option value="parent" {{ old('role') == 'parent' ? 'selected' : '' }}>Parent</option>
+                            <option value="supervision" {{ old('role') == 'supervision' ? 'selected' : '' }}>Supervision</option>
                         </select>
                         @error('role')
                             <div class="invalid-feedback">{{ $message }}</div>

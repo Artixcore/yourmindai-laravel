@@ -83,6 +83,8 @@
                             <option value="">Select Role</option>
                             <option value="doctor" {{ old('role', $staff->role) == 'doctor' ? 'selected' : '' }}>Doctor</option>
                             <option value="assistant" {{ old('role', $staff->role) == 'assistant' ? 'selected' : '' }}>Assistant</option>
+                            <option value="parent" {{ old('role', $staff->role) == 'parent' ? 'selected' : '' }}>Parent</option>
+                            <option value="supervision" {{ old('role', $staff->role) == 'supervision' ? 'selected' : '' }}>Supervision</option>
                         </select>
                         @error('role')
                             <div class="invalid-feedback">{{ $message }}</div>

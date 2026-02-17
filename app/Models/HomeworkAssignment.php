@@ -29,6 +29,9 @@ class HomeworkAssignment extends Model
         'requires_parent_feedback',
         'requires_others_feedback',
         'custom_fields',
+        'contingency_self_action_points',
+        'contingency_others_help_points',
+        'contingency_not_working_points',
     ];
 
     protected $casts = [
@@ -106,5 +109,29 @@ class HomeworkAssignment extends Model
     public function exerciseLogs()
     {
         return $this->hasMany(ExerciseLog::class, 'homework_assignment_id');
+    }
+
+    /**
+     * Get contingency points for a scoring choice.
+     * Falls back to HomeworkCompletion defaults when not set.
+     */
+    public function getContingencyPoints(?string $choice): ?int
+    {
+        if (!$choice) {
+            return null;
+        }
+
+        $column = match ($choice) {
+            'self_action' => 'contingency_self_action_points',
+            'others_help' => 'contingency_others_help_points',
+            'not_working' => 'contingency_not_working_points',
+            default => null,
+        };
+
+        if ($column && $this->{$column} !== null) {
+            return (int) $this->{$column};
+        }
+
+        return HomeworkCompletion::SCORE_VALUES[$choice] ?? null;
     }
 }

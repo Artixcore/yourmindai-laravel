@@ -29,7 +29,7 @@ class UpdateStaffRequest extends FormRequest
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $userId,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'role' => 'sometimes|in:doctor,assistant',
+            'role' => 'sometimes|in:doctor,assistant,parent,supervision',
             'password' => 'nullable|string|min:8|confirmed',
             'status' => 'nullable|in:active,inactive',
         ];

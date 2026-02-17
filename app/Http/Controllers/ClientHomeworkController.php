@@ -96,7 +96,7 @@ class ClientHomeworkController extends Controller
         $percentage = isset($validated['completion_percentage']) ? (int) $validated['completion_percentage'] : ($isDone ? 100 : 0);
 
         $scoringChoice = $validated['scoring_choice'] ?? null;
-        $scoreValue = $scoringChoice ? HomeworkCompletion::getScoreForChoice($scoringChoice) : null;
+        $scoreValue = $scoringChoice ? $homework->getContingencyPoints($scoringChoice) : null;
 
         try {
             DB::transaction(function () use ($homework, $patient, $user, $validated, $isDone, $percentage, $scoringChoice, $scoreValue) {

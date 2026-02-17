@@ -73,6 +73,7 @@ class ParentTaskController extends Controller
                 TaskVerification::create([
                     'task_id' => $task->id,
                     'parent_user_id' => $parent->id,
+                    'verifier_role' => 'parent',
                     'verified_at' => now(),
                 ]);
             }

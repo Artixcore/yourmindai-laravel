@@ -11,7 +11,9 @@ class TaskVerification extends Model
     protected $fillable = [
         'task_id',
         'parent_user_id',
+        'verifier_role',
         'verified_at',
+        'remarks',
     ];
 
     protected $casts = [

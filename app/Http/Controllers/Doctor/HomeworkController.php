@@ -126,7 +126,11 @@ class HomeworkController extends Controller
                 'status' => 'assigned',
                 'requires_parent_feedback' => $validated['requires_parent_feedback'] ?? false,
                 'requires_others_feedback' => $validated['requires_others_feedback'] ?? false,
-            ]);
+            ] + ($validated['homework_type'] === 'contingency' ? [
+                'contingency_self_action_points' => isset($validated['contingency_self_action_points']) ? (int) $validated['contingency_self_action_points'] : null,
+                'contingency_others_help_points' => isset($validated['contingency_others_help_points']) ? (int) $validated['contingency_others_help_points'] : null,
+                'contingency_not_working_points' => isset($validated['contingency_not_working_points']) ? (int) $validated['contingency_not_working_points'] : null,
+            ] : []));
 
             if (!empty($validated['media'])) {
                 foreach ($validated['media'] as $mediaItem) {

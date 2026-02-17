@@ -112,4 +112,12 @@ class PatientProfile extends Model
     {
         return $this->hasMany(ParentLink::class, 'patient_id');
     }
+
+    /**
+     * Get the supervisor links.
+     */
+    public function supervisorLinks()
+    {
+        return $this->hasMany(SupervisorLink::class, 'patient_id');
+    }
 }

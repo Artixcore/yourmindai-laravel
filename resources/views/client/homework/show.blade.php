@@ -117,24 +117,31 @@
                 </div>
             </div>
 
-            <!-- Contingency Scoring (optional) -->
+            @if($homework->homework_type === 'contingency')
+            <!-- Contingency Scoring (optional) - doctor-set points -->
+            @php
+                $selfPoints = $homework->getContingencyPoints('self_action') ?? 10;
+                $othersPoints = $homework->getContingencyPoints('others_help') ?? 5;
+                $notPoints = $homework->getContingencyPoints('not_working') ?? -10;
+            @endphp
             <div class="mb-3">
                 <label class="form-label fw-semibold">How did you complete this? (Optional)</label>
                 <div class="d-flex flex-column gap-2">
                     <div class="form-check">
                         <input type="radio" name="scoring_choice" id="scoring_self" value="self_action" class="form-check-input" {{ old('scoring_choice') === 'self_action' ? 'checked' : '' }}>
-                        <label for="scoring_self" class="form-check-label">Self action (+10)</label>
+                        <label for="scoring_self" class="form-check-label">Self action ({{ $selfPoints >= 0 ? '+' : '' }}{{ $selfPoints }})</label>
                     </div>
                     <div class="form-check">
                         <input type="radio" name="scoring_choice" id="scoring_others" value="others_help" class="form-check-input" {{ old('scoring_choice') === 'others_help' ? 'checked' : '' }}>
-                        <label for="scoring_others" class="form-check-label">Others helped (+5)</label>
+                        <label for="scoring_others" class="form-check-label">Others helped ({{ $othersPoints >= 0 ? '+' : '' }}{{ $othersPoints }})</label>
                     </div>
                     <div class="form-check">
                         <input type="radio" name="scoring_choice" id="scoring_not" value="not_working" class="form-check-input" {{ old('scoring_choice') === 'not_working' ? 'checked' : '' }}>
-                        <label for="scoring_not" class="form-check-label">Not working (-10)</label>
+                        <label for="scoring_not" class="form-check-label">Not working ({{ $notPoints }})</label>
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Comment / Feedback -->
             <div class="mb-3">

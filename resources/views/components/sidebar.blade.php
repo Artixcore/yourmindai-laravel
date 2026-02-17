@@ -103,6 +103,10 @@
                     <i class="bi bi-currency-dollar flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Article Earnings</span>
                 </a>
+                <a href="{{ route('admin.supervisor-links.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.supervisor-links.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-shield-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Supervisor Links</span>
+                </a>
             @endif
             
             @if($role === 'doctor')

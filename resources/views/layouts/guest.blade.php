@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     
     <!-- Custom Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="https://storaeall.s3.us-east-1.amazonaws.com/public/css/app.css" rel="stylesheet">
     
     <!-- AOS Animation Library CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -44,7 +44,7 @@
                 <input type="range" class="form-range form-range-sm" min="0" max="100" x-model="volumePercent" @input="setVolume($event.target.value)">
             </div>
         </div>
-        <audio id="bg-music" loop preload="metadata" src="{{ asset('audio/background.mp3') }}" x-ref="audio"></audio>
+        <audio id="bg-music" loop preload="metadata" src="https://storaeall.s3.us-east-1.amazonaws.com/public/audio/background.mp3" x-ref="audio"></audio>
     </div>
     
     <x-footer />
@@ -54,7 +54,7 @@
     
     <!-- jQuery (for AJAX form handling) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
-    <script src="{{ asset('js/app-ajax.js') }}"></script>
+    <script src="https://storaeall.s3.us-east-1.amazonaws.com/public/js/app-ajax.js"></script>
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

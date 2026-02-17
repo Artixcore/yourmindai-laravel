@@ -19,7 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Client panel sky blue theme -->
-    <link href="{{ asset('css/client-theme.css') }}" rel="stylesheet">
+    <link href="https://storaeall.s3.us-east-1.amazonaws.com/public/css/client-theme.css" rel="stylesheet">
     
     <style>
         * {
@@ -222,8 +222,8 @@
     
     <!-- jQuery (for AJAX form handling) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
-    <script src="{{ asset('js/app-ajax.js') }}"></script>
-    <script src="{{ asset('js/notifications.js') }}"></script>
+    <script src="https://storaeall.s3.us-east-1.amazonaws.com/public/js/app-ajax.js"></script>
+    <script src="https://storaeall.s3.us-east-1.amazonaws.com/public/js/notifications.js"></script>
     
     @stack('scripts')
 </body>

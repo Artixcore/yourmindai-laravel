@@ -137,12 +137,15 @@
                 <h5 class="mb-0 fw-bold">Your Mind Aid</h5>
                 <small class="opacity-75">{{ auth()->user()->name ?? 'Patient' }}</small>
             </div>
-            <form method="POST" action="{{ route('client.logout') }}" class="mb-0">
+            <div class="d-flex align-items-center gap-1">
+                <x-notification-bell />
+                <form method="POST" action="{{ route('client.logout') }}" class="mb-0">
                 @csrf
                 <button type="submit" class="btn btn-sm btn-light">
                     <i class="bi bi-box-arrow-right"></i>
                 </button>
             </form>
+            </div>
         </div>
     </div>
     
@@ -218,6 +221,7 @@
     <!-- jQuery (for AJAX form handling) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('js/app-ajax.js') }}"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
     
     @stack('scripts')
 </body>

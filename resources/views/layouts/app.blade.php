@@ -71,6 +71,7 @@
     <!-- jQuery (for AJAX form handling) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('js/app-ajax.js') }}"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

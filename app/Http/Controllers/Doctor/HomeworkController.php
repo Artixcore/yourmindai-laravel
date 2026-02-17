@@ -13,6 +13,8 @@ use App\Models\Patient;
 use App\Models\PatientProfile;
 use App\Models\Session;
 use App\Models\User;
+use App\Notifications\HomeworkAssignedNotification;
+use App\Notifications\HomeworkReviewedNotification;
 use Illuminate\Support\Facades\DB;
 
 class HomeworkController extends Controller
@@ -104,7 +106,8 @@ class HomeworkController extends Controller
             $frequencyValue = is_array($validated['frequency_value']) ? $validated['frequency_value'] : ['value' => $validated['frequency_value']];
         }
 
-        DB::transaction(function () use ($request, $patientProfile, $validated, $frequencyValue) {
+        $homework = null;
+        DB::transaction(function () use ($request, $patientProfile, $validated, $frequencyValue, &$homework) {
             $homework = HomeworkAssignment::create([
                 'patient_id' => $patientProfile->id,
                 'assigned_by' => $request->user()->id,
@@ -138,6 +141,18 @@ class HomeworkController extends Controller
                 }
             }
         });
+
+        if ($homework) {
+            $clientUser = $patientProfile->user;
+            if ($clientUser) {
+                $clientUser->notify(new HomeworkAssignedNotification(
+                    $homework,
+                    'New Homework Assigned',
+                    "New homework \"{$homework->title}\" has been assigned to you.",
+                    route('client.homework.show', $homework->id)
+                ));
+            }
+        }
 
         return redirect()->route('patients.homework.index', $patient)
             ->with('success', 'Homework assigned successfully!');
@@ -222,6 +237,17 @@ class HomeworkController extends Controller
             'reviewed_at' => now(),
             'score_value' => $validated['score_value'] ?? $completion->score_value,
         ]);
+
+        $clientUser = $patientProfile->user ?? null;
+        if ($clientUser) {
+            $clientUser->notify(new HomeworkReviewedNotification(
+                $homework,
+                $completion,
+                'Homework Reviewed',
+                "Your homework \"{$homework->title}\" has been reviewed by your doctor.",
+                route('client.homework.show', $homework->id)
+            ));
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             $completion->load('reviewer');

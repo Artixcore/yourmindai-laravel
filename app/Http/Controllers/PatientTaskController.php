@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\PatientProfile;
 use App\Models\PatientPoints;
 use App\Models\Patient;
+use App\Notifications\TaskCompletedNotification;
 use Illuminate\Http\Request;
 
 class PatientTaskController extends Controller
@@ -152,6 +153,16 @@ class PatientTaskController extends Controller
             'status' => 'completed',
             'completed_at' => now(),
         ]);
+
+        $doctor = $task->assignedByDoctor;
+        if ($doctor) {
+            $doctor->notify(new TaskCompletedNotification(
+                $task,
+                'Task Completed',
+                "A task \"{$task->title}\" has been completed by your patient.",
+                route('doctor.tasks.show', $task->id)
+            ));
+        }
         
         // Award points if task has points
         if ($task->points > 0) {

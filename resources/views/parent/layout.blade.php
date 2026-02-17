@@ -38,12 +38,15 @@
             <a class="navbar-brand" href="{{ route('parent.dashboard') }}">
                 <i class="bi bi-person-heart"></i> Parent Portal
             </a>
-            <form action="{{ route('client.logout') }}" method="POST" class="d-inline">
+            <div class="d-flex align-items-center gap-2">
+                <x-notification-bell />
+                <form action="{{ route('client.logout') }}" method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn btn-sm btn-outline-light">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </button>
             </form>
+            </div>
         </div>
     </nav>
 
@@ -54,9 +57,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- jQuery (for AJAX form handling) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('js/app-ajax.js') }}"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
 </body>
 </html>

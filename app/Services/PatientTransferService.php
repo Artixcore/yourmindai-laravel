@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Patient;
 use App\Models\PatientProfile;
 use App\Models\User;
+use App\Notifications\PatientTransferredNotification;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -56,6 +57,31 @@ class PatientTransferService
                     'patient_profiles_updated' => $linkedProfiles->count(),
                 ]
             );
+
+            $oldDoctor = User::find($oldDoctorId);
+            $newDoctor = User::find($newDoctorId);
+            $patientUrl = route('admin.patients.show', $patient);
+
+            if ($oldDoctor) {
+                $oldDoctor->notify(new PatientTransferredNotification(
+                    (int) $patient->id,
+                    $oldDoctorId,
+                    $newDoctorId,
+                    'Patient Transferred',
+                    "Patient {$patient->name} has been transferred to another doctor.",
+                    $patientUrl
+                ));
+            }
+            if ($newDoctor) {
+                $newDoctor->notify(new PatientTransferredNotification(
+                    (int) $patient->id,
+                    $oldDoctorId,
+                    $newDoctorId,
+                    'New Patient Assigned',
+                    "Patient {$patient->name} has been assigned to you.",
+                    $patientUrl
+                ));
+            }
         });
     }
 

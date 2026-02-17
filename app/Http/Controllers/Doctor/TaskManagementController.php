@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\PatientProfile;
 use App\Models\User;
+use App\Notifications\TaskAssignedNotification;
 
 class TaskManagementController extends Controller
 {
@@ -98,6 +99,16 @@ class TaskManagementController extends Controller
         $validated['points'] = $validated['points'] ?? 0;
 
         $task = Task::create($validated);
+
+        $clientUser = $patient->user;
+        if ($clientUser && ($validated['visible_to_patient'] ?? false)) {
+            $clientUser->notify(new TaskAssignedNotification(
+                $task,
+                'New Task Assigned',
+                "A new task \"{$task->title}\" has been assigned to you.",
+                route('client.tasks.show', $task)
+            ));
+        }
 
         return redirect()->route('doctor.tasks.show', $task->id)
             ->with('success', 'Task created successfully.');

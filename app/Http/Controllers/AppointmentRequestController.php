@@ -7,6 +7,7 @@ use App\Models\Patient;
 use App\Models\PatientProfile;
 use App\Models\User;
 use App\Models\Appointment;
+use App\Notifications\NewAppointmentNotification;
 use App\Services\AppointmentSlotService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -370,7 +371,7 @@ class AppointmentRequestController extends Controller
                     $date->setTime(9, 0, 0);
                 }
                 $bookingFee = (float) config('app.booking_fee', 0);
-                Appointment::create([
+                $appointment = Appointment::create([
                     'doctor_id' => $doctorId,
                     'patient_id' => $patientProfile->id,
                     'date' => $date,
@@ -383,6 +384,29 @@ class AppointmentRequestController extends Controller
                     'notes' => 'Created from appointment request',
                     'reminder_enabled' => false,
                 ]);
+
+                $doctor = User::find($doctorId);
+                $dateFormatted = $appointment->date->format('M j, Y \a\t g:i A');
+                $appointmentUrl = route('admin.appointment-requests.show', $appointmentRequest);
+
+                if ($doctor) {
+                    $doctor->notify(new NewAppointmentNotification(
+                        $appointment,
+                        'New Appointment',
+                        "A new appointment has been scheduled for {$dateFormatted}.",
+                        $appointmentUrl
+                    ));
+                }
+
+                $clientUser = $patientProfile->user;
+                if ($clientUser) {
+                    $clientUser->notify(new NewAppointmentNotification(
+                        $appointment,
+                        'Appointment Confirmed',
+                        "Your appointment has been scheduled for {$dateFormatted}.",
+                        route('patient.appointments.index')
+                    ));
+                }
             }
 
             DB::commit();

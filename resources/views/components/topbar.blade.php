@@ -28,53 +28,48 @@
         
         <div class="d-flex align-items-center gap-2">
             <!-- Notifications -->
-            <button class="btn btn-link position-relative p-2 text-muted border-0" type="button" title="Notifications">
-                <i class="bi bi-bell" style="font-size: 1.25rem;"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.5rem; padding: 0.125rem 0.25rem;">
-                    <span class="visually-hidden">New alerts</span>
-                </span>
-            </button>
-            
+            <div class="dropdown">
+                <button class="btn btn-link position-relative p-2 text-muted border-0"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        title="Notifications">
+                    <i class="bi bi-bell" style="font-size: 1.25rem;"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          style="font-size: 0.5rem; padding: 0.125rem 0.25rem;">
+                        <span class="visually-hidden">New alerts</span>
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border" style="min-width: 280px;">
+                    <li class="px-3 py-2 small text-muted">Notifications</li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="px-3 py-2 small text-muted">No new notifications</li>
+                </ul>
+            </div>
+
             <!-- Profile Dropdown -->
-            <div class="dropdown position-relative" x-data="dropdown(false)">
-                <button 
-                    @click="toggle()" 
-                    class="btn btn-link d-flex align-items-center gap-2 text-decoration-none border-0 p-2" 
-                    type="button"
-                    aria-expanded="false"
-                >
-                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-semibold" style="width: 32px; height: 32px; font-size: 0.875rem;">
+            <div class="dropdown">
+                <button class="btn btn-link d-flex align-items-center gap-2 text-decoration-none border-0 p-2 dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-semibold"
+                         style="width: 32px; height: 32px; font-size: 0.875rem;">
                         {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                     </div>
                     <span class="d-none d-lg-inline text-muted small">{{ $user->name ?? 'User' }}</span>
-                    <i class="bi bi-chevron-down text-muted d-none d-lg-inline" style="font-size: 0.75rem;"></i>
                 </button>
-                
-                <div 
-                    x-show="open"
-                    x-cloak
-                    x-transition:enter="transition ease-out duration-100"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-75"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    @click.away="close()"
-                    class="dropdown-menu dropdown-menu-end shadow-sm border position-absolute"
-                    style="display: none; min-width: 200px; margin-top: 0.5rem; z-index: 1060; top: 100%; right: 0;"
-                >
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="dropdown-item text-danger w-100 text-start border-0 bg-transparent">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                        </button>
-                    </form>
-                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border" style="min-width: 200px;">
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger w-100 text-start">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    [x-cloak] { display: none !important; }
-</style>

@@ -4,7 +4,12 @@
     <div class="d-flex align-items-center justify-content-between px-4 px-md-5 h-100">
         <div class="d-flex align-items-center gap-3">
             <!-- Mobile Menu Toggle -->
-            <button @click="sidebarOpen = !sidebarOpen" class="btn btn-link d-md-none text-muted p-2 border-0" type="button">
+            <button class="btn btn-link d-md-none text-muted p-2 border-0"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#mobileSidebar"
+                    aria-controls="mobileSidebar"
+                    aria-label="Open sidebar">
                 <i class="bi bi-list" style="font-size: 1.5rem;"></i>
             </button>
             

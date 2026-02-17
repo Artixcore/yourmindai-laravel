@@ -31,35 +31,25 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body class="bg-stone-50">
-    <div x-data="{ sidebarOpen: false }" class="d-flex" style="height: 100vh; overflow: hidden;">
+    <div class="d-flex" style="height: 100vh; overflow: hidden;">
         <!-- Sidebar -->
         <div class="d-none d-md-block">
             <x-sidebar :role="auth()->user()->role ?? 'assistant'" />
         </div>
         
-        <!-- Mobile sidebar overlay -->
-        <div 
-            x-show="sidebarOpen"
-            x-cloak
-            @click="sidebarOpen = false"
-            class="position-fixed top-0 start-0 w-100 h-100 bg-dark"
-            style="display: none; opacity: 0.5; z-index: 1030;"
-        ></div>
-        
-        <!-- Mobile sidebar -->
-        <div 
-            x-show="sidebarOpen"
-            x-cloak
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="-translate-x-full"
-            x-transition:enter-end="translate-x-0"
-            x-transition:leave="transition ease-in duration-300"
-            x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="-translate-x-full"
-            class="position-fixed start-0 top-0 h-100 d-md-none"
-            style="display: none; z-index: 1040;"
-        >
-            <x-sidebar :role="auth()->user()->role ?? 'assistant'" />
+        <!-- Mobile sidebar (Bootstrap Offcanvas) -->
+        <div class="offcanvas offcanvas-start d-md-none"
+             tabindex="-1"
+             id="mobileSidebar"
+             aria-labelledby="mobileSidebarLabel"
+             style="z-index: 1040; --bs-offcanvas-width: 256px;">
+
+            <div class="offcanvas-header border-bottom border-stone-200 d-flex justify-content-end py-2">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body p-0 overflow-y-auto">
+                <x-sidebar :role="auth()->user()->role ?? 'assistant'" />
+            </div>
         </div>
         
         <!-- Main content -->
@@ -128,16 +118,6 @@
                     this.open = false;
                 },
             }));
-
-            Alpine.data('sidebar', (initialOpen = false) => ({
-                open: initialOpen,
-                toggle() {
-                    this.open = !this.open;
-                },
-                close() {
-                    this.open = false;
-                },
-            }));
         });
 
         // Fallback: If Alpine is already loaded, register components immediately
@@ -153,16 +133,6 @@
             }));
 
             Alpine.data('dropdown', (initialOpen = false) => ({
-                open: initialOpen,
-                toggle() {
-                    this.open = !this.open;
-                },
-                close() {
-                    this.open = false;
-                },
-            }));
-
-            Alpine.data('sidebar', (initialOpen = false) => ({
                 open: initialOpen,
                 toggle() {
                     this.open = !this.open;
@@ -201,6 +171,11 @@
     
     <style>
         [x-cloak] { display: none !important; }
+        /* Sidebar inside offcanvas: override position-fixed so it flows with content */
+        #mobileSidebar .sidebar-width.position-fixed {
+            position: static !important;
+            height: auto !important;
+        }
         /* Skeleton loader for heavy sections */
         .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 4px; }
         @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }

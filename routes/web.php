@@ -82,6 +82,11 @@ Route::get('/client', [\App\Http\Controllers\ClientLoginController::class, 'show
 Route::post('/client', [\App\Http\Controllers\ClientLoginController::class, 'login'])->name('client.login.post')->middleware('guest');
 Route::post('/client/logout', [\App\Http\Controllers\ClientLoginController::class, 'logout'])->name('client.logout')->middleware('auth');
 
+// Parent login routes
+Route::get('/parent/login', [\App\Http\Controllers\ParentLoginController::class, 'showLoginForm'])->name('parent.login')->middleware('guest');
+Route::post('/parent/login', [\App\Http\Controllers\ParentLoginController::class, 'login'])->name('parent.login.post')->middleware('guest');
+Route::post('/parent/logout', [\App\Http\Controllers\ParentLoginController::class, 'logout'])->name('parent.logout')->middleware('auth');
+
 // Client dashboard routes (for webview app)
 Route::prefix('client')->name('client.')->middleware(['auth'])->group(function () {
     // Dashboard
@@ -200,11 +205,16 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 // Parent routes (Phase 1)
-Route::prefix('parent')->name('parent.')->middleware(['auth'])->group(function () {
+Route::prefix('parent')->name('parent.')->middleware(['auth', 'blade.role:parent'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\ParentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/child/{patient}', [\App\Http\Controllers\ParentDashboardController::class, 'showChild'])->name('child.show');
     Route::get('/child/{patient}/homework', [\App\Http\Controllers\ParentDashboardController::class, 'showChildHomework'])->name('child.homework');
     Route::get('/child/{patient}/sessions', [\App\Http\Controllers\ParentDashboardController::class, 'showChildSessions'])->name('child.sessions');
+
+    // Tasks and verification
+    Route::get('/tasks', [\App\Http\Controllers\ParentTaskController::class, 'index'])->name('tasks.index');
+    Route::get('/child/{patient}/tasks', [\App\Http\Controllers\ParentTaskController::class, 'childTasks'])->name('child.tasks');
+    Route::post('/tasks/{task}/verify', [\App\Http\Controllers\ParentTaskController::class, 'verify'])->name('tasks.verify');
     
     // Feedback
     Route::post('/feedback/{feedbackable_type}/{feedbackable_id}', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('feedback.store');

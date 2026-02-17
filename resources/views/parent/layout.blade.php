@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Parent Portal - Your Mind Aid')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -14,6 +15,8 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f8f9fa;
+            overflow-y: auto;
+            padding-bottom: env(safe-area-inset-bottom, 0);
         }
         .navbar-custom {
             background-color: var(--primary-color);
@@ -40,7 +43,7 @@
             </a>
             <div class="d-flex align-items-center gap-2">
                 <x-notification-bell />
-                <form action="{{ route('client.logout') }}" method="POST" class="d-inline">
+                <form action="{{ route('parent.logout') }}" method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn btn-sm btn-outline-light">
                     <i class="bi bi-box-arrow-right"></i> Logout

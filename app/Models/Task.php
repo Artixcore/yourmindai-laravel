@@ -40,4 +40,14 @@ class Task extends Model
     {
         return $this->belongsTo(User::class, 'assigned_by_doctor_id');
     }
+
+    public function verifications()
+    {
+        return $this->hasMany(TaskVerification::class);
+    }
+
+    public function isVerifiedByParent(User $parent): bool
+    {
+        return $this->verifications()->where('parent_user_id', $parent->id)->exists();
+    }
 }

@@ -83,10 +83,13 @@
                             </div>
                             
                             <div class="d-grid gap-2">
-                                <a href="{{ route('parent.child.show', $child->id) }}" class="btn btn-primary">
+                                <a href="{{ route('parent.child.tasks', $child->id) }}" class="btn btn-primary" style="min-height: 44px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-check2-square me-2"></i>Verify Tasks
+                                </a>
+                                <a href="{{ route('parent.child.show', $child->id) }}" class="btn btn-outline-primary" style="min-height: 44px; display: flex; align-items: center; justify-content: center;">
                                     <i class="bi bi-eye me-2"></i>View Progress
                                 </a>
-                                <a href="{{ route('parent.child.homework', $child->id) }}" class="btn btn-outline-primary">
+                                <a href="{{ route('parent.child.homework', $child->id) }}" class="btn btn-outline-primary" style="min-height: 44px; display: flex; align-items: center; justify-content: center;">
                                     <i class="bi bi-list-check me-2"></i>View Homework
                                 </a>
                             </div>

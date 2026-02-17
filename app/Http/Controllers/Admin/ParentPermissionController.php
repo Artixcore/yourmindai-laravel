@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ParentPermission;
+use App\Models\ParentLink;
 use App\Models\User;
 use App\Models\PatientProfile;
 
@@ -158,6 +159,14 @@ class ParentPermissionController extends Controller
         }
 
         $permission = ParentPermission::create($validated);
+
+        // Sync parent_links so ParentDashboardController and task verification can use it
+        ParentLink::firstOrCreate(
+            [
+                'parent_id' => $validated['parent_id'],
+                'patient_id' => $validated['patient_id'],
+            ]
+        );
 
         return redirect()->route('admin.parent-permissions.show', $permission->id)
             ->with('success', 'Parent permission created successfully.');

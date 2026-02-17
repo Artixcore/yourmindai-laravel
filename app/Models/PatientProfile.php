@@ -104,4 +104,12 @@ class PatientProfile extends Model
     {
         return $this->hasMany(BehaviorContingencyPlan::class, 'patient_profile_id');
     }
+
+    /**
+     * Get the parent links (parent-child relationships).
+     */
+    public function parentLinks()
+    {
+        return $this->hasMany(ParentLink::class, 'patient_id');
+    }
 }

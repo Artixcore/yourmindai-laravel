@@ -170,6 +170,21 @@
             text-decoration: underline;
         }
         
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .footer-links a {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+        }
+        
         .logo-icon {
             width: 60px;
             height: 60px;
@@ -309,12 +324,18 @@
                     </button>
                 </form>
                 
-                <!-- Footer Link -->
+                <!-- Footer Links -->
                 <div class="footer-link">
-                    <a href="{{ route('login') }}">
-                        <i class="bi bi-arrow-left me-1"></i>
-                        Staff Login
-                    </a>
+                    <div class="footer-links">
+                        <a href="{{ route('parent.login') }}">
+                            <i class="bi bi-person-heart me-1"></i>
+                            Parents Login
+                        </a>
+                        <a href="{{ route('login') }}">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Staff Login
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

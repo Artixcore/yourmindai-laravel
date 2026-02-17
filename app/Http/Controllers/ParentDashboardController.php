@@ -62,6 +62,42 @@ class ParentDashboardController extends Controller
     }
 
     /**
+     * Show child's homework assignments.
+     */
+    public function showChildHomework(Request $request, $patientId)
+    {
+        $parent = $request->user();
+
+        $patient = PatientProfile::whereHas('parentLinks', function ($query) use ($parent) {
+            $query->where('parent_id', $parent->id);
+        })->with(['user', 'doctor'])->findOrFail($patientId);
+
+        $homework = HomeworkAssignment::where('patient_id', $patientId)
+            ->where('status', '!=', 'cancelled')
+            ->with(['feedback', 'practiceProgressions', 'assignedByDoctor'])
+            ->latest()
+            ->get();
+
+        return view('parent.child.homework', compact('patient', 'homework'));
+    }
+
+    /**
+     * Show child's sessions.
+     */
+    public function showChildSessions(Request $request, $patientId)
+    {
+        $parent = $request->user();
+
+        $patient = PatientProfile::whereHas('parentLinks', function ($query) use ($parent) {
+            $query->where('parent_id', $parent->id);
+        })->with(['user', 'doctor'])->findOrFail($patientId);
+
+        $sessions = $patient->sessions()->with(['doctor', 'days'])->orderBy('created_at', 'desc')->get();
+
+        return view('parent.child.sessions', compact('patient', 'sessions'));
+    }
+
+    /**
      * Get pending feedback count for parent.
      */
     private function getPendingFeedbackCount($parentId)

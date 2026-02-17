@@ -86,6 +86,8 @@
         .content-wrapper {
             padding: 1rem;
             max-width: 100%;
+            min-height: calc(100vh - 140px);
+            overflow-y: auto;
         }
         
         .card {

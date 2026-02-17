@@ -83,12 +83,8 @@ class SessionReportController extends Controller
                 ->where('doctor_id', $user->id)
                 ->with('user')
                 ->firstOrFail();
-            
-        $sessions = Session::where('doctor_id', $user->id)
-            ->whereHas('days', function($q) use ($patientId) {
-                $q->where('patient_id', $patientId);
-            })
-            ->get();
+
+            $sessions = $patient->sessions()->with('days')->orderBy('created_at', 'desc')->get();
         }
 
         return view('doctor.session-reports.create', compact('patients', 'sessions', 'patient'));
@@ -125,7 +121,7 @@ class SessionReportController extends Controller
 
         $report = SessionReport::create($validated);
 
-        return redirect()->route('doctor.session-reports.show', $report->id)
+        return redirect()->route('session-reports.show', $report->id)
             ->with('success', 'Session report created successfully.');
     }
 
@@ -143,18 +139,14 @@ class SessionReportController extends Controller
         $this->authorize('update', $report);
 
         if ($report->finalized_at) {
-            return redirect()->route('doctor.session-reports.show', $report->id)
+            return redirect()->route('session-reports.show', $report->id)
                 ->with('error', 'Cannot edit finalized report.');
         }
 
         $patient = $report->patient;
         $patients = PatientProfile::where('doctor_id', auth()->id())->with('user')->get();
 
-        $sessions = Session::where('doctor_id', auth()->id())
-            ->whereHas('days', function($q) use ($patient) {
-                $q->where('patient_id', $patient->id);
-            })
-            ->get();
+        $sessions = $patient ? $patient->sessions()->with('days')->orderBy('created_at', 'desc')->get() : collect();
 
         return view('doctor.session-reports.edit', compact('report', 'patients', 'sessions', 'patient'));
     }
@@ -165,7 +157,7 @@ class SessionReportController extends Controller
         $this->authorize('update', $report);
 
         if ($report->finalized_at) {
-            return redirect()->route('doctor.session-reports.show', $report->id)
+            return redirect()->route('session-reports.show', $report->id)
                 ->with('error', 'Cannot edit finalized report.');
         }
 
@@ -190,7 +182,7 @@ class SessionReportController extends Controller
 
         $report->update($validated);
 
-        return redirect()->route('doctor.session-reports.show', $report->id)
+        return redirect()->route('session-reports.show', $report->id)
             ->with('success', 'Session report updated successfully.');
     }
 
@@ -207,7 +199,7 @@ class SessionReportController extends Controller
 
         $report->delete();
 
-        return redirect()->route('doctor.session-reports.index')
+        return redirect()->route('session-reports.index')
             ->with('success', 'Session report deleted successfully.');
     }
 
@@ -230,7 +222,7 @@ class SessionReportController extends Controller
         // Generate and store PDF when finalizing
         app(SessionReportPdfService::class)->generateAndStore($report->fresh());
 
-        return redirect()->route('doctor.session-reports.show', $report->id)
+        return redirect()->route('session-reports.show', $report->id)
             ->with('success', 'Session report finalized successfully. It can no longer be edited.');
     }
 

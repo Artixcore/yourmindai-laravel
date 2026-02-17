@@ -8,11 +8,11 @@
         <x-breadcrumb :items="[
             ['label' => 'Home', 'url' => route('dashboard')],
             ['label' => 'Patients', 'url' => route('patients.index')],
-            ['label' => $patient->name, 'url' => route('patients.show', $patient)],
+            ['label' => $patient->name ?? $patient->full_name ?? optional($patient->user)->name ?? 'Patient', 'url' => route('patients.show', $patient)],
             ['label' => 'Device Actions Timeline']
         ]" />
         <h1 class="h3 mb-1 fw-semibold">Device Actions Timeline</h1>
-        <p class="text-muted mb-0">View {{ $patient->name }}'s device-related actions</p>
+        <p class="text-muted mb-0">View {{ $patient->name ?? $patient->full_name ?? optional($patient->user)->name ?? 'Patient' }}'s device-related actions</p>
     </div>
 </div>
 

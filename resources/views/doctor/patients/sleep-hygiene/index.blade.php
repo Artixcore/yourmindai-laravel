@@ -8,11 +8,11 @@
         <x-breadcrumb :items="[
             ['label' => 'Home', 'url' => route('dashboard')],
             ['label' => 'Patients', 'url' => route('patients.index')],
-            ['label' => $patient->name, 'url' => route('patients.show', $patient)],
+            ['label' => $patient->name ?? $patient->full_name ?? optional($patient->user)->name ?? 'Patient', 'url' => route('patients.show', $patient)],
             ['label' => 'Sleep Hygiene Logs']
         ]" />
         <h1 class="h3 mb-1 fw-semibold">Sleep Hygiene Logs</h1>
-        <p class="text-muted mb-0">View {{ $patient->name }}'s sleep hygiene checklist completion</p>
+        <p class="text-muted mb-0">View {{ $patient->name ?? $patient->full_name ?? optional($patient->user)->name ?? 'Patient' }}'s sleep hygiene checklist completion</p>
     </div>
 </div>
 

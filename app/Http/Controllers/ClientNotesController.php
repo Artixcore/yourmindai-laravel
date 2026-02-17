@@ -45,7 +45,7 @@ class ClientNotesController extends Controller
                 $data['voice_path'] = $path;
                 $data['content'] = 'Voice note';
             } else {
-                return redirect()->back()->withErrors(['voice' => 'Please record or upload an audio file.']);
+                return redirect()->back()->withInput()->withErrors(['voice' => 'Please record or upload an audio file.']);
             }
         }
 

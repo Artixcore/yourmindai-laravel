@@ -74,10 +74,10 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="mb-1">{{ $child->user->name ?? 'Patient' }}</h5>
+                                    <h5 class="mb-1">{{ optional($child->user)->name ?? optional($child)->full_name ?? 'Patient' }}</h5>
                                     <p class="text-muted small mb-0">
                                         <i class="bi bi-person-badge me-1"></i>
-                                        Under care of: {{ $child->doctor->name ?? 'Not assigned' }}
+                                        Under care of: {{ optional($child->doctor)->name ?? 'Not assigned' }}
                                     </p>
                                 </div>
                             </div>

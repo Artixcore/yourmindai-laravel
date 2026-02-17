@@ -160,7 +160,7 @@ class PatientTaskController extends Controller
                 $task,
                 'Task Completed',
                 "A task \"{$task->title}\" has been completed by your patient.",
-                route('doctor.tasks.show', $task->id)
+                route('tasks.show', $task)
             ));
         }
         

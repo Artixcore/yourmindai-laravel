@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -46,12 +45,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'request' => sanitizeRequest(request()),
         ]);
 
-        // ModelNotFoundException -> 404 (web: redirect + flash; API: JSON)
+        // ModelNotFoundException -> 404 (web: friendly view or redirect; API: JSON)
         $exceptions->render(function (ModelNotFoundException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => 'Record not found.'], 404);
             }
-            return redirect()->back()->with('error', 'The requested resource was not found.');
+            $prev = url()->previous();
+            if ($prev && $prev !== $request->fullUrl()) {
+                return redirect()->to($prev)->with('error', 'The requested resource was not found.');
+            }
+            return response()->view('errors.404', [], 404);
         });
 
         // AuthorizationException -> 403
@@ -59,23 +62,31 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => $e->getMessage() ?: 'This action is unauthorized.'], 403);
             }
-            return redirect()->back()->with('error', $e->getMessage() ?: 'You are not authorized to perform this action.');
+            $prev = url()->previous();
+            if ($prev && $prev !== $request->fullUrl()) {
+                return redirect()->to($prev)->with('error', $e->getMessage() ?: 'You are not authorized to perform this action.');
+            }
+            return response()->view('errors.403', [], 403);
         });
 
-        // NotFoundHttpException -> 404 (web: redirect + flash; API: JSON)
+        // NotFoundHttpException -> 404 (web: friendly view or redirect; API: JSON)
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => $e->getMessage() ?: 'Not found.'], 404);
             }
-            return redirect()->back()->with('error', 'The page you requested was not found.');
+            $prev = url()->previous();
+            if ($prev && $prev !== $request->fullUrl()) {
+                return redirect()->to($prev)->with('error', 'The page you requested was not found.');
+            }
+            return response()->view('errors.404', [], 404);
         });
 
         // General exception handler: API returns JSON, web shows friendly alert
-        $exceptions->render(function (Throwable $e, Request $request) {
+        $exceptions->render(function (\Throwable $e, Request $request) {
             $isApi = $request->expectsJson() || $request->is('api/*');
             $debug = config('app.debug');
 
-            // Web requests: friendly redirect in production
+            // Web requests: friendly 500 view in production
             if (!$isApi) {
                 if ($debug) {
                     return null; // Let Laravel show debug page
@@ -88,8 +99,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'request' => sanitizeRequest($request),
                     'trace' => $e->getTraceAsString(),
                 ]);
-                $url = url()->previous() ?: (auth()->check() ? route('dashboard') : url('/'));
-                return redirect()->to($url)->with('error', 'Something went wrong. Please try again.');
+                return response()->view('errors.500', [], 500);
             }
 
             // API: JSON response

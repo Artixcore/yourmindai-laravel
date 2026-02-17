@@ -52,7 +52,7 @@
                 <h6 class="mb-1 fw-semibold">{{ $session->title ?? 'Session #' . $session->id }}</h6>
                 <small class="text-muted">
                     <i class="bi bi-calendar3 me-1"></i>
-                    {{ $session->created_at->format('M d, Y') }}
+                    {{ $session->created_at?->format('M d, Y') ?? '—' }}
                 </small>
             </div>
             <a href="{{ route('client.sessions.show', $session->id) }}" class="btn btn-sm btn-outline-primary">
@@ -77,7 +77,7 @@
             @foreach($pendingAssessments as $assessment)
             <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
                 <div>
-                    <h6 class="mb-1 fw-semibold">{{ $assessment->scale->name ?? 'Assessment' }}</h6>
+                    <h6 class="mb-1 fw-semibold">{{ optional($assessment->scale)->name ?? 'Assessment' }}</h6>
                     <small class="text-muted">
                         Assigned: {{ $assessment->assigned_at ? $assessment->assigned_at->format('M d, Y') : 'Recently' }}
                     </small>
@@ -151,7 +151,7 @@
                 <div>
                     <h6 class="mb-1 fw-semibold">{{ $plan->title }}</h6>
                     <small class="text-muted">
-                        Created: {{ $plan->created_at->format('M d, Y') }}
+                        Created: {{ $plan->created_at?->format('M d, Y') ?? '—' }}
                     </small>
                 </div>
                 <a href="{{ route('client.contingency.show', $plan->id) }}" class="btn btn-sm btn-outline-danger">

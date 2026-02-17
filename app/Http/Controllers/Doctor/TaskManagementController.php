@@ -110,7 +110,7 @@ class TaskManagementController extends Controller
             ));
         }
 
-        return redirect()->route('doctor.tasks.show', $task->id)
+        return redirect()->route('tasks.show', $task->id)
             ->with('success', 'Task created successfully.');
     }
 
@@ -141,7 +141,7 @@ class TaskManagementController extends Controller
 
         // Cannot edit completed tasks
         if ($task->status == 'completed') {
-            return redirect()->route('doctor.tasks.show', $task->id)
+            return redirect()->route('tasks.show', $task->id)
                 ->with('error', 'Cannot edit completed task.');
         }
 
@@ -164,7 +164,7 @@ class TaskManagementController extends Controller
 
         // Cannot edit completed tasks
         if ($task->status == 'completed') {
-            return redirect()->route('doctor.tasks.show', $task->id)
+            return redirect()->route('tasks.show', $task->id)
                 ->with('error', 'Cannot edit completed task.');
         }
 
@@ -185,7 +185,7 @@ class TaskManagementController extends Controller
 
         $task->update($validated);
 
-        return redirect()->route('doctor.tasks.show', $task->id)
+        return redirect()->route('tasks.show', $task->id)
             ->with('success', 'Task updated successfully.');
     }
 
@@ -202,7 +202,7 @@ class TaskManagementController extends Controller
 
         $task->delete();
 
-        return redirect()->route('doctor.tasks.index')
+        return redirect()->route('tasks.index')
             ->with('success', 'Task deleted successfully.');
     }
 

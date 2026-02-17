@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreHomeworkRequest;
+use App\Http\Requests\UpdateHomeworkRequest;
 use Illuminate\Http\Request;
 use App\Models\HomeworkAssignment;
 use App\Models\HomeworkCompletion;
@@ -86,7 +88,7 @@ class HomeworkController extends Controller
     /**
      * Store homework assignment for patient.
      */
-    public function store(Request $request, Patient $patient)
+    public function store(StoreHomeworkRequest $request, Patient $patient)
     {
         $patientProfile = $this->resolvePatientProfile($patient);
         
@@ -95,26 +97,7 @@ class HomeworkController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
-            'session_id' => 'nullable|exists:therapy_sessions,id',
-            'homework_type' => 'required|in:psychotherapy,lifestyle_modification,sleep_tracking,mood_tracking,personal_journal,risk_tracking,contingency,exercise,parent_role,others_role,self_help_tools',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'instructions' => 'nullable|string',
-            'goals' => 'nullable|array',
-            'frequency' => 'required|in:daily,weekly,as_needed',
-            'frequency_type' => 'nullable|in:times_per_day,days_per_week,schedule_rules,as_before',
-            'frequency_value' => 'nullable',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after:start_date',
-            'reminder_at' => 'nullable|date',
-            'requires_parent_feedback' => 'boolean',
-            'requires_others_feedback' => 'boolean',
-            'media' => 'nullable|array',
-            'media.*.type' => 'required_with:media|in:video,audio,podcast,link',
-            'media.*.url' => 'required_with:media|url',
-            'media.*.title' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $frequencyValue = null;
         if (!empty($validated['frequency_value'])) {
@@ -182,7 +165,7 @@ class HomeworkController extends Controller
     /**
      * Update homework assignment.
      */
-    public function update(Request $request, Patient $patient, $homeworkId)
+    public function update(UpdateHomeworkRequest $request, Patient $patient, $homeworkId)
     {
         $patientProfile = $this->resolvePatientProfile($patient);
         $homework = HomeworkAssignment::where('id', $homeworkId)
@@ -194,12 +177,19 @@ class HomeworkController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
-            'status' => 'required|in:assigned,in_progress,completed,cancelled',
-            'end_date' => 'nullable|date',
-        ]);
+        $validated = $request->validated();
 
         $homework->update($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $homework->refresh();
+            return response()->json([
+                'success' => true,
+                'message' => 'Homework updated successfully!',
+                'html' => view('partials.homework_status_row', compact('homework'))->render(),
+                'target' => '#homework-status-row',
+            ]);
+        }
 
         return redirect()->route('patients.homework.show', [$patient, $homework])
             ->with('success', 'Homework updated successfully!');
@@ -232,6 +222,17 @@ class HomeworkController extends Controller
             'reviewed_at' => now(),
             'score_value' => $validated['score_value'] ?? $completion->score_value,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $completion->load('reviewer');
+            return response()->json([
+                'success' => true,
+                'message' => 'Completion reviewed successfully!',
+                'html' => view('partials.homework_completion_row', compact('patient', 'homework', 'completion'))->render(),
+                'target' => '#completion-' . $completion->id,
+                'replace' => true,
+            ]);
+        }
 
         return redirect()->route('patients.homework.show', [$patient, $homework])
             ->with('success', 'Completion reviewed successfully!');

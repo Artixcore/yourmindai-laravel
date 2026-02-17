@@ -82,23 +82,34 @@ class AppointmentRequestController extends Controller
                 'name' => $appointmentRequest->first_name . ' ' . $appointmentRequest->last_name,
             ]);
 
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Your appointment request has been submitted successfully! We will contact you soon to confirm your appointment.',
+                ]);
+            }
+
             return back()->with('success', 'Your appointment request has been submitted successfully! We will contact you soon to confirm your appointment.');
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error('Database error creating appointment request', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Failed to submit appointment request due to a database error. Please try again or contact support.']);
+            $msg = 'Failed to submit appointment request due to a database error. Please try again or contact support.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg, 'errors' => ['error' => [$msg]]], 422);
+            }
+            return back()->withInput()->withErrors(['error' => $msg]);
         } catch (\Exception $e) {
             Log::error('Error creating appointment request', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Failed to submit appointment request. Please try again.']);
+            $msg = 'Failed to submit appointment request. Please try again.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg, 'errors' => ['error' => [$msg]]], 422);
+            }
+            return back()->withInput()->withErrors(['error' => $msg]);
         }
     }
 

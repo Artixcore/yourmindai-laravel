@@ -40,7 +40,7 @@
                     <h5 class="mb-0">Assignment Details</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3 mb-3">
+                    <div class="row g-3 mb-3" id="homework-status-row">
                         <div class="col-md-4">
                             <small class="text-muted">Status</small>
                             <div>
@@ -89,7 +89,7 @@
                 </div>
                 <div class="card-body">
                     @forelse($homework->completions()->orderBy('completion_date', 'desc')->get() as $completion)
-                        <div class="border-bottom pb-3 mb-3">
+                        <div id="completion-{{ $completion->id }}" class="border-bottom pb-3 mb-3">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <strong>{{ $completion->completion_date->format('M d, Y') }}</strong>
@@ -116,10 +116,10 @@
                                     </div>
                                 </div>
                                 @if(!$completion->reviewed_at)
-                                    <form action="{{ route('patients.homework.completions.review', [$patient, $homework, $completion]) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('patients.homework.completions.review', [$patient, $homework, $completion]) }}" method="POST" class="d-inline ajax-form" data-target="#completion-{{ $completion->id }}">
                                         @csrf
                                         @method('PUT')
-                                        <button type="submit" class="btn btn-sm btn-primary">Mark Reviewed</button>
+                                        <button type="submit" class="btn btn-sm btn-primary" data-loading-text="Saving...">Mark Reviewed</button>
                                     </form>
                                 @endif
                             </div>
@@ -138,6 +138,34 @@
         </div>
 
         <div class="col-lg-4">
+            <!-- Update Status -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Update Status</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('patients.homework.update', [$patient, $homework]) }}" class="ajax-form" data-target="#homework-status-row">
+                        @csrf
+                        @method('PUT')
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select name="status" id="status" class="form-select" required>
+                                <option value="assigned" {{ $homework->status === 'assigned' ? 'selected' : '' }}>Assigned</option>
+                                <option value="in_progress" {{ $homework->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                <option value="completed" {{ $homework->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                                <option value="cancelled" {{ $homework->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ $homework->end_date?->format('Y-m-d') }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" data-loading-text="Saving...">
+                            <i class="bi bi-check-lg me-2"></i>Update
+                        </button>
+                    </form>
+                </div>
+            </div>
             <!-- Quick Actions -->
             <div class="card shadow-sm mb-3">
                 <div class="card-header bg-white">

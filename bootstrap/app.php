@@ -54,13 +54,6 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect()->back()->with('error', 'The requested resource was not found.');
         });
 
-        // NotFoundHttpException -> 404 for API
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if ($request->expectsJson() || $request->is('api/*')) {
-                return response()->json(['message' => $e->getMessage() ?: 'Not found.'], 404);
-            }
-        });
-
         // AuthorizationException -> 403
         $exceptions->render(function (AuthorizationException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
@@ -69,15 +62,37 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect()->back()->with('error', $e->getMessage() ?: 'You are not authorized to perform this action.');
         });
 
-        // General API exception handler (from origin/main)
+        // NotFoundHttpException -> 404 (web: redirect + flash; API: JSON)
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => $e->getMessage() ?: 'Not found.'], 404);
+            }
+            return redirect()->back()->with('error', 'The page you requested was not found.');
+        });
+
+        // General exception handler: API returns JSON, web shows friendly alert
         $exceptions->render(function (Throwable $e, Request $request) {
             $isApi = $request->expectsJson() || $request->is('api/*');
+            $debug = config('app.debug');
 
+            // Web requests: friendly redirect in production
             if (!$isApi) {
-                return null;
+                if ($debug) {
+                    return null; // Let Laravel show debug page
+                }
+                Log::error($e->getMessage(), [
+                    'exception' => get_class($e),
+                    'user_id' => auth()->id(),
+                    'role' => auth()->user()?->role ?? null,
+                    'route' => $request->route()?->getName() ?? $request->path(),
+                    'request' => sanitizeRequest($request),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                $url = url()->previous() ?: (auth()->check() ? route('dashboard') : url('/'));
+                return redirect()->to($url)->with('error', 'Something went wrong. Please try again.');
             }
 
-            $debug = config('app.debug');
+            // API: JSON response
             $code = 500;
             $message = 'Something went wrong.';
             $errors = [];

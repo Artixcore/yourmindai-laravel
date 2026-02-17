@@ -77,7 +77,17 @@ class ClientWellbeingController extends Controller
                 'route' => 'client.wellbeing.store',
                 'error' => $e->getMessage(),
             ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to save wellbeing log. Please try again.', 'errors' => ['error' => ['Failed to save wellbeing log. Please try again.']]], 422);
+            }
             return back()->withInput()->with('error', 'Failed to save wellbeing log. Please try again.');
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Wellbeing log saved.',
+            ]);
         }
 
         return redirect()->route('client.wellbeing.index')

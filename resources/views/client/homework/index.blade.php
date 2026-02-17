@@ -36,7 +36,7 @@
     <div class="card mb-3">
         <div class="card-header bg-white border-0">
             <h6 class="mb-0 fw-semibold">
-                <i class="bi bi-{{ $this->getIcon($type) }} me-2"></i>
+                <i class="bi bi-{{ getIcon($type) }} me-2"></i>
                 {{ ucfirst(str_replace('_', ' ', $type)) }}
             </h6>
         </div>
@@ -49,7 +49,7 @@
                     
                     <!-- Progression Indicators -->
                     @php
-                        $latestProgression = $assignment->latestProgression();
+                        $latestProgression = $assignment->practiceProgressions->sortByDesc('progress_date')->first();
                     @endphp
                     @if($latestProgression)
                     <div class="d-flex align-items-center gap-3 small">
@@ -63,16 +63,20 @@
                     </div>
                     @endif
                     
+                    @php
+                        $selfFbCount = $assignment->feedback->where('source', 'self')->count();
+                        $parentFbCount = $assignment->feedback->where('source', 'parent')->count();
+                    @endphp
                     <!-- Feedback Indicators -->
                     <div class="d-flex gap-2 mt-2">
-                        @if($assignment->requires_parent_feedback && $assignment->parentFeedback()->count() > 0)
+                        @if($assignment->requires_parent_feedback && $parentFbCount > 0)
                             <span class="badge bg-success small">
-                                <i class="bi bi-check-circle me-1"></i>Parent Feedback: {{ $assignment->parentFeedback()->count() }}
+                                <i class="bi bi-check-circle me-1"></i>Parent Feedback: {{ $parentFbCount }}
                             </span>
                         @endif
-                        @if($assignment->selfFeedback()->count() > 0)
+                        @if($selfFbCount > 0)
                             <span class="badge bg-info small">
-                                <i class="bi bi-check-circle me-1"></i>Self Feedback: {{ $assignment->selfFeedback()->count() }}
+                                <i class="bi bi-check-circle me-1"></i>Self Feedback: {{ $selfFbCount }}
                             </span>
                         @endif
                     </div>

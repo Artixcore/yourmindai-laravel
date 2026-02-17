@@ -22,7 +22,7 @@
             <i class="bi bi-phone me-2 text-primary"></i>
             Log Screen Time
         </h6>
-        <form action="{{ route('client.wellbeing.store') }}" method="POST">
+        <form action="{{ route('client.wellbeing.store') }}" method="POST" class="ajax-form">
             @csrf
             <input type="hidden" name="log_date" value="{{ $todayLog?->log_date?->format('Y-m-d') ?? now()->toDateString() }}">
             <div class="row g-2 mb-2">
@@ -33,7 +33,7 @@
                            value="{{ old('screentime_minutes', $todayLog?->screentime_minutes) }}">
                 </div>
                 <div class="col-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">Save</button>
+                    <button type="submit" class="btn btn-primary btn-sm w-100" data-loading-text="Saving...">Save</button>
                 </div>
             </div>
         </form>

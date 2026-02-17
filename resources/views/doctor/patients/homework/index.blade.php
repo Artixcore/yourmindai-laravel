@@ -31,7 +31,7 @@
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-white">
                 <h5 class="mb-0">
-                    <i class="bi bi-{{ $this->getIcon($type) }} me-2"></i>
+                    <i class="bi bi-{{ getIcon($type) }} me-2"></i>
                     {{ ucfirst(str_replace('_', ' ', $type)) }}
                     <span class="badge bg-secondary ms-2">{{ $assignments->count() }}</span>
                 </h5>
@@ -83,7 +83,7 @@
                                 </td>
                                 <td>
                                     @php
-                                        $completionCount = $assignment->completions()->where('is_completed', true)->count();
+                                        $completionCount = $assignment->completions->where('is_completed', true)->count();
                                         $totalExpected = $assignment->frequency === 'daily' 
                                             ? \Carbon\Carbon::parse($assignment->start_date)->diffInDays(now()) 
                                             : 0;
@@ -96,20 +96,25 @@
                                     </small>
                                 </td>
                                 <td>
+                                    @php
+                                        $selfCount = $assignment->feedback->where('source', 'self')->count();
+                                        $parentCount = $assignment->feedback->where('source', 'parent')->count();
+                                        $othersCount = $assignment->feedback->where('source', 'others')->count();
+                                    @endphp
                                     <div class="d-flex gap-1">
-                                        @if($assignment->selfFeedback()->count() > 0)
+                                        @if($selfCount > 0)
                                             <span class="badge bg-info" title="Self feedback">
-                                                S: {{ $assignment->selfFeedback()->count() }}
+                                                S: {{ $selfCount }}
                                             </span>
                                         @endif
-                                        @if($assignment->parentFeedback()->count() > 0)
+                                        @if($parentCount > 0)
                                             <span class="badge bg-success" title="Parent feedback">
-                                                P: {{ $assignment->parentFeedback()->count() }}
+                                                P: {{ $parentCount }}
                                             </span>
                                         @endif
-                                        @if($assignment->othersFeedback()->count() > 0)
+                                        @if($othersCount > 0)
                                             <span class="badge bg-purple" title="Others feedback">
-                                                O: {{ $assignment->othersFeedback()->count() }}
+                                                O: {{ $othersCount }}
                                             </span>
                                         @endif
                                     </div>

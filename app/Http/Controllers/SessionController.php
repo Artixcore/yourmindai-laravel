@@ -25,7 +25,7 @@ class SessionController extends Controller
             $query->where('doctor_id', $user->id);
         }
 
-        $sessions = $query->orderBy('created_at', 'desc')->get();
+        $sessions = $query->orderBy('created_at', 'desc')->paginate(15);
 
         return view('sessions.index', [
             'patient' => $patient,
@@ -80,6 +80,14 @@ class SessionController extends Controller
             'next_session_date' => $validated['next_session_date'] ?? null,
             'reminder_at' => $validated['reminder_at'] ?? null,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Session created successfully!',
+                'redirect' => route('patients.sessions.show', [$patient, $session]),
+            ]);
+        }
 
         return redirect()
             ->route('patients.sessions.show', [$patient, $session])
@@ -151,6 +159,14 @@ class SessionController extends Controller
         ]);
 
         $session->update($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Session updated successfully!',
+                'redirect' => route('patients.sessions.show', [$patient, $session]),
+            ]);
+        }
 
         return redirect()
             ->route('patients.sessions.show', [$patient, $session])

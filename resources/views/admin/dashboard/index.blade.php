@@ -23,7 +23,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Total Doctors</p>
-                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\User::where('role', 'doctor')->where('status', 'active')->count() }}</h3>
+                        <h3 class="h4 mb-0 fw-bold">{{ $stats['total_doctors'] }}</h3>
                     </div>
                     <div class="bg-primary bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-person-badge text-primary fs-4"></i>
@@ -39,7 +39,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Total Patients</p>
-                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\Patient::where('status', 'active')->count() }}</h3>
+                        <h3 class="h4 mb-0 fw-bold">{{ $stats['total_patients'] }}</h3>
                     </div>
                     <div class="bg-success bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-people text-success fs-4"></i>
@@ -55,7 +55,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Active Sessions</p>
-                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\Session::where('status', 'active')->count() }}</h3>
+                        <h3 class="h4 mb-0 fw-bold">{{ $stats['active_sessions'] }}</h3>
                     </div>
                     <div class="bg-info bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-calendar-check text-info fs-4"></i>
@@ -71,7 +71,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Pending Messages</p>
-                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\ContactMessage::where('status', 'new')->count() }}</h3>
+                        <h3 class="h4 mb-0 fw-bold">{{ $stats['pending_messages'] }}</h3>
                     </div>
                     <div class="bg-warning bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-chat-dots text-warning fs-4"></i>
@@ -87,7 +87,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <p class="text-muted small mb-1">Pending Requests</p>
-                        <h3 class="h4 mb-0 fw-bold">{{ \App\Models\AppointmentRequest::where('status', 'pending')->count() }}</h3>
+                        <h3 class="h4 mb-0 fw-bold">{{ $stats['pending_requests'] }}</h3>
                     </div>
                     <div class="bg-info bg-opacity-10 rounded-3 p-3 stat-icon">
                         <i class="bi bi-calendar-plus text-info fs-4"></i>

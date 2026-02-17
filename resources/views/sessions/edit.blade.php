@@ -23,7 +23,7 @@
 
     <!-- Form -->
     <x-card>
-        <form action="{{ route('patients.sessions.update', [$patient, $session]) }}" method="POST">
+        <form action="{{ route('patients.sessions.update', [$patient, $session]) }}" method="POST" class="ajax-form">
             @csrf
             @method('PUT')
 
@@ -137,6 +137,7 @@
                     <button
                         type="submit"
                         class="btn btn-primary"
+                        data-loading-text="Saving..."
                     >
                         Update Session
                     </button>

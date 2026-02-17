@@ -38,9 +38,9 @@
     <div class="card-body text-center py-5">
         <i class="bi bi-file-earmark-text text-muted" style="font-size: 3rem;"></i>
         <p class="text-muted mt-3 mb-3">No report generated yet.</p>
-        <form action="{{ route('client.assessments.report.generate', $assessment) }}" method="POST" class="d-inline">
+        <form action="{{ route('client.assessments.report.generate', $assessment) }}" method="POST" class="d-inline ajax-form">
             @csrf
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" data-loading-text="Generating...">
                 <i class="bi bi-file-earmark-plus me-2"></i>Generate Report
             </button>
         </form>
@@ -50,9 +50,9 @@
 
 <div class="d-grid gap-2">
     @if($report)
-    <form action="{{ route('client.assessments.report.generate', $assessment) }}" method="POST" class="d-inline">
+    <form action="{{ route('client.assessments.report.generate', $assessment) }}" method="POST" class="d-inline ajax-form">
         @csrf
-        <button type="submit" class="btn btn-outline-primary w-100">
+        <button type="submit" class="btn btn-outline-primary w-100" data-loading-text="Regenerating...">
             <i class="bi bi-arrow-clockwise me-2"></i>Regenerate Report
         </button>
     </form>

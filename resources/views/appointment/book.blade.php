@@ -34,7 +34,7 @@
             @endif
 
             <div class="card-body p-4 p-md-5">
-                <form method="POST" action="{{ route('appointment-request.store') }}">
+                <form method="POST" action="{{ route('appointment-request.store') }}" class="ajax-form">
                     @csrf
                     @if($doctor)
                         <input type="hidden" name="doctor_id" value="{{ $doctor->id }}">

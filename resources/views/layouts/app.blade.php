@@ -68,6 +68,7 @@
             
             <main class="flex-grow-1 overflow-y-auto" style="padding-top: 64px;">
                 <div class="p-4 p-md-5">
+                    <x-alerts />
                     @yield('content')
                 </div>
             </main>
@@ -76,6 +77,10 @@
     
     <!-- Bootstrap 5.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- jQuery (for AJAX form handling) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="{{ asset('js/app-ajax.js') }}"></script>
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -191,64 +196,14 @@
             }
         }
         
-        // SweetAlert2 notifications for session messages
-        document.addEventListener('DOMContentLoaded', function() {
-            @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                });
-            @endif
-            
-            @if(session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: '{{ session('error') }}',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 4000,
-                    timerProgressBar: true,
-                });
-            @endif
-            
-            @if(session('warning'))
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Warning!',
-                    text: '{{ session('warning') }}',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 4000,
-                    timerProgressBar: true,
-                });
-            @endif
-            
-            @if(session('info'))
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Info',
-                    text: '{{ session('info') }}',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                });
-            @endif
-        });
+        // Session flash messages and validation errors are displayed via <x-alerts /> (Bootstrap)
     </script>
     
     <style>
         [x-cloak] { display: none !important; }
+        /* Skeleton loader for heavy sections */
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 4px; }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
     
     @stack('scripts')

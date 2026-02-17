@@ -23,64 +23,18 @@
 </div>
 
 <!-- Devices List -->
-@if($devices->isEmpty())
-<div class="card">
+<div id="devices-empty-state" class="card" style="{{ $devices->isNotEmpty() ? 'display:none' : '' }}">
     <div class="card-body text-center py-5">
         <i class="bi bi-phone display-1 text-muted mb-3"></i>
         <p class="text-muted mb-0">No devices registered yet.</p>
         <p class="text-muted small">Register your first device to get started.</p>
     </div>
 </div>
-@else
+<div id="devices-list" style="{{ $devices->isEmpty() ? 'display:none' : '' }}">
 @foreach($devices as $device)
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-                <h6 class="fw-bold mb-1">{{ $device->device_name }}</h6>
-                <div class="small text-muted mb-2">
-                    <div><i class="bi bi-device-hdd me-1"></i> {{ ucfirst($device->device_type) }}</div>
-                    @if($device->os_type)
-                    <div><i class="bi bi-window me-1"></i> {{ $device->os_type }} {{ $device->os_version ?? '' }}</div>
-                    @endif
-                    @if($device->app_version)
-                    <div><i class="bi bi-app me-1"></i> App v{{ $device->app_version }}</div>
-                    @endif
-                </div>
-                <div class="small">
-                    @if($device->is_active)
-                    <span class="badge bg-success">Active</span>
-                    @else
-                    <span class="badge bg-secondary">Inactive</span>
-                    @endif
-                    @if($device->last_active_at)
-                    <span class="text-muted ms-2">
-                        Last active: {{ $device->last_active_at->diffForHumans() }}
-                    </span>
-                    @endif
-                </div>
-                <div class="small text-muted mt-2">
-                    Registered: {{ $device->registered_at?->format('M d, Y') ?? '—' }}
-                    @if($device->device_source === 'manual')
-                        <span class="badge bg-secondary ms-1">Manual</span>
-                    @endif
-                </div>
-                @if($device->notes)
-                <div class="small text-muted mt-1">{{ Str::limit($device->notes, 60) }}</div>
-                @endif
-            </div>
-            <form method="POST" action="{{ route('client.devices.destroy', $device->id) }}" class="ms-2" onsubmit="return confirm('Are you sure you want to remove this device?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-outline-danger">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
+@include('partials.device_card', ['device' => $device])
 @endforeach
-@endif
+</div>
 
 <!-- Register Device Modal -->
 <div class="modal fade" id="registerDeviceModal" tabindex="-1">
@@ -90,7 +44,7 @@
                 <h5 class="modal-title">Register New Device</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="{{ route('client.devices.store') }}">
+            <form method="POST" action="{{ route('client.devices.store') }}" class="ajax-form" data-target="#devices-list">
                 @csrf
                 <input type="hidden" name="device_source" value="app_registered">
                 <div class="modal-body">
@@ -131,7 +85,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Register Device</button>
+                    <button type="submit" class="btn btn-primary" data-loading-text="Registering...">Register Device</button>
                 </div>
             </form>
         </div>
@@ -146,7 +100,7 @@
                 <h5 class="modal-title">Add Smart Device</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="{{ route('client.devices.store') }}">
+            <form method="POST" action="{{ route('client.devices.store') }}" class="ajax-form" data-target="#devices-list">
                 @csrf
                 <input type="hidden" name="device_source" value="manual">
                 <div class="modal-body">
@@ -177,7 +131,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Device</button>
+                    <button type="submit" class="btn btn-primary" data-loading-text="Adding...">Add Device</button>
                 </div>
             </form>
         </div>

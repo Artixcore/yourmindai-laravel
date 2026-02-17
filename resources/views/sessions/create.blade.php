@@ -23,7 +23,7 @@
 
     <!-- Form -->
     <x-card>
-        <form action="{{ route('patients.sessions.store', $patient) }}" method="POST">
+        <form action="{{ route('patients.sessions.store', $patient) }}" method="POST" class="ajax-form">
             @csrf
 
             <div class="d-flex flex-column gap-4">
@@ -137,6 +137,7 @@
                     <button
                         type="submit"
                         class="btn btn-primary"
+                        data-loading-text="Creating..."
                     >
                         Create Session
                     </button>

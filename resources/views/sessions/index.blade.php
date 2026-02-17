@@ -115,6 +115,11 @@
                 </x-card>
             @endforeach
         </div>
+        @if($sessions->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                {{ $sessions->links() }}
+            </div>
+        @endif
     @endif
 </div>
 @endsection

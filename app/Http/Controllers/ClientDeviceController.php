@@ -102,14 +102,29 @@ class ClientDeviceController extends Controller
         }
 
         try {
-            PatientDevice::create($deviceData);
+            $device = PatientDevice::create($deviceData);
         } catch (\Exception $e) {
             Log::error('Device registration failed', [
                 'user_id' => $request->user()->id,
                 'route' => 'client.devices.store',
                 'error' => $e->getMessage(),
             ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to register device. Please try again.', 'errors' => ['error' => ['Failed to register device. Please try again.']]], 422);
+            }
             return back()->withInput()->with('error', 'Failed to register device. Please try again.');
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Device registered successfully.',
+                'html' => view('partials.device_card', compact('device'))->render(),
+                'target' => '#devices-list',
+                'prepend' => true,
+                'showTarget' => true,
+                'hideOnAdd' => '#devices-empty-state',
+            ]);
         }
 
         return redirect()->route('client.devices.index')
@@ -119,7 +134,7 @@ class ClientDeviceController extends Controller
     /**
      * Remove a device.
      */
-    public function destroy(PatientDevice $device)
+    public function destroy(Request $request, PatientDevice $device)
     {
         $patientInfo = $this->getPatientId();
         
@@ -136,7 +151,18 @@ class ClientDeviceController extends Controller
             return back()->with('error', 'Unauthorized action.');
         }
 
+        $deviceId = $device->id;
         $device->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Device removed successfully.',
+                'html' => '',
+                'target' => '#device-card-' . $deviceId,
+                'replace' => true,
+            ]);
+        }
 
         return redirect()->route('client.devices.index')
             ->with('success', 'Device removed successfully.');

@@ -135,7 +135,7 @@ class ClientPsychometricController extends Controller
     /**
      * Generate report for completed assessment.
      */
-    public function generateReport(PsychometricAssessment $assessment)
+    public function generateReport(Request $request, PsychometricAssessment $assessment)
     {
         $patientInfo = $this->getPatientId();
         if (!$patientInfo) {
@@ -155,6 +155,13 @@ class ClientPsychometricController extends Controller
 
         $existing = PsychometricReport::where('assessment_id', $assessment->id)->first();
         if ($existing) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Report already exists.',
+                    'redirect' => route('client.assessments.report', $assessment),
+                ]);
+            }
             return redirect()->route('client.assessments.report', $assessment)
                 ->with('info', 'Report already exists.');
         }
@@ -177,7 +184,18 @@ class ClientPsychometricController extends Controller
                 'route' => 'client.assessments.report.generate',
                 'error' => $e->getMessage(),
             ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to generate report. Please try again.'], 422);
+            }
             return back()->with('error', 'Failed to generate report. Please try again.');
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Report generated successfully.',
+                'redirect' => route('client.assessments.report', $assessment),
+            ]);
         }
 
         return redirect()->route('client.assessments.report', $assessment)

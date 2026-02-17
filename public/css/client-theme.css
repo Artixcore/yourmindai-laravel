@@ -1,0 +1,40 @@
+/**
+ * Client panel sky blue theme.
+ * Scoped to body.client-panel-theme - does not affect doctor/admin panels.
+ */
+body.client-panel-theme {
+    background: #87CEEB !important;
+}
+
+body.client-panel-theme .card,
+body.client-panel-theme .card-body,
+body.client-panel-theme .card-header {
+    background: #ffffff !important;
+    color: #1f2937;
+}
+
+body.client-panel-theme .stats-card {
+    background: #ffffff !important;
+}
+
+body.client-panel-theme .stats-card .number {
+    color: #0ea5e9;
+}
+
+body.client-panel-theme .stats-card .label,
+body.client-panel-theme .text-muted {
+    color: #6b7280 !important;
+}
+
+body.client-panel-theme .btn-primary {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+    border: none;
+}
+
+body.client-panel-theme .btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+}
+
+body.client-panel-theme .nav-item.active {
+    color: #0ea5e9 !important;
+}

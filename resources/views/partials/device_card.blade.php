@@ -34,13 +34,18 @@
                 <div class="small text-muted mt-1">{{ Str::limit($device->notes, 60) }}</div>
                 @endif
             </div>
-            <form method="POST" action="{{ route('client.devices.destroy', $device->id) }}" class="ms-2 ajax-form" data-target="#device-card-{{ $device->id }}" onsubmit="return confirm('Are you sure you want to remove this device?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-outline-danger" data-loading-text="Removing...">
-                    <i class="bi bi-trash"></i>
+            <div class="d-flex gap-1">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editDeviceModal{{ $device->id }}" title="Edit">
+                    <i class="bi bi-pencil"></i>
                 </button>
-            </form>
+                <form method="POST" action="{{ route('client.devices.destroy', $device->id) }}" class="ajax-form" data-target="#device-card-{{ $device->id }}" onsubmit="return confirm('Are you sure you want to remove this device?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-outline-danger" data-loading-text="Removing..." title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

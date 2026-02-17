@@ -100,6 +100,14 @@ class ClientBehaviorContingencyController extends Controller
             );
         }
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Check-in saved successfully.',
+                'redirect' => route('client.contingency-plans.show', $plan),
+            ]);
+        }
+
         return redirect()->route('client.contingency-plans.show', $plan)
             ->with('success', 'Check-in saved successfully.');
     }
@@ -121,6 +129,14 @@ class ClientBehaviorContingencyController extends Controller
             'followed' => (bool) $request->followed,
             'client_note' => $request->client_note,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Check-in updated successfully.',
+                'redirect' => route('client.contingency-plans.show', $plan),
+            ]);
+        }
 
         return redirect()->route('client.contingency-plans.show', $plan)
             ->with('success', 'Check-in updated successfully.');

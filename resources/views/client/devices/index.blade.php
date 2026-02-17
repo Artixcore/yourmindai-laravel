@@ -33,6 +33,7 @@
 <div id="devices-list" style="{{ $devices->isEmpty() ? 'display:none' : '' }}">
 @foreach($devices as $device)
 @include('partials.device_card', ['device' => $device])
+@include('partials.device_edit_modal', ['device' => $device])
 @endforeach
 </div>
 

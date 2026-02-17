@@ -60,7 +60,7 @@
         <h6 class="mb-0 fw-semibold">Submit Today's Check-in</h6>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('client.contingency-plans.checkins.store', $plan) }}">
+        <form method="POST" action="{{ route('client.contingency-plans.checkins.store', $plan) }}" class="ajax-form">
             @csrf
             @foreach($plan->items as $item)
             <div class="border rounded p-3 mb-3">

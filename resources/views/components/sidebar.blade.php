@@ -59,6 +59,14 @@
                     <i class="bi bi-clipboard-check flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">Check-in Reviews</span>
                 </a>
+                <a href="{{ route('admin.sleep-hygiene.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.sleep-hygiene.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-moon-stars flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Sleep Hygiene Logs</span>
+                </a>
+                <a href="{{ route('admin.device-actions.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.device-actions.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
+                    <i class="bi bi-broadcast flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
+                    <span x-show="!collapsed">Device Actions</span>
+                </a>
                 <a href="{{ route('admin.ai-reports.index') }}" class="sidebar-nav-item d-flex align-items-center gap-3 text-decoration-none {{ request()->routeIs('admin.ai-reports.*') ? 'active' : '' }}" :class="collapsed ? 'justify-content-center' : ''">
                     <i class="bi bi-file-earmark-text flex-shrink-0" style="width: 20px; height: 20px; font-size: 20px;"></i>
                     <span x-show="!collapsed">AI Reports</span>

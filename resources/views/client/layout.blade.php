@@ -18,6 +18,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Client panel sky blue theme -->
+    <link href="{{ asset('css/client-theme.css') }}" rel="stylesheet">
+    
     <style>
         * {
             font-family: 'Inter', sans-serif;
@@ -120,7 +123,7 @@
     
     @stack('styles')
 </head>
-<body>
+<body class="client-panel-theme">
     <!-- Header -->
     <div class="client-header">
         <div class="d-flex align-items-center justify-content-between">
@@ -188,6 +191,18 @@
         <a href="{{ route('client.contingency-plans.index') }}" class="nav-item {{ request()->routeIs('client.contingency-plans.*') ? 'active' : '' }}">
             <i class="bi bi-clipboard-check"></i>
             <span>Contingency Plan</span>
+        </a>
+        <a href="{{ route('client.sleep-hygiene.index') }}" class="nav-item {{ request()->routeIs('client.sleep-hygiene.*') ? 'active' : '' }}">
+            <i class="bi bi-moon-stars"></i>
+            <span>Sleep Hygiene</span>
+        </a>
+        <a href="{{ route('client.devices.index') }}" class="nav-item {{ request()->routeIs('client.devices.*') ? 'active' : '' }}">
+            <i class="bi bi-phone"></i>
+            <span>Devices</span>
+        </a>
+        <a href="{{ route('client.device-actions.index') }}" class="nav-item {{ request()->routeIs('client.device-actions.*') ? 'active' : '' }}">
+            <i class="bi bi-broadcast"></i>
+            <span>Device Actions</span>
         </a>
     </nav>
     

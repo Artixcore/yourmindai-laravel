@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\PatientProfile;
 use App\Models\Patient;
 use App\Models\PatientDevice;
+use App\Http\Requests\StoreDeviceRequest;
+use App\Http\Requests\UpdateDeviceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -53,24 +55,13 @@ class ClientDeviceController extends Controller
     /**
      * Store a newly registered device.
      */
-    public function store(Request $request)
+    public function store(StoreDeviceRequest $request)
     {
         $patientInfo = $this->getPatientId();
         
         if (!$patientInfo) {
             return back()->with('error', 'Patient profile not found.');
         }
-
-        $request->validate([
-            'device_name' => 'required|string|max:255',
-            'device_type' => 'required|in:mobile,tablet,desktop,wearable,smartwatch,other',
-            'device_identifier' => 'nullable|string|max:100',
-            'os_type' => 'nullable|string|max:50',
-            'os_version' => 'nullable|string|max:50',
-            'app_version' => 'nullable|string|max:50',
-            'notes' => 'nullable|string|max:500',
-            'device_source' => 'nullable|in:app_registered,manual',
-        ]);
 
         $identifier = $request->device_identifier;
         if (empty($identifier)) {
@@ -166,5 +157,51 @@ class ClientDeviceController extends Controller
 
         return redirect()->route('client.devices.index')
             ->with('success', 'Device removed successfully.');
+    }
+
+    /**
+     * Update a device.
+     */
+    public function update(UpdateDeviceRequest $request, PatientDevice $device)
+    {
+        $patientInfo = $this->getPatientId();
+
+        if (!$patientInfo) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Patient profile not found.'], 403);
+            }
+            return back()->with('error', 'Patient profile not found.');
+        }
+
+        $devicePatientId = $patientInfo['is_profile']
+            ? $device->patient_profile_id
+            : $device->patient_id;
+
+        if ($devicePatientId != $patientInfo['id']) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+            }
+            return back()->with('error', 'Unauthorized action.');
+        }
+
+        $device->update([
+            'device_name' => $request->device_name,
+            'device_type' => $request->device_type,
+            'device_identifier' => $request->device_identifier ?? $device->device_identifier,
+            'notes' => $request->notes,
+        ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Device updated successfully.',
+                'html' => view('partials.device_card', ['device' => $device->fresh()])->render(),
+                'target' => '#device-card-' . $device->id,
+                'replace' => true,
+            ]);
+        }
+
+        return redirect()->route('client.devices.index')
+            ->with('success', 'Device updated successfully.');
     }
 }

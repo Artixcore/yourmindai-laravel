@@ -81,6 +81,7 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     // Device Management
     Route::get('/devices', [\App\Http\Controllers\ClientDeviceController::class, 'index'])->name('devices.index');
     Route::post('/devices', [\App\Http\Controllers\ClientDeviceController::class, 'store'])->name('devices.store');
+    Route::put('/devices/{device}', [\App\Http\Controllers\ClientDeviceController::class, 'update'])->name('devices.update');
     Route::delete('/devices/{device}', [\App\Http\Controllers\ClientDeviceController::class, 'destroy'])->name('devices.destroy');
     
     // Psychometric Assessments
@@ -172,6 +173,14 @@ Route::prefix('client')->name('client.')->middleware(['auth'])->group(function (
     // Routine Management
     Route::get('/routine', [\App\Http\Controllers\ClientRoutineController::class, 'index'])->name('routine.index');
     Route::post('/routine/{item}/log', [\App\Http\Controllers\ClientRoutineController::class, 'logItem'])->name('routine.log');
+    
+    // Sleep Hygiene
+    Route::get('/sleep-hygiene', [\App\Http\Controllers\ClientSleepHygieneController::class, 'index'])->name('sleep-hygiene.index');
+    Route::post('/sleep-hygiene', [\App\Http\Controllers\ClientSleepHygieneController::class, 'store'])->name('sleep-hygiene.store');
+    
+    // Device Actions
+    Route::get('/device-actions', [\App\Http\Controllers\ClientDeviceActionController::class, 'index'])->name('device-actions.index');
+    Route::post('/device-actions', [\App\Http\Controllers\ClientDeviceActionController::class, 'store'])->name('device-actions.store');
     
     // Risk Assessments (Phase 5)
     Route::get('/risk-assessments', [\App\Http\Controllers\ClientRiskAssessmentController::class, 'index'])->name('risk-assessments.index');
@@ -428,6 +437,14 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::get('patients/{patient}/tracking/exercise', [\App\Http\Controllers\Doctor\TrackingLogController::class, 'exercise'])
         ->name('patients.tracking.exercise');
     
+    // Sleep Hygiene Logs
+    Route::get('patients/{patient}/sleep-hygiene', [\App\Http\Controllers\Doctor\SleepHygieneController::class, 'index'])
+        ->name('patients.sleep-hygiene.index');
+    
+    // Device Actions Timeline
+    Route::get('patients/{patient}/device-actions', [\App\Http\Controllers\Doctor\DeviceActionController::class, 'index'])
+        ->name('patients.device-actions.index');
+    
     // Risk Assessment Management (Phase 5)
     Route::get('patients/{patient}/risk-assessments', [\App\Http\Controllers\Doctor\RiskAssessmentController::class, 'index'])
         ->name('patients.risk-assessments.index');
@@ -611,6 +628,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     Route::get('devices/analytics', [\App\Http\Controllers\Admin\PatientDeviceController::class, 'analytics'])->name('devices.analytics');
     Route::get('devices/{device}', [\App\Http\Controllers\Admin\PatientDeviceController::class, 'show'])->name('devices.show');
     Route::delete('devices/{device}', [\App\Http\Controllers\Admin\PatientDeviceController::class, 'destroy'])->name('devices.destroy');
+    
+    // Sleep Hygiene Logs
+    Route::get('sleep-hygiene', [\App\Http\Controllers\Admin\SleepHygieneController::class, 'index'])->name('sleep-hygiene.index');
+    
+    // Device Actions Timeline
+    Route::get('device-actions', [\App\Http\Controllers\Admin\DeviceActionController::class, 'index'])->name('device-actions.index');
     
     // Enhanced Tracking Overview (Phase 6)
     Route::get('tracking/all', [\App\Http\Controllers\Admin\TrackingOverviewController::class, 'allTracking'])->name('tracking.all');

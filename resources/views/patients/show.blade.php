@@ -716,6 +716,60 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="card border-warning border-opacity-25">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-moon-stars text-warning" style="font-size: 1.5rem;"></i>
+                            <strong>Sleep Hygiene</strong>
+                        </div>
+                        @php
+                            $sleepHygieneCount = \App\Models\SleepHygieneLog::where(function($q) use ($patient, $patientProfile) {
+                                if ($patientProfile) $q->where('patient_profile_id', $patientProfile->id);
+                                else $q->where('patient_id', $patient->id);
+                            })->count();
+                        @endphp
+                        <div class="small text-muted">{{ $sleepHygieneCount }} log entries</div>
+                        <a href="{{ route('patients.sleep-hygiene.index', $patient) }}" class="btn btn-sm btn-warning mt-2">View Logs</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-secondary border-opacity-25">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-phone text-secondary" style="font-size: 1.5rem;"></i>
+                            <strong>Devices</strong>
+                        </div>
+                        @php
+                            $deviceCount = \App\Models\PatientDevice::where(function($q) use ($patient, $patientProfile) {
+                                if ($patientProfile) $q->where('patient_profile_id', $patientProfile->id)->orWhere('patient_id', $patient->id);
+                                else $q->where('patient_id', $patient->id);
+                            })->count();
+                        @endphp
+                        <div class="small text-muted">{{ $deviceCount }} device(s)</div>
+                        <a href="{{ route('patients.devices.index', $patient) }}" class="btn btn-sm btn-outline-secondary mt-2">View Devices</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-info border-opacity-25">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-broadcast text-info" style="font-size: 1.5rem;"></i>
+                            <strong>Device Actions</strong>
+                        </div>
+                        @php
+                            $actionCount = \App\Models\DeviceAction::where(function($q) use ($patient, $patientProfile) {
+                                if ($patientProfile) $q->where('patient_profile_id', $patientProfile->id)->orWhere('patient_id', $patient->id);
+                                else $q->where('patient_id', $patient->id);
+                            })->count();
+                        @endphp
+                        <div class="small text-muted">{{ $actionCount }} action(s)</div>
+                        <a href="{{ route('patients.device-actions.index', $patient) }}" class="btn btn-sm btn-info mt-2">View Timeline</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </x-card>
 

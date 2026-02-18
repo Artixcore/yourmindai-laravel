@@ -6,8 +6,8 @@
 <p>Total devices: {{ $stats['total'] ?? 0 }}</p>
 @if($devices->isEmpty())<p class="mb-0">No devices found.</p>
 @else
-<table class="table"><thead><tr><th>Device</th><th>Patient</th><th>Platform</th></tr></thead><tbody>
-@foreach($devices as $d)<tr><td>{{ $d->device_name ?? '-' }}</td><td>{{ optional(optional($d->patientProfile)->user)->name ?? '-' }}</td><td>{{ $d->platform ?? '-' }}</td></tr>@endforeach
+<table class="table"><thead><tr><th>Device</th><th>Patient</th><th>Type</th></tr></thead><tbody>
+@foreach($devices as $d)<tr><td>{{ $d->device_name ?? '-' }}</td><td>{{ optional(optional($d->patientProfile)->user)->name ?? optional($d->patient)->name ?? '-' }}</td><td>{{ ucfirst($d->device_type ?? $d->os_type ?? '-') }}</td></tr>@endforeach
 </tbody></table>{{ $devices->links() }}
 @endif
 </div></div>

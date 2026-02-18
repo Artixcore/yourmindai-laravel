@@ -20,10 +20,6 @@ class PatientDeviceController extends Controller
             $query->where('patient_profile_id', $request->patient_id);
         }
 
-        if ($request->filled('platform')) {
-            $query->where('platform', $request->platform);
-        }
-
         if ($request->filled('device_type')) {
             $query->where('device_type', $request->device_type);
         }
@@ -39,7 +35,7 @@ class PatientDeviceController extends Controller
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('device_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('device_id', 'like', '%' . $request->search . '%');
+                  ->orWhere('device_identifier', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -48,22 +44,22 @@ class PatientDeviceController extends Controller
         // Get patients for filter dropdown
         $patients = PatientProfile::with('user')->get();
 
-        // Get unique platforms
-        $platforms = PatientDevice::select('platform')->distinct()->pluck('platform');
+        // Get unique device types for filter
+        $deviceTypes = PatientDevice::select('device_type')->distinct()->whereNotNull('device_type')->pluck('device_type');
 
         // Calculate statistics
         $stats = [
             'total' => PatientDevice::count(),
-            'by_platform' => PatientDevice::select('platform', DB::raw('COUNT(*) as count'))
-                ->groupBy('platform')
-                ->pluck('count', 'platform')
+            'by_type' => PatientDevice::select('device_type', DB::raw('COUNT(*) as count'))
+                ->groupBy('device_type')
+                ->pluck('count', 'device_type')
                 ->toArray(),
             'active_this_week' => PatientDevice::where('last_active_at', '>=', Carbon::now()->subWeek())->count(),
             'new_this_month' => PatientDevice::whereMonth('created_at', Carbon::now()->month)->count(),
             'patients_with_multiple' => $this->getPatientsWithMultipleDevices(),
         ];
 
-        return view('admin.devices.index', compact('devices', 'patients', 'platforms', 'stats'));
+        return view('admin.devices.index', compact('devices', 'patients', 'deviceTypes', 'stats'));
     }
 
     public function show($id)

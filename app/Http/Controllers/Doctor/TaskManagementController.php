@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\PatientProfile;
+use App\Models\PatientPointAdjustment;
 use App\Models\PatientPoints;
 use App\Models\User;
 use App\Notifications\TaskAssignedNotification;
@@ -239,6 +240,44 @@ class TaskManagementController extends Controller
         ];
 
         return view('doctor.patients.tasks.index', compact('patient', 'tasks', 'stats'));
+    }
+
+    public function adjustPoints(Request $request, PatientProfile $patient)
+    {
+        $user = $request->user();
+
+        if (!$this->canAccessPatient($user, $patient)) {
+            abort(403, 'Unauthorized access to patient data');
+        }
+
+        if (!$patient->user_id) {
+            return redirect()->back()
+                ->with('error', 'This patient has no linked user account. Points require a linked user.');
+        }
+
+        $validated = $request->validate([
+            'points_delta' => 'required|integer|min:-100|max:100',
+            'reason' => 'nullable|string|max:255',
+            'category' => 'required|in:contingency,task,other',
+        ]);
+
+        PatientPointAdjustment::create([
+            'user_id' => $patient->user_id,
+            'points_delta' => $validated['points_delta'],
+            'reason' => $validated['reason'] ?? null,
+            'category' => $validated['category'],
+            'created_by_doctor_id' => $user->id,
+        ]);
+
+        $patientPoints = PatientPoints::firstOrCreate(
+            ['user_id' => $patient->user_id],
+            ['total_points' => 0]
+        );
+        $patientPoints->increment('total_points', $validated['points_delta']);
+
+        $sign = $validated['points_delta'] >= 0 ? '+' : '';
+        return redirect()->back()
+            ->with('success', "Points adjusted successfully ({$sign}{$validated['points_delta']}).");
     }
 
     protected function canAccessPatient(User $user, PatientProfile $patient): bool

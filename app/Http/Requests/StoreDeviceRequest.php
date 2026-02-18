@@ -21,7 +21,7 @@ class StoreDeviceRequest extends FormRequest
             'os_version' => 'nullable|string|max:50',
             'app_version' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:500',
-            'device_source' => 'nullable|in:app_registered,manual',
+            'device_source' => 'nullable|in:app_registered,manual,bluetooth',
         ];
     }
 }

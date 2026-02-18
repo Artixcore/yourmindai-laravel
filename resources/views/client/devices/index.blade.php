@@ -19,6 +19,19 @@
             <i class="bi bi-smartwatch me-2"></i>
             Add Smart Device
         </button>
+        <button type="button" class="btn btn-outline-info" id="bluetooth-scan-btn" title="Scan nearby Bluetooth devices and pair">
+            <i class="bi bi-bluetooth me-2"></i>
+            Scan & Pair Bluetooth
+        </button>
+    </div>
+</div>
+
+<!-- Bluetooth Scan Info Card -->
+<div id="bluetooth-info-card" class="card mb-3 border-info">
+    <div class="card-body">
+        <h6 class="fw-bold text-info mb-2"><i class="bi bi-bluetooth me-2"></i>Bluetooth Pairing</h6>
+        <p class="small text-muted mb-2">Make sure Bluetooth is on and your device is discoverable. Tap the button above to scan for nearby devices.</p>
+        <p class="small text-muted mb-0">Supported on Chrome/Edge (Android) and secure (HTTPS) pages. Wearables, headphones, and other BLE devices will appear in the system picker.</p>
     </div>
 </div>
 
@@ -141,6 +154,102 @@
 @endsection
 
 @push('scripts')
+<script>
+(function() {
+    'use strict';
+
+    /**
+     * Bluetooth Scan & Pair
+     * Uses Web Bluetooth API to scan nearby BLE devices and register paired device
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('bluetooth-scan-btn');
+        if (!btn) return;
+
+        function showBluetoothAlert(type, msg) {
+            if (window.AppAjax && typeof AppAjax.showAlert === 'function') {
+                AppAjax.showAlert(type, msg);
+            } else {
+                alert(msg);
+            }
+        }
+
+        btn.addEventListener('click', function() {
+            if (!navigator.bluetooth) {
+                showBluetoothAlert('error', 'Bluetooth is not supported in this browser. Try Chrome or Edge on Android.');
+                return;
+            }
+            if (!window.isSecureContext) {
+                showBluetoothAlert('error', 'Bluetooth requires a secure connection (HTTPS).');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Scanning...';
+
+            navigator.bluetooth.requestDevice({ acceptAllDevices: true })
+                .then(function(device) {
+                    var deviceName = (device.name && device.name.trim()) ? device.name.trim() : 'Bluetooth Device';
+                    var deviceId = device.id || ('bt-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
+
+                    var formData = new FormData();
+                    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+                    formData.append('device_name', deviceName);
+                    formData.append('device_type', 'wearable');
+                    formData.append('device_identifier', deviceId);
+                    formData.append('device_source', 'bluetooth');
+
+                    return fetch('{{ route("client.devices.store") }}', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    }).then(function(r) { return r.json().then(function(j) { return { ok: r.ok, json: j }; }); });
+                })
+                .then(function(result) {
+                    if (result.ok && result.json.success) {
+                        showBluetoothAlert('success', result.json.message || 'Bluetooth device paired successfully.');
+                        if (result.json.html && result.json.target) {
+                            var target = document.querySelector(result.json.target);
+                            if (target) {
+                                target.insertAdjacentHTML('afterbegin', result.json.html);
+                                target.style.display = '';
+                                var emptyState = document.getElementById('devices-empty-state');
+                                if (emptyState) emptyState.style.display = 'none';
+                            }
+                        }
+                    } else {
+                        var errMsg = (result.json && result.json.message) ? result.json.message : 'Failed to register device.';
+                        if (result.json && result.json.errors) {
+                            var firstErr = Object.values(result.json.errors)[0];
+                            if (Array.isArray(firstErr)) errMsg = firstErr[0];
+                            else if (typeof firstErr === 'string') errMsg = firstErr;
+                        }
+                        showBluetoothAlert('error', errMsg);
+                    }
+                })
+                .catch(function(err) {
+                    if (err.name === 'NotFoundError') {
+                        showBluetoothAlert('info', 'No device selected or no nearby devices found.');
+                    } else if (err.name === 'SecurityError') {
+                        showBluetoothAlert('error', 'Bluetooth requires a secure page (HTTPS).');
+                    } else if (err.name === 'NotSupportedError') {
+                        showBluetoothAlert('error', 'Bluetooth is not supported.');
+                    } else {
+                        showBluetoothAlert('error', err.message || 'Could not connect to Bluetooth device. Please try again.');
+                    }
+                })
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-bluetooth me-2"></i>Scan & Pair Bluetooth';
+                });
+        });
+    });
+</script>
 <script>
 (function() {
     'use strict';

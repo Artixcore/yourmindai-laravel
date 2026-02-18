@@ -551,6 +551,8 @@ Route::middleware(['auth', 'blade.role:admin,doctor'])->group(function () {
     Route::get('tasks', [\App\Http\Controllers\Doctor\TaskManagementController::class, 'index'])->name('tasks.index');
     Route::get('patients/{patient}/tasks', [\App\Http\Controllers\Doctor\TaskManagementController::class, 'patientTasks'])
         ->name('patients.tasks.index');
+    Route::post('patients/{patient}/points/adjust', [\App\Http\Controllers\Doctor\TaskManagementController::class, 'adjustPoints'])
+        ->name('patients.points.adjust');
 });
 
 // Admin routes

@@ -8,7 +8,7 @@
         <x-breadcrumb :items="[
             ['label' => 'Home', 'url' => route('dashboard')],
             ['label' => 'Patients', 'url' => route('patients.index')],
-            ['label' => $patient->name ?? $patient->full_name ?? optional($patient->user)->name ?? 'Patient', 'url' => route('patients.show', $patient)],
+            ['label' => $patient->name ?? $patient->full_name ?? optional($patient->user)->name ?? 'Patient', 'url' => $patient->getPatient() ? route('patients.show', $patient->getPatient()) : route('patients.index')],
             ['label' => 'Device Actions Timeline']
         ]" />
         <h1 class="h3 mb-1 fw-semibold">Device Actions Timeline</h1>
@@ -51,7 +51,7 @@
 </div>
 
 <div class="mt-3">
-    <a href="{{ route('patients.show', $patient) }}" class="btn btn-outline-secondary">
+    <a href="{{ $patient->getPatient() ? route('patients.show', $patient->getPatient()) : route('patients.index') }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-2"></i>Back to Patient
     </a>
 </div>

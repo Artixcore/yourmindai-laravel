@@ -28,6 +28,8 @@
                     Registered: {{ $device->registered_at?->format('M d, Y') ?? '—' }}
                     @if($device->device_source === 'manual')
                         <span class="badge bg-secondary ms-1">Manual</span>
+                    @elseif($device->device_source === 'bluetooth')
+                        <span class="badge bg-info ms-1">Bluetooth</span>
                     @endif
                 </div>
                 @if($device->notes)
@@ -38,7 +40,7 @@
                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editDeviceModal{{ $device->id }}" title="Edit">
                     <i class="bi bi-pencil"></i>
                 </button>
-                <form method="POST" action="{{ route('client.devices.destroy', $device->id) }}" class="ajax-form" data-target="#device-card-{{ $device->id }}" onsubmit="return confirm('Are you sure you want to remove this device?');">
+                <form method="POST" action="{{ route('client.devices.destroy', $device) }}" class="ajax-form" data-target="#device-card-{{ $device->id }}" onsubmit="return confirm('Are you sure you want to remove this device?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-outline-danger" data-loading-text="Removing..." title="Remove">

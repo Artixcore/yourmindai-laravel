@@ -120,4 +120,16 @@ class PatientProfile extends Model
     {
         return $this->hasMany(SupervisorLink::class, 'patient_id');
     }
+
+    /**
+     * Resolve PatientProfile to Patient (from patients table) for routes that expect Patient.
+     */
+    public function getPatient(): ?Patient
+    {
+        $user = $this->user;
+        if (!$user) {
+            return null;
+        }
+        return Patient::where('email', $user->email)->where('doctor_id', $this->doctor_id)->first();
+    }
 }

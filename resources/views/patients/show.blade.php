@@ -491,6 +491,59 @@
         @endif
     </x-card>
 
+    @if($patientProfile)
+    <!-- Tasks Section -->
+    <x-card class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 font-semibold text-stone-900 mb-0">Tasks</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ route('tasks.create', ['patient_id' => $patientProfile->id]) }}" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Add Task</span>
+                </a>
+                <a href="{{ route('patients.tasks.index', $patientProfile) }}" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-list-check"></i>
+                    <span>View All</span>
+                </a>
+            </div>
+        </div>
+        @php
+            $patientTasks = \App\Models\Task::where('patient_id', $patientProfile->id)
+                ->orderBy('due_date', 'desc')
+                ->take(5)
+                ->get();
+        @endphp
+        @if($patientTasks->isEmpty())
+            <div class="text-center py-4 text-stone-500">
+                <i class="bi bi-list-check text-stone-400" style="font-size: 2rem;"></i>
+                <p class="mb-0 mt-2">No tasks assigned yet.</p>
+                <a href="{{ route('tasks.create', ['patient_id' => $patientProfile->id]) }}" class="btn btn-primary mt-2">Add first task</a>
+            </div>
+        @else
+            <div class="d-flex flex-column gap-2">
+                @foreach($patientTasks as $t)
+                    <div class="border border-stone-200 rounded p-2">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <strong class="text-stone-900">{{ $t->title }}</strong>
+                                @if($t->due_date)
+                                    <br><small class="text-muted">Due {{ $t->due_date->format('M d, Y') }}</small>
+                                @endif
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if($t->points != 0)
+                                    <span class="badge bg-{{ $t->points > 0 ? 'success' : 'danger' }}">{{ $t->points > 0 ? '+' : '' }}{{ $t->points }} pts</span>
+                                @endif
+                                <a href="{{ route('tasks.show', $t) }}" class="btn btn-sm btn-outline-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-card>
+    @endif
+
     <!-- Goals Section -->
     <x-card class="mt-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -748,7 +801,11 @@
                             })->count();
                         @endphp
                         <div class="small text-muted">{{ $deviceCount }} device(s)</div>
-                        <a href="{{ route('patients.devices.index', $patient) }}" class="btn btn-sm btn-outline-secondary mt-2">View Devices</a>
+                        @if($patientProfile)
+                        <a href="{{ route('patients.devices.index', $patientProfile) }}" class="btn btn-sm btn-outline-secondary mt-2">View Devices</a>
+                        @else
+                        <span class="text-muted small">Link requires patient profile</span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -766,7 +823,11 @@
                             })->count();
                         @endphp
                         <div class="small text-muted">{{ $actionCount }} action(s)</div>
-                        <a href="{{ route('patients.device-actions.index', $patient) }}" class="btn btn-sm btn-info mt-2">View Timeline</a>
+                        @if($patientProfile)
+                        <a href="{{ route('patients.device-actions.index', $patientProfile) }}" class="btn btn-sm btn-info mt-2">View Timeline</a>
+                        @else
+                        <span class="text-muted small">Link requires patient profile</span>
+                        @endif
                     </div>
                 </div>
             </div>

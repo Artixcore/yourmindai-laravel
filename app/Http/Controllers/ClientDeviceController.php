@@ -107,10 +107,12 @@ class ClientDeviceController extends Controller
         }
 
         if ($request->ajax() || $request->wantsJson()) {
+            $cardHtml = view('partials.device_card', compact('device'))->render();
+            $modalHtml = view('partials.device_edit_modal', compact('device'))->render();
             return response()->json([
                 'success' => true,
                 'message' => 'Device registered successfully.',
-                'html' => view('partials.device_card', compact('device'))->render(),
+                'html' => $cardHtml . $modalHtml,
                 'target' => '#devices-list',
                 'prepend' => true,
                 'showTarget' => true,

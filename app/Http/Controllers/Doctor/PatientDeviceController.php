@@ -26,7 +26,7 @@ class PatientDeviceController extends Controller
         $stats = [
             'total' => $devices->count(),
             'active' => $devices->where('last_active_at', '>=', now()->subDays(7))->count(),
-            'by_platform' => $devices->groupBy('platform')->map->count(),
+            'by_type' => $devices->groupBy('device_type')->map->count(),
         ];
 
         return view('doctor.patients.devices.index', compact('patient', 'devices', 'stats'));

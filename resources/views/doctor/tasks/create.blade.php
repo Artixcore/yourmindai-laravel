@@ -38,8 +38,9 @@
                     @error('due_date')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
-                    <label for="points" class="form-label">Points</label>
-                    <input type="number" name="points" id="points" class="form-control" value="{{ old('points', 0) }}" min="0">
+                    <label for="points" class="form-label">Points (+ or -)</label>
+                    <input type="number" name="points" id="points" class="form-control" value="{{ old('points', 0) }}" min="-100" max="100" placeholder="0">
+                    <small class="text-muted">Positive for reward, negative for penalty. Affects patient's total points.</small>
                 </div>
                 <div class="form-check mb-2">
                     <input type="checkbox" name="visible_to_patient" id="visible_to_patient" class="form-check-input" {{ old('visible_to_patient', true) ? 'checked' : '' }}>

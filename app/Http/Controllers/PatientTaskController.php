@@ -164,18 +164,19 @@ class PatientTaskController extends Controller
             ));
         }
         
-        // Award points if task has points
-        if ($task->points > 0) {
+        // Award or deduct points if task has points (supports + and -)
+        if ($task->points != 0) {
             $patientPoints = PatientPoints::firstOrCreate(
                 ['user_id' => $user->id],
                 ['total_points' => 0]
             );
-            
             $patientPoints->increment('total_points', $task->points);
-            $patientPoints->save();
         }
-        
+
+        $pointsMsg = $task->points != 0
+            ? ($task->points > 0 ? " You earned {$task->points} points!" : " {$task->points} points applied.")
+            : '';
         return redirect()->route('patient.tasks.show', $task)
-            ->with('success', 'Task completed successfully!' . ($task->points > 0 ? " You earned {$task->points} points!" : ''));
+            ->with('success', 'Task completed successfully!' . $pointsMsg);
     }
 }

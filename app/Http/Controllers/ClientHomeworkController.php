@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\HomeworkAssignment;
 use App\Models\HomeworkCompletion;
+use App\Models\PatientPoints;
 use App\Models\PatientProfile;
 
 class ClientHomeworkController extends Controller
@@ -143,6 +144,15 @@ class ClientHomeworkController extends Controller
                     $homework->update(['status' => 'completed']);
                 } else {
                     $homework->update(['status' => 'in_progress']);
+                }
+
+                // Add contingency score to patient points (when homework has scoring choice)
+                if ($scoreValue !== null && $user->id) {
+                    $patientPoints = PatientPoints::firstOrCreate(
+                        ['user_id' => $user->id],
+                        ['total_points' => 0]
+                    );
+                    $patientPoints->increment('total_points', $scoreValue);
                 }
             });
         } catch (\Exception $e) {

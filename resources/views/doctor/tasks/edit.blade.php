@@ -41,8 +41,8 @@
                         @error('due_date')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="points" class="form-label">Points</label>
-                        <input type="number" name="points" id="points" class="form-control" value="{{ old('points', $task->points ?? 0) }}" min="0">
+                        <label for="points" class="form-label">Points (+ or -)</label>
+                        <input type="number" name="points" id="points" class="form-control" value="{{ old('points', $task->points ?? 0) }}" min="-100" max="100">
                     </div>
                     <div class="col-12">
                         <div class="form-check">

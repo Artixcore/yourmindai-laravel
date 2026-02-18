@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\PatientProfile;
+use App\Models\PatientPoints;
 use App\Models\User;
 use App\Notifications\TaskAssignedNotification;
 
@@ -82,7 +83,7 @@ class TaskManagementController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
-            'points' => 'nullable|integer|min:0',
+            'points' => 'nullable|integer|min:-100|max:100',
             'visible_to_patient' => 'boolean',
             'visible_to_parent' => 'boolean',
         ]);
@@ -173,7 +174,7 @@ class TaskManagementController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
-            'points' => 'nullable|integer|min:0',
+            'points' => 'nullable|integer|min:-100|max:100',
             'visible_to_patient' => 'boolean',
             'visible_to_parent' => 'boolean',
             'status' => 'nullable|in:pending,in_progress,completed,cancelled',
@@ -219,6 +220,13 @@ class TaskManagementController extends Controller
             ->orderBy('due_date', 'desc')
             ->get();
 
+        // Get patient total points (from tasks + contingency homework)
+        $totalPoints = 0;
+        if ($patient->user_id) {
+            $patientPoints = PatientPoints::where('user_id', $patient->user_id)->first();
+            $totalPoints = $patientPoints ? $patientPoints->total_points : 0;
+        }
+
         // Calculate patient statistics
         $stats = [
             'total' => $tasks->count(),
@@ -227,6 +235,7 @@ class TaskManagementController extends Controller
             'overdue' => $tasks->where('due_date', '<', now())
                 ->where('status', '!=', 'completed')->count(),
             'total_points_earned' => $tasks->where('status', 'completed')->sum('points'),
+            'total_points' => $totalPoints,
         ];
 
         return view('doctor.patients.tasks.index', compact('patient', 'tasks', 'stats'));

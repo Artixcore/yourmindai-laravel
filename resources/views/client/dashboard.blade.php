@@ -30,8 +30,9 @@
     </div>
     <div class="col-6">
         <div class="stats-card">
-            <div class="number">{{ $stats['total_points'] }}</div>
+            <div class="number {{ ($stats['total_points'] ?? 0) >= 0 ? '' : 'text-danger' }}">{{ $stats['total_points'] ?? 0 }}</div>
             <div class="label">Points</div>
+            <small class="text-muted">Tasks + contingency</small>
         </div>
     </div>
 </div>

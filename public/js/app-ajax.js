@@ -52,10 +52,13 @@
 
         container.append(html);
 
-        // Auto-dismiss after 5 seconds
-        setTimeout(function() {
-            container.find('.alert').last().alert('close');
-        }, 5000);
+        // Auto-dismiss after 5 seconds (Bootstrap 5 API)
+        var alertEl = container.find('.alert').last()[0];
+        if (alertEl && typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+            setTimeout(function() {
+                bootstrap.Alert.getOrCreateInstance(alertEl).close();
+            }, 5000);
+        }
     }
 
     /**

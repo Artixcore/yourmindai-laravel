@@ -18,17 +18,24 @@
     }
 
     function showErrorAlert(message) {
-        var alert = $('<div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 9999; max-width: 90%;" role="alert">' +
+        var alertHtml = '<div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 9999; max-width: 90%;" role="alert">' +
             (message || 'Something went wrong. Please try again.') +
-            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
-        $('body').append(alert);
-        setTimeout(function() { alert.alert('close'); }, 5000);
+            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+        var $alert = $(alertHtml);
+        $('body').append($alert);
+        var alertEl = $alert[0];
+        if (alertEl && typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+            setTimeout(function() {
+                bootstrap.Alert.getOrCreateInstance(alertEl).close();
+            }, 5000);
+        }
     }
 
     function fetchUnreadCount(callback) {
         $.ajax({
             url: countUrl,
             method: 'GET',
+            timeout: 10000,
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             success: function(data) {
                 if (data.success && typeof data.count === 'number') {
@@ -36,10 +43,10 @@
                 }
             },
             error: function(xhr) {
-                if (xhr.status !== 401 && xhr.status !== 419) {
-                    var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to fetch notifications';
-                    showErrorAlert(msg);
-                }
+                if (xhr.status === 401 || xhr.status === 419) return;
+                if (xhr.status === 524 || xhr.status === 504) return;
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to fetch notifications';
+                showErrorAlert(msg);
             }
         });
     }

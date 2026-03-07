@@ -34,14 +34,16 @@ class ShopController extends Controller
             ->whereIn('id', array_keys($cart))
             ->get()
             ->keyBy('id');
-        return collect($cart)->map(function ($qty, $productId) use ($products) {
+        $items = collect($cart)->map(function ($qty, $productId) use ($products) {
             $product = $products->get($productId);
             if (!$product) {
                 return null;
             }
-            $qty = max(1, (int) $qty);
-            $available = $product->quantity ?? 0;
-            $qty = min($qty, max(1, $available));
+            $available = (int) ($product->quantity ?? 0);
+            if ($available < 1) {
+                return null;
+            }
+            $qty = min(max(1, (int) $qty), $available);
             return [
                 'product' => $product,
                 'quantity' => $qty,
@@ -49,6 +51,12 @@ class ShopController extends Controller
                 'total' => $product->price * $qty,
             ];
         })->filter();
+        // Keep session cart in sync: remove out-of-stock or inactive products
+        $validCart = $items->mapWithKeys(fn ($item) => [$item['product']->id => $item['quantity']])->all();
+        if (count($validCart) !== count($cart)) {
+            $this->setCart($validCart);
+        }
+        return $items;
     }
 
     public function products()
@@ -74,9 +82,12 @@ class ShopController extends Controller
             'quantity' => 'nullable|integer|min:1|max:99',
         ]);
         $product = Product::active()->findOrFail($request->product_id);
-        $qty = (int) ($request->quantity ?? 1);
         $available = $product->quantity ?? 0;
-        $qty = min($qty, max(1, $available));
+        if ($available < 1) {
+            return redirect()->route('shop.products')->with('error', 'This product is currently out of stock.');
+        }
+        $qty = (int) ($request->quantity ?? 1);
+        $qty = min($qty, $available);
         $cart = $this->getCart();
         $cart[$product->id] = ($cart[$product->id] ?? 0) + $qty;
         $this->setCart($cart);

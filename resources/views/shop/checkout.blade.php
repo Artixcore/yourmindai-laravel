@@ -100,7 +100,7 @@
         </div>
     </div>
 </section>
-@if($errors->any() && isset($errors) && $errors->count() > 0)
+@if($errors->any())
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {

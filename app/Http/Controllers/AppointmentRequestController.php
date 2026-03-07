@@ -145,7 +145,7 @@ class AppointmentRequestController extends Controller
                 ]);
             }
 
-            return back()->with('success', 'Your appointment request has been submitted successfully! We will contact you soon to confirm your appointment.');
+            return back()->with('appointment_success', 'Your appointment request has been submitted successfully! We will contact you soon to confirm your appointment.');
         } catch (\Illuminate\Database\QueryException $e) {
             Log::error('Database error creating appointment request', [
                 'error' => $e->getMessage(),

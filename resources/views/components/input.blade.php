@@ -2,7 +2,7 @@
 
 <div class="mb-3">
     @if($label)
-        <label for="{{ $attributes->get('id', $attributes->get('name')) }}" class="form-label text-stone-700">
+        <label for="{{ $attributes->get('id', $attributes->get('name')) }}" class="form-label text-stone-700 fw-semibold">
             {{ $label }}
             @if($required)
                 <span class="text-danger">*</span>
@@ -12,7 +12,8 @@
     
     <input 
         type="{{ $type }}"
-        {{ $attributes->merge([
+        id="{{ $attributes->get('id', $attributes->get('name')) }}"
+        {{ $attributes->except('id')->merge([
             'class' => 'form-control ' . ($error ? 'is-invalid' : '')
         ]) }}
     >

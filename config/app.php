@@ -125,4 +125,14 @@ return [
 
     'booking_fee' => (float) env('BOOKING_FEE', 0),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public contact details (footer, contact section)
+    |--------------------------------------------------------------------------
+    | Set CONTACT_PHONE and CONTACT_EMAIL in .env to replace placeholders.
+    */
+
+    'contact_phone' => env('CONTACT_PHONE', '(555) 123-4567'),
+    'contact_email' => env('CONTACT_EMAIL', 'info@yourmindaid.com'),
+
 ];

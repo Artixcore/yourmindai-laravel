@@ -10,7 +10,7 @@
             @foreach($items as $index => $item)
                 <div class="feature-grid__item col-12 col-sm-6 col-md-6 col-lg-{{ 12 / min($columns, 4) }}" data-aos="fade-up" data-aos-delay="{{ $index * 50 }}">
                     <div class="card card-rounded card-psychological h-100 border-0 shadow-soft feature-grid__card">
-                        <div class="card-body p-4 p-md-5">
+                        <div class="card-body card-padding">
                             @if(!empty($item['icon']))
                                 <div class="feature-grid__icon rounded-3 d-flex align-items-center justify-content-center text-white mb-3" style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--color-teal-600) 0%, var(--color-soft-blue-500) 100%);">
                                     <i class="bi {{ $item['icon'] }} fs-4"></i>

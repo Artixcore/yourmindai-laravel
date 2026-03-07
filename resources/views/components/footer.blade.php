@@ -1,31 +1,32 @@
 <footer class="footer-guest">
-    <div class="container-fluid px-4 px-md-5 py-5">
+    <div class="container-fluid px-4 px-md-5 footer-guest__container py-5 py-lg-6">
         <div class="row g-4 g-lg-5">
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 col-lg-4">
                 <h3 class="footer-guest__title">Your Mind Aid</h3>
                 <p class="footer-guest__text">
                     Providing compassionate mental health care with a focus on healing and growth.
                 </p>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 col-lg-4">
                 <h4 class="footer-guest__heading">Quick Links</h4>
                 <ul class="footer-guest__links list-unstyled">
                     <li><a href="{{ route('landing') }}#about" class="footer-guest__link">About Us</a></li>
                     <li><a href="{{ route('landing') }}#doctors" class="footer-guest__link">Our Doctors</a></li>
+                    <li><a href="{{ route('wellbeing.public') }}" class="footer-guest__link">Digital Wellbeing</a></li>
                     <li><a href="{{ route('articles.public.index') }}" class="footer-guest__link">Articles</a></li>
                     <li><a href="{{ route('shop.products') }}" class="footer-guest__link">Products</a></li>
                     <li><a href="{{ route('landing') }}#contact" class="footer-guest__link">Contact</a></li>
                 </ul>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-4 col-lg-4">
                 <h4 class="footer-guest__heading">Contact</h4>
                 <p class="footer-guest__text">
-                    Email: info@yourmindaid.com<br>
-                    Phone: (555) 123-4567
+                    Email: <a href="mailto:{{ config('app.contact_email') }}" class="footer-guest__link">{{ config('app.contact_email') }}</a><br>
+                    Phone: {{ config('app.contact_phone') }}
                 </p>
             </div>
         </div>
-        <div class="footer-guest__bottom mt-5 pt-4">
+        <div class="footer-guest__bottom mt-5 pt-5">
             <p class="footer-guest__copyright mb-0">
                 &copy; {{ date('Y') }} Your Mind Aid. All rights reserved.
                 <span class="d-none d-md-inline"> &middot; </span>

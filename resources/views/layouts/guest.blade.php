@@ -6,9 +6,29 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <title>@yield('title', 'Your Mind Aid - Mental Health Care')</title>
+    <meta name="description" content="@yield('meta_description', 'Compassionate mental health care for your journey to wellness. Book an appointment with our expert team at Your Mind Aid.')">
+    <link rel="icon" href="https://storaeall.s3.us-east-1.amazonaws.com/public/mindaidlogo.png" type="image/x-icon">
+    
+    @stack('meta')
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="@yield('og_title', 'Your Mind Aid - Mental Health Care')">
+    <meta property="og:description" content="@yield('og_description', 'Compassionate mental health care for your journey to wellness. Book an appointment with our expert team.')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    @hasSection('og_image')
+        <meta property="og:image" content="@yield('og_image')">
+    @else
+        <meta property="og:image" content="{{ asset('images/og-default.png') }}">
+    @endif
+    
+    <!-- Preconnect to key origins -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://storaeall.s3.us-east-1.amazonaws.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
     
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
     
     <!-- Bootstrap 5.3 CSS -->
@@ -36,14 +56,14 @@
     </main>
     
     <!-- Background music control (optional, user-controllable) -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;" x-data="backgroundMusic()">
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;" x-data="backgroundMusic()" role="group" aria-label="Background music">
         <div class="d-flex align-items-center gap-2 bg-white rounded-3 shadow-sm border border-stone-200 px-3 py-2">
-            <button type="button" class="btn btn-link text-stone-700 p-0 border-0" @click="toggle()" :title="playing ? 'Pause' : 'Play'">
-                <i class="bi fs-5" :class="playing ? 'bi-pause-circle-fill' : 'bi-play-circle-fill'"></i>
+            <button type="button" class="btn btn-link text-stone-700 p-0 border-0" @click="toggle()" :aria-label="playing ? 'Pause background music' : 'Play background music'" :title="playing ? 'Pause' : 'Play'">
+                <i class="bi fs-5" :class="playing ? 'bi-pause-circle-fill' : 'bi-play-circle-fill'" aria-hidden="true"></i>
             </button>
             <div class="d-flex align-items-center gap-1" style="width: 80px;">
-                <i class="bi bi-volume-down text-stone-500 small"></i>
-                <input type="range" class="form-range form-range-sm" min="0" max="100" x-model="volumePercent" @input="setVolume($event.target.value)">
+                <label for="bg-music-volume" class="visually-hidden">Volume</label>
+                <input id="bg-music-volume" type="range" class="form-range form-range-sm" min="0" max="100" x-model="volumePercent" @input="setVolume($event.target.value)" aria-label="Volume">
             </div>
         </div>
         <audio id="bg-music" loop preload="metadata" src="https://storaeall.s3.us-east-1.amazonaws.com/public/audio/background.mp3" x-ref="audio"></audio>
@@ -61,8 +81,8 @@
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    <!-- AOS Animation Library -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- AOS Animation Library (deferred, non-critical) -->
+    <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -70,7 +90,7 @@
         window.axios = axios;
         window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     </script>
-    <!-- SweetAlert2 JS -->
+    <!-- SweetAlert2 JS (used for flash messages; must load before inline script) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <!-- Alpine.js Components -->
@@ -144,19 +164,8 @@
             });
         });
         
-        // Initialize AOS
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                if (typeof AOS !== 'undefined') {
-                    AOS.init({
-                        duration: 800,
-                        easing: 'ease-in-out',
-                        once: true,
-                        offset: 100,
-                    });
-                }
-            });
-        } else {
+        // Initialize AOS (runs after deferred AOS script loads)
+        window.addEventListener('load', function() {
             if (typeof AOS !== 'undefined') {
                 AOS.init({
                     duration: 800,
@@ -165,17 +174,13 @@
                     offset: 100,
                 });
             }
-        }
+        });
 
-        // Flash messages as SweetAlert (success, error, warning, info)
+        // Flash messages as SweetAlert (error, warning, info). Success uses inline alerts on guest forms.
         (function() {
-            const success = @json(session('success'));
             const error = @json(session('error'));
             const warning = @json(session('warning'));
             const info = @json(session('info'));
-            if (success && typeof Swal !== 'undefined') {
-                Swal.fire({ icon: 'success', title: 'Success', text: success, confirmButtonColor: '#0d6efd' });
-            }
             if (error && typeof Swal !== 'undefined') {
                 Swal.fire({ icon: 'error', title: 'Error', text: error, confirmButtonColor: '#0d6efd' });
             }

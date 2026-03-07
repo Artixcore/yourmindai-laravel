@@ -43,6 +43,6 @@ class LandingController extends Controller
 
         ContactMessage::create($validated);
 
-        return back()->with('success', 'Thank you for your message! We will get back to you soon.');
+        return back()->with('contact_success', 'Thank you for your message! We will get back to you soon.');
     }
 }

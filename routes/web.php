@@ -713,6 +713,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'blade.role:admin'])
     Route::post('article-earnings/calculate', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'calculate'])->name('article-earnings.calculate');
     Route::post('article-earnings/{earning}/paid', [\App\Http\Controllers\Admin\ArticleEarningsController::class, 'markAsPaid'])->name('article-earnings.paid');
     
+    // Inventory / Ecommerce
+    Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::resource('products', \App\Http\Controllers\Admin\Inventory\ProductController::class)->parameters(['products' => 'product']);
+        Route::get('orders', [\App\Http\Controllers\Admin\Inventory\OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/create', [\App\Http\Controllers\Admin\Inventory\OrderController::class, 'create'])->name('orders.create');
+        Route::post('orders', [\App\Http\Controllers\Admin\Inventory\OrderController::class, 'store'])->name('orders.store');
+        Route::get('orders/{order}', [\App\Http\Controllers\Admin\Inventory\OrderController::class, 'show'])->name('orders.show');
+        Route::post('orders/{order}/status', [\App\Http\Controllers\Admin\Inventory\OrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::get('orders/{order}/invoice', [\App\Http\Controllers\Admin\Inventory\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
+        Route::get('sales/{sale}/invoice', [\App\Http\Controllers\Admin\Inventory\SaleController::class, 'downloadInvoice'])->name('sales.invoice');
+        Route::resource('sales', \App\Http\Controllers\Admin\Inventory\SaleController::class)->parameters(['sales' => 'sale']);
+        Route::get('settings', [\App\Http\Controllers\Admin\Inventory\InvoiceSettingController::class, 'edit'])->name('settings.edit');
+        Route::put('settings', [\App\Http\Controllers\Admin\Inventory\InvoiceSettingController::class, 'update'])->name('settings.update');
+    });
+    
     // General Assessments Overview (Phase 4)
     Route::get('general-assessments', [\App\Http\Controllers\Admin\GeneralAssessmentController::class, 'index'])->name('general-assessments.index');
     Route::get('general-assessments/{assessment}', [\App\Http\Controllers\Admin\GeneralAssessmentController::class, 'show'])->name('general-assessments.show');

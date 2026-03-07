@@ -26,10 +26,9 @@
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
-<body class="bg-gradient-guest">
+<body class="bg-gradient-guest d-flex flex-column min-vh-100">
     <x-navbar />
-    
-    <main>
+    <main class="main-guest flex-grow-1">
         <div class="container-fluid px-3 py-2">
             <x-alerts />
         </div>

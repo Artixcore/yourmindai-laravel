@@ -1,16 +1,108 @@
 /* Public site (guest) – section spacing, typography, shop & articles polish */
+/* Calmoria-style: large whitespace, rounded cards, modern SaaS */
 
 :root {
     --public-content-max: 720px;
     --public-section-padding-y: 3rem;
     --public-section-padding-y-lg: 4rem;
+    --section-padding-y: 4rem;
+    --section-padding-y-lg: 5rem;
+    --card-radius: 16px;
+    --card-radius-lg: 24px;
 }
 
 @media (min-width: 992px) {
     :root {
         --public-section-padding-y: 3.5rem;
         --public-section-padding-y-lg: 4.5rem;
+        --section-padding-y: 4.5rem;
+        --section-padding-y-lg: 5.5rem;
     }
+}
+
+/* Calmoria-style section spacing (generous whitespace) */
+.public-section {
+    padding-top: var(--section-padding-y);
+    padding-bottom: var(--section-padding-y);
+}
+
+@media (min-width: 992px) {
+    .public-section {
+        padding-top: var(--section-padding-y-lg);
+        padding-bottom: var(--section-padding-y-lg);
+    }
+}
+
+/* Rounded cards */
+.card-rounded {
+    border-radius: var(--card-radius) !important;
+}
+
+.card-rounded-lg {
+    border-radius: var(--card-radius-lg) !important;
+}
+
+/* Hero section (Calmoria-style: centered, large type) */
+.hero-section {
+    padding-top: var(--section-padding-y-lg);
+    padding-bottom: var(--section-padding-y-lg);
+}
+
+.min-vh-80 {
+    min-height: 80vh;
+}
+
+@media (min-width: 768px) {
+    .display-md-3 {
+        font-size: calc(1.5rem + 3vw);
+    }
+}
+
+.hero-section__trust {
+    letter-spacing: 0.08em;
+    color: var(--color-teal-600);
+}
+
+.hero-section__blob {
+    position: absolute;
+    mix-blend-mode: multiply;
+}
+
+.hero-section__blob--1 {
+    top: 5rem;
+    left: 2.5rem;
+    width: 20rem;
+    height: 20rem;
+    background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
+}
+
+.hero-section__blob--2 {
+    top: 10rem;
+    right: 2.5rem;
+    width: 22rem;
+    height: 22rem;
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+}
+
+.hero-section__blob--3 {
+    bottom: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20rem;
+    height: 20rem;
+    background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+}
+
+.hero-section__blob--4 {
+    top: 50%;
+    left: 10%;
+    width: 16rem;
+    height: 16rem;
+    background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+}
+
+.animation-delay-1000 {
+    animation-delay: 1s;
 }
 
 /* Page hero / subhero (shop, inner pages) */
@@ -50,19 +142,6 @@
     max-width: var(--public-content-max);
     margin-left: auto;
     margin-right: auto;
-}
-
-/* Public section spacing */
-.public-section {
-    padding-top: var(--public-section-padding-y);
-    padding-bottom: var(--public-section-padding-y);
-}
-
-@media (min-width: 992px) {
-    .public-section {
-        padding-top: var(--public-section-padding-y-lg);
-        padding-bottom: var(--public-section-padding-y-lg);
-    }
 }
 
 /* ----- Shop: product grid ----- */
@@ -154,10 +233,45 @@
     border-color: var(--color-teal-500);
 }
 
-/* ----- Nav link hover (optional) ----- */
+/* ----- Navbar (Calmoria-style minimal) ----- */
+.navbar-guest {
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-soft-gray-200, #e2e8f0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.navbar-guest__inner {
+    min-height: 56px;
+}
+
+@media (min-width: 768px) {
+    .navbar-guest__inner {
+        min-height: 64px;
+    }
+}
+
+.navbar-guest__brand-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-teal-700) 0%, var(--color-soft-blue-600) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: opacity 0.2s ease;
+}
+
+.navbar-guest__brand:hover .navbar-guest__brand-text {
+    opacity: 0.9;
+}
+
+/* ----- Nav link hover ----- */
 .navbar-guest-link {
     position: relative;
     transition: color 0.25s ease;
+    font-size: 0.9375rem;
 }
 
 .navbar-guest-link:hover {
@@ -178,4 +292,99 @@
 
 .navbar-guest-link:hover::after {
     opacity: 1;
+}
+
+/* ----- Form cards (appointment, contact) ----- */
+.form-card-rounded {
+    border-radius: var(--card-radius);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(13, 148, 136, 0.1);
+}
+
+/* ----- Stats strip (optional) ----- */
+.stats-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem 3rem;
+    padding: var(--section-padding-y) 0;
+}
+
+.stats-strip__item {
+    text-align: center;
+}
+
+.stats-strip__value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-teal-700);
+    line-height: 1.2;
+}
+
+.stats-strip__label {
+    font-size: 0.875rem;
+    color: #57534e;
+    margin-top: 0.25rem;
+}
+
+/* ----- Footer (Calmoria-style minimal) ----- */
+.footer-guest {
+    background: linear-gradient(135deg, var(--color-teal-800) 0%, var(--color-teal-900) 100%);
+    color: #fff;
+    margin-top: auto;
+}
+
+.footer-guest__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.75rem;
+}
+
+.footer-guest__heading {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.75rem;
+}
+
+.footer-guest__text {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+
+.footer-guest__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer-guest__link {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-guest__link:hover {
+    color: var(--color-mint-400);
+}
+
+.footer-guest__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-guest__copyright {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.875rem;
+}
+
+.footer-guest__copyright .footer-guest__link:hover {
+    color: var(--color-mint-400);
+}
+
+/* ----- Main (guest layout) ----- */
+.main-guest {
+    /* Sections control their own padding; main is full-width */
 }

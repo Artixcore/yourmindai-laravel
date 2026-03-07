@@ -1,11 +1,9 @@
-<nav class="bg-white shadow-soft border-bottom border-stone-200 position-sticky top-0" style="z-index: 1000; background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+<nav class="navbar-guest position-sticky top-0" x-data="{ mobileMenuOpen: false }">
     <div class="container-fluid px-4 px-md-5">
-        <div class="d-flex justify-content-between align-items-center" style="height: 64px;">
+        <div class="navbar-guest__inner d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <a href="{{ route('landing') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-                    <span class="fs-2 fw-bold text-psychological-primary" style="background: linear-gradient(135deg, var(--color-teal-700) 0%, var(--color-soft-blue-600) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                        Your Mind Aid
-                    </span>
+                <a href="{{ route('landing') }}" class="navbar-guest__brand text-decoration-none">
+                    <span class="navbar-guest__brand-text">Your Mind Aid</span>
                 </a>
             </div>
             
@@ -48,7 +46,7 @@
     </div>
     
     <!-- Mobile menu -->
-    <div x-data="{ mobileMenuOpen: false }" x-show="mobileMenuOpen" x-cloak class="d-md-none border-top border-stone-200 bg-white">
+    <div x-show="mobileMenuOpen" x-cloak class="d-md-none border-top border-stone-200 bg-white" style="border-color: var(--color-soft-gray-200, #e2e8f0);">
         <div class="px-4 py-3 d-flex flex-column gap-2">
             <a href="{{ route('landing') }}#about" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2">About</a>
             <a href="{{ route('landing') }}#doctors" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2">Doctors</a>

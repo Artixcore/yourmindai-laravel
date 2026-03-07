@@ -10,11 +10,12 @@
             </div>
             
             <div class="d-none d-md-flex align-items-center gap-4">
-                <a href="{{ route('landing') }}#about" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">About</a>
-                <a href="{{ route('landing') }}#doctors" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Doctors</a>
-                <a href="{{ route('shop.products') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Products</a>
-                <a href="{{ route('landing') }}#contact" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Contact</a>
-                <a href="{{ route('shop.cart') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium d-flex align-items-center gap-1" style="transition: color 0.3s ease;">
+                <a href="{{ route('landing') }}#about" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium">About</a>
+                <a href="{{ route('landing') }}#doctors" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium">Doctors</a>
+                <a href="{{ route('articles.public.index') }}" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium">Articles</a>
+                <a href="{{ route('shop.products') }}" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium">Products</a>
+                <a href="{{ route('landing') }}#contact" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium">Contact</a>
+                <a href="{{ route('shop.cart') }}" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium d-flex align-items-center gap-1">
                     <i class="bi bi-cart3"></i> Cart
                     @php $cartCount = array_sum(session('cart', [])); @endphp
                     @if($cartCount > 0)
@@ -23,10 +24,10 @@
                 </a>
                 
                 @auth
-                    <a href="{{ route('dashboard') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium">Dashboard</a>
                     <form method="POST" action="{{ route('logout') }}" class="d-inline">
                         @csrf
-                        <button type="submit" class="btn btn-link text-stone-700 hover-text-teal-700 p-0 border-0 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Logout</button>
+                        <button type="submit" class="btn btn-link navbar-guest-link text-stone-700 p-0 border-0 text-decoration-none fw-medium">Logout</button>
                     </form>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-gradient-primary">
@@ -49,11 +50,12 @@
     <!-- Mobile menu -->
     <div x-data="{ mobileMenuOpen: false }" x-show="mobileMenuOpen" x-cloak class="d-md-none border-top border-stone-200 bg-white">
         <div class="px-4 py-3 d-flex flex-column gap-2">
-            <a href="{{ route('landing') }}#about" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">About</a>
-            <a href="{{ route('landing') }}#doctors" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">Doctors</a>
-            <a href="{{ route('shop.products') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">Products</a>
-            <a href="{{ route('landing') }}#contact" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">Contact</a>
-            <a href="{{ route('shop.cart') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2 d-flex align-items-center gap-2" style="transition: color 0.3s ease;">
+            <a href="{{ route('landing') }}#about" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2">About</a>
+            <a href="{{ route('landing') }}#doctors" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2">Doctors</a>
+            <a href="{{ route('articles.public.index') }}" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2">Articles</a>
+            <a href="{{ route('shop.products') }}" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2">Products</a>
+            <a href="{{ route('landing') }}#contact" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2">Contact</a>
+            <a href="{{ route('shop.cart') }}" class="navbar-guest-link text-stone-700 text-decoration-none fw-medium py-2 d-flex align-items-center gap-2">
                 <i class="bi bi-cart3"></i> Cart
                 @php $cartCount = array_sum(session('cart', [])); @endphp
                 @if($cartCount > 0)

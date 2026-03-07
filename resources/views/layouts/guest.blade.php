@@ -19,6 +19,7 @@
     
     <!-- Custom Styles -->
     <link href="https://storaeall.s3.us-east-1.amazonaws.com/public/css/app.css" rel="stylesheet">
+    <link href="{{ asset('css/guest.css') }}" rel="stylesheet">
     
     <!-- AOS Animation Library CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">

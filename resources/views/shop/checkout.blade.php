@@ -3,9 +3,12 @@
 @section('title', 'Checkout - Your Mind Aid')
 
 @section('content')
-<section class="py-5 px-3 px-md-4 px-lg-5">
+<section class="public-page-hero px-3 px-md-4 px-lg-5">
     <div class="container-fluid" style="max-width: 960px;">
-        <h1 class="h2 fw-bold text-psychological-primary mb-4">Confirm Your Order</h1>
+        <div class="text-center mb-4" data-aos="fade-up">
+            <h1 class="h1 public-section-title">Confirm Your Order</h1>
+            <p class="public-section-lead text-stone-600 mx-auto mb-0">Enter your delivery details below</p>
+        </div>
 
         <div class="row g-4">
             <div class="col-12 col-lg-7">
@@ -64,9 +67,9 @@
                 </div>
             </div>
             <div class="col-12 col-lg-5">
-                <div class="card card-psychological shadow-sm">
+                <div class="card card-psychological shadow-sm shop-checkout-summary">
                     <div class="card-header bg-white border-0 py-3">
-                        <h5 class="mb-0 fw-semibold">Order Summary</h5>
+                        <h5 class="mb-0 fw-semibold text-psychological-primary">Order Summary</h5>
                     </div>
                     <div class="card-body p-0">
                         <ul class="list-group list-group-flush">

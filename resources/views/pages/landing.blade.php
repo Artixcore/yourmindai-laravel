@@ -11,12 +11,18 @@
                 <p class="h4 h5-md text-stone-700 mb-4 mb-md-5 mx-auto" style="max-width: 768px; line-height: 1.6;">
                     Compassionate mental health care for your journey to wellness
                 </p>
-                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                <div class="d-flex flex-column flex-sm-row flex-wrap gap-3 justify-content-center">
                     <a href="{{ route('appointment.book') }}" class="btn btn-gradient-primary btn-lg px-5 py-3 shadow-soft-lg animate-pulse-soft">
                         <i class="bi bi-calendar-check me-2"></i>Book Appointment
                     </a>
                     <a href="#about" class="btn btn-gradient-outline btn-lg px-5 py-3">
                         <i class="bi bi-info-circle me-2"></i>Learn More
+                    </a>
+                    <a href="{{ route('shop.products') }}" class="btn btn-gradient-outline btn-lg px-5 py-3">
+                        <i class="bi bi-bag me-2"></i>View Products
+                    </a>
+                    <a href="{{ route('articles.public.index') }}" class="btn btn-gradient-outline btn-lg px-5 py-3">
+                        <i class="bi bi-journal-text me-2"></i>Read Articles
                     </a>
                 </div>
             </div>
@@ -32,11 +38,11 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-1 position-relative">
+    <section id="about" class="public-section px-3 px-md-4 px-lg-5 bg-gradient-section-1 position-relative">
         <div class="container-fluid">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="h1 fw-bold text-psychological-primary mb-3">About Us</h2>
-                <p class="h5 text-stone-600 mx-auto" style="max-width: 768px; line-height: 1.7;">
+                <h2 class="h1 public-section-title">About Us</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">
                     Your Mind Aid is dedicated to providing exceptional mental health care with a focus on compassion, understanding, and evidence-based treatment.
                 </p>
             </div>
@@ -78,11 +84,11 @@
     </section>
 
     <!-- Doctors Section -->
-    <section id="doctors" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-2 position-relative">
+    <section id="doctors" class="public-section px-3 px-md-4 px-lg-5 bg-gradient-section-2 position-relative">
         <div class="container-fluid">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="h1 fw-bold text-psychological-primary mb-3">Our Expert Team</h2>
-                <p class="h5 text-stone-600 mx-auto" style="max-width: 768px; line-height: 1.7;">
+                <h2 class="h1 public-section-title">Our Expert Team</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">
                     Meet our dedicated team of mental health professionals
                 </p>
             </div>
@@ -108,13 +114,28 @@
         </div>
     </section>
 
-    <!-- Featured Articles Section -->
-    @if ($featuredArticles->count() > 0)
-    <section class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-white position-relative">
+    <!-- Shop Our Products Section -->
+    <section id="products" class="public-section px-3 px-md-4 px-lg-5 bg-white position-relative">
         <div class="container-fluid">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="h1 fw-bold text-psychological-primary mb-3">Featured Articles</h2>
-                <p class="h5 text-stone-600 mx-auto" style="max-width: 768px; line-height: 1.7;">
+                <h2 class="h1 public-section-title">Shop Our Products</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">
+                    Browse wellness and self-care products to support your journey.
+                </p>
+                <a href="{{ route('shop.products') }}" class="btn btn-gradient-primary btn-lg px-5 py-3 mt-3 shadow-soft-lg">
+                    <i class="bi bi-bag me-2"></i>View All Products
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Articles Section -->
+    @if ($featuredArticles->count() > 0)
+    <section class="public-section px-3 px-md-4 px-lg-5 bg-gradient-section-1 position-relative">
+        <div class="container-fluid">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="h1 public-section-title">Featured Articles</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">
                     Explore our expert insights on mental health and wellness
                 </p>
             </div>
@@ -130,7 +151,7 @@
             </div>
             
             <div class="text-center">
-                <a href="{{ route('articles.public.index') }}" class="btn btn-outline-primary btn-lg px-5 py-3">
+                <a href="{{ route('articles.public.index') }}" class="btn btn-gradient-outline btn-lg px-5 py-3">
                     View All Articles <i class="bi bi-arrow-right ms-2"></i>
                 </a>
             </div>
@@ -140,11 +161,11 @@
 
     <!-- Latest Articles Section -->
     @if ($latestArticles->count() > 0)
-    <section class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-2 position-relative">
+    <section class="public-section px-3 px-md-4 px-lg-5 bg-gradient-section-2 position-relative">
         <div class="container-fluid">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="h1 fw-bold text-psychological-primary mb-3">Latest Articles</h2>
-                <p class="h5 text-stone-600">Recent insights from our team</p>
+                <h2 class="h1 public-section-title">Latest Articles</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">Recent insights from our team</p>
             </div>
             
             <div class="row g-4">
@@ -161,14 +182,14 @@
     @endif
 
     <!-- Digital Wellbeing Section -->
-    <section id="wellbeing" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-white position-relative">
+    <section id="wellbeing" class="public-section px-3 px-md-4 px-lg-5 bg-white position-relative">
         <div class="container-fluid">
             <div class="text-center mb-4" data-aos="fade-up">
-                <h2 class="h1 fw-bold text-psychological-primary mb-3">Digital Wellbeing</h2>
-                <p class="h5 text-stone-600 mx-auto" style="max-width: 640px; line-height: 1.7;">
+                <h2 class="h1 public-section-title">Digital Wellbeing</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">
                     Simple practices for a healthier relationship with technology: screen time awareness, mindfulness prompts, and daily tips.
                 </p>
-                <a href="{{ route('wellbeing.public') }}" class="btn btn-primary btn-lg mt-3 px-4 py-2">
+                <a href="{{ route('wellbeing.public') }}" class="btn btn-gradient-outline btn-lg mt-3 px-4 py-2">
                     Explore Digital Wellbeing <i class="bi bi-arrow-right ms-2"></i>
                 </a>
             </div>
@@ -176,11 +197,11 @@
     </section>
 
     <!-- Appointment Booking Section -->
-    <section id="appointment" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-3 position-relative">
+    <section id="appointment" class="public-section px-3 px-md-4 px-lg-5 bg-gradient-section-3 position-relative">
         <div class="container-fluid" style="max-width: 896px;">
             <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
-                <h2 class="h1 fw-bold text-psychological-primary mb-3">Book an Appointment</h2>
-                <p class="h5 text-stone-600" style="line-height: 1.7;">
+                <h2 class="h1 public-section-title">Book an Appointment</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">
                     Request an appointment with our mental health professionals. We'll contact you to confirm your preferred date and time.
                 </p>
             </div>
@@ -370,11 +391,11 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-5 py-md-5 px-3 px-md-4 px-lg-5 bg-gradient-section-1 position-relative">
+    <section id="contact" class="public-section px-3 px-md-4 px-lg-5 bg-gradient-section-1 position-relative">
         <div class="container-fluid" style="max-width: 896px;">
             <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
-                <h2 class="h1 fw-bold text-psychological-primary mb-3">Get in Touch</h2>
-                <p class="h5 text-stone-600" style="line-height: 1.7;">
+                <h2 class="h1 public-section-title">Get in Touch</h2>
+                <p class="h5 public-section-lead text-stone-600 mx-auto">
                     We're here to help. Send us a message and we'll respond as soon as possible.
                 </p>
             </div>

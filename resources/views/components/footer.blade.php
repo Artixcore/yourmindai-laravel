@@ -13,6 +13,8 @@
                 <ul class="list-unstyled d-flex flex-column gap-2">
                     <li><a href="{{ route('landing') }}#about" class="text-white-50 text-decoration-none hover-text-mint-400" style="transition: color 0.3s ease; opacity: 0.9;">About Us</a></li>
                     <li><a href="{{ route('landing') }}#doctors" class="text-white-50 text-decoration-none hover-text-mint-400" style="transition: color 0.3s ease; opacity: 0.9;">Our Doctors</a></li>
+                    <li><a href="{{ route('articles.public.index') }}" class="text-white-50 text-decoration-none hover-text-mint-400" style="transition: color 0.3s ease; opacity: 0.9;">Articles</a></li>
+                    <li><a href="{{ route('shop.products') }}" class="text-white-50 text-decoration-none hover-text-mint-400" style="transition: color 0.3s ease; opacity: 0.9;">Products</a></li>
                     <li><a href="{{ route('landing') }}#contact" class="text-white-50 text-decoration-none hover-text-mint-400" style="transition: color 0.3s ease; opacity: 0.9;">Contact</a></li>
                 </ul>
             </div>

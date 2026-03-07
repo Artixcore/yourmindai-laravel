@@ -3,11 +3,15 @@
 @section('title', 'Cart - Your Mind Aid')
 
 @section('content')
-<section class="py-5 px-3 px-md-4 px-lg-5">
+<section class="public-page-hero px-3 px-md-4 px-lg-5">
     <div class="container-fluid" style="max-width: 960px;">
+        <div class="text-center mb-4" data-aos="fade-up">
+            <h1 class="h1 public-section-title">Shopping Cart</h1>
+            <p class="public-section-lead text-stone-600 mx-auto mb-0">Review your items</p>
+        </div>
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-            <h1 class="h2 fw-bold text-psychological-primary">Shopping Cart</h1>
-            <a href="{{ route('shop.products') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left me-2"></i>Continue Shopping</a>
+            <span></span>
+            <a href="{{ route('shop.products') }}" class="btn btn-gradient-outline"><i class="bi bi-arrow-left me-2"></i>Continue Shopping</a>
         </div>
 
         @if($items->isEmpty())
@@ -24,7 +28,7 @@
                 <div class="card card-psychological shadow-sm mb-4">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0 shop-cart-table">
                                 <thead class="table-light">
                                     <tr>
                                         <th class="border-0 ps-4">Product</th>

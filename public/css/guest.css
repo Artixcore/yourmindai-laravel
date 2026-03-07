@@ -1,0 +1,181 @@
+/* Public site (guest) – section spacing, typography, shop & articles polish */
+
+:root {
+    --public-content-max: 720px;
+    --public-section-padding-y: 3rem;
+    --public-section-padding-y-lg: 4rem;
+}
+
+@media (min-width: 992px) {
+    :root {
+        --public-section-padding-y: 3.5rem;
+        --public-section-padding-y-lg: 4.5rem;
+    }
+}
+
+/* Page hero / subhero (shop, inner pages) */
+.public-page-hero {
+    padding-top: var(--public-section-padding-y);
+    padding-bottom: var(--public-section-padding-y);
+    background: linear-gradient(135deg, var(--color-lavender-50) 0%, var(--color-teal-50) 50%, var(--color-mint-50) 100%);
+}
+
+.public-page-hero .public-section-title {
+    margin-bottom: 0.5rem;
+}
+
+.public-page-hero .public-section-lead {
+    max-width: var(--public-content-max);
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.65;
+    color: #57534e;
+}
+
+/* Section title + lead (reusable) */
+.public-section-title {
+    font-weight: 700;
+    color: var(--color-teal-700);
+    margin-bottom: 0.75rem;
+}
+
+.public-section-lead {
+    font-size: 1.125rem;
+    color: #57534e;
+    line-height: 1.7;
+}
+
+/* Content width for long text */
+.public-content-narrow {
+    max-width: var(--public-content-max);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Public section spacing */
+.public-section {
+    padding-top: var(--public-section-padding-y);
+    padding-bottom: var(--public-section-padding-y);
+}
+
+@media (min-width: 992px) {
+    .public-section {
+        padding-top: var(--public-section-padding-y-lg);
+        padding-bottom: var(--public-section-padding-y-lg);
+    }
+}
+
+/* ----- Shop: product grid ----- */
+.shop-product-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.shop-product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px -8px rgba(13, 148, 136, 0.2), 0 4px 12px -4px rgba(0, 0, 0, 0.08);
+}
+
+.shop-product-card .card-img-top,
+.shop-product-card .card-img-placeholder {
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+}
+
+.shop-product-card .card-img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-soft-gray-100);
+}
+
+/* ----- Shop: cart table ----- */
+.shop-cart-table thead th {
+    color: var(--color-teal-700);
+    font-weight: 600;
+    border-color: rgba(20, 184, 166, 0.15);
+}
+
+.shop-cart-table tbody tr:hover {
+    background-color: var(--color-teal-50);
+}
+
+.shop-cart-table .form-control:focus {
+    border-color: var(--color-teal-500);
+    box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.15);
+}
+
+/* ----- Shop: checkout summary card ----- */
+.shop-checkout-summary {
+    border: 1px solid rgba(20, 184, 166, 0.25);
+    border-radius: 0.75rem;
+    background: linear-gradient(to bottom, #ffffff 0%, var(--color-teal-50) 100%);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.08);
+}
+
+.shop-checkout-summary .card-footer {
+    background: rgba(255, 255, 255, 0.8);
+    border-top: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+/* ----- Shop: order confirmed success block ----- */
+.shop-order-confirmed-card {
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: linear-gradient(to bottom, #ffffff 0%, var(--color-mint-50) 100%);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.12);
+    border-radius: 1rem;
+    padding: 2.5rem;
+}
+
+.shop-order-confirmed-card .btn-gradient-primary {
+    margin-right: 0.5rem;
+}
+
+/* ----- Articles list ----- */
+.articles-page-header .public-section-title {
+    margin-bottom: 0.5rem;
+}
+
+.articles-page-header .public-section-lead {
+    max-width: var(--public-content-max);
+}
+
+.articles-search-input:focus,
+.articles-search-input.form-control:focus {
+    border-color: var(--color-teal-500);
+    box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.15);
+}
+
+.articles-category-list .list-group-item-action:hover {
+    background-color: var(--color-teal-50);
+    color: var(--color-teal-800);
+}
+
+.articles-category-list .list-group-item-action:focus {
+    border-color: var(--color-teal-500);
+}
+
+/* ----- Nav link hover (optional) ----- */
+.navbar-guest-link {
+    position: relative;
+    transition: color 0.25s ease;
+}
+
+.navbar-guest-link:hover {
+    color: var(--color-teal-700);
+}
+
+.navbar-guest-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-teal-500), var(--color-soft-blue-500));
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.navbar-guest-link:hover::after {
+    opacity: 1;
+}

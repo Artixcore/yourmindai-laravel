@@ -29,7 +29,7 @@
         </div>
         
         <div class="mt-4 pt-4 border-top" style="border-color: rgba(255, 255, 255, 0.2) !important;">
-            <p class="text-center text-white-50 mb-0" style="opacity: 0.8;">&copy; {{ date('Y') }} Your Mind Aid. All rights reserved.</p>
+            <p class="text-center text-white-50 mb-0" style="opacity: 0.8;">&copy; {{ date('Y') }} Your Mind Aid. All rights reserved. &middot; Developed by <a href="https://artixcore.com" target="_blank" rel="noopener noreferrer" class="text-white-50 text-decoration-none hover-text-mint-400" style="transition: color 0.3s ease;">Artixcore</a></p>
         </div>
     </div>
 </footer>

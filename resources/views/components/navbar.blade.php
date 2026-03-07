@@ -12,7 +12,15 @@
             <div class="d-none d-md-flex align-items-center gap-4">
                 <a href="{{ route('landing') }}#about" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">About</a>
                 <a href="{{ route('landing') }}#doctors" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Doctors</a>
+                <a href="{{ route('shop.products') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Products</a>
                 <a href="{{ route('landing') }}#contact" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Contact</a>
+                <a href="{{ route('shop.cart') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium d-flex align-items-center gap-1" style="transition: color 0.3s ease;">
+                    <i class="bi bi-cart3"></i> Cart
+                    @php $cartCount = array_sum(session('cart', [])); @endphp
+                    @if($cartCount > 0)
+                        <span class="badge bg-primary rounded-pill">{{ $cartCount }}</span>
+                    @endif
+                </a>
                 
                 @auth
                     <a href="{{ route('dashboard') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium" style="transition: color 0.3s ease;">Dashboard</a>
@@ -43,7 +51,15 @@
         <div class="px-4 py-3 d-flex flex-column gap-2">
             <a href="{{ route('landing') }}#about" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">About</a>
             <a href="{{ route('landing') }}#doctors" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">Doctors</a>
+            <a href="{{ route('shop.products') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">Products</a>
             <a href="{{ route('landing') }}#contact" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">Contact</a>
+            <a href="{{ route('shop.cart') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2 d-flex align-items-center gap-2" style="transition: color 0.3s ease;">
+                <i class="bi bi-cart3"></i> Cart
+                @php $cartCount = array_sum(session('cart', [])); @endphp
+                @if($cartCount > 0)
+                    <span class="badge bg-primary rounded-pill">{{ $cartCount }}</span>
+                @endif
+            </a>
             @auth
                 <a href="{{ route('dashboard') }}" class="text-stone-700 hover-text-teal-700 text-decoration-none fw-medium py-2" style="transition: color 0.3s ease;">Dashboard</a>
                 <form method="POST" action="{{ route('logout') }}">

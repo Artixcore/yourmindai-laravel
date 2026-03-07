@@ -22,6 +22,8 @@
     
     <!-- AOS Animation Library CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body class="bg-gradient-guest">
     <x-navbar />
@@ -68,6 +70,8 @@
         window.axios = axios;
         window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     </script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <!-- Alpine.js Components -->
     <script>
@@ -162,6 +166,27 @@
                 });
             }
         }
+
+        // Flash messages as SweetAlert (success, error, warning, info)
+        (function() {
+            const success = @json(session('success'));
+            const error = @json(session('error'));
+            const warning = @json(session('warning'));
+            const info = @json(session('info'));
+            if (success && typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'success', title: 'Success', text: success, confirmButtonColor: '#0d6efd' });
+            }
+            if (error && typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'error', title: 'Error', text: error, confirmButtonColor: '#0d6efd' });
+            }
+            if (warning && typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'warning', title: 'Notice', text: warning, confirmButtonColor: '#0d6efd' });
+            }
+            if (info && typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'info', title: 'Info', text: info, confirmButtonColor: '#0d6efd' });
+            }
+        })();
     </script>
+    @stack('scripts')
 </body>
 </html>

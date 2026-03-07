@@ -69,7 +69,9 @@
             <div class="card-body">
                 <p class="mb-1"><strong>{{ $order->customer_name }}</strong></p>
                 <p class="mb-1 text-muted small">{{ $order->customer_email }}</p>
-                @if($order->customer_phone)<p class="mb-2 text-muted small">{{ $order->customer_phone }}</p>@endif
+                @if($order->customer_phone)<p class="mb-1 text-muted small">{{ $order->customer_phone }}</p>@endif
+                @if($order->customer_address)<p class="mb-1 text-muted small">{{ $order->customer_address }}</p>@endif
+                @if($order->customer_city)<p class="mb-2 text-muted small">{{ $order->customer_city }}</p>@endif
                 @if($order->notes)<p class="mb-2"><small>{{ $order->notes }}</small></p>@endif
 
                 <form action="{{ route('admin.inventory.orders.update-status', $order) }}" method="POST" class="mt-3">

@@ -11,6 +11,8 @@ class Order extends Model
         'customer_name',
         'customer_email',
         'customer_phone',
+        'customer_address',
+        'customer_city',
         'status',
         'notes',
         'subtotal',

@@ -64,6 +64,18 @@ Route::prefix('articles')->name('articles.')->group(function () {
     Route::get('/{slug}', [\App\Http\Controllers\ArticlePublicController::class, 'show'])->name('public.show');
 });
 
+// Public Shop (products, cart, checkout)
+Route::prefix('shop')->name('shop.')->group(function () {
+    Route::get('/products', [\App\Http\Controllers\ShopController::class, 'products'])->name('products');
+    Route::get('/cart', [\App\Http\Controllers\ShopController::class, 'cart'])->name('cart');
+    Route::post('/cart/add', [\App\Http\Controllers\ShopController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update', [\App\Http\Controllers\ShopController::class, 'updateCart'])->name('cart.update');
+    Route::delete('/cart/remove/{product}', [\App\Http\Controllers\ShopController::class, 'removeFromCart'])->name('cart.remove');
+    Route::get('/checkout', [\App\Http\Controllers\ShopController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout', [\App\Http\Controllers\ShopController::class, 'storeOrder'])->name('checkout.store');
+    Route::get('/order-confirmed', [\App\Http\Controllers\ShopController::class, 'orderConfirmed'])->name('order-confirmed');
+});
+
 // Authentication routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post')->middleware('guest');

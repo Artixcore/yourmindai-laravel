@@ -22,6 +22,29 @@
     --public-section-padding-y-lg: var(--section-padding-y-lg);
     --card-radius: 16px;
     --card-radius-lg: 24px;
+    /* Guest palette (fallback if app.css from S3 does not load) */
+    --color-teal-50: #f0fdfa;
+    --color-teal-100: #ccfbf1;
+    --color-teal-200: #99f6e4;
+    --color-teal-300: #5eead4;
+    --color-teal-400: #2dd4bf;
+    --color-teal-500: #14b8a6;
+    --color-teal-600: #0d9488;
+    --color-teal-700: #0f766e;
+    --color-teal-800: #115e59;
+    --color-teal-900: #134e4a;
+    --color-soft-blue-50: #eff6ff;
+    --color-soft-blue-100: #dbeafe;
+    --color-soft-blue-500: #3b82f6;
+    --color-soft-blue-600: #2563eb;
+    --color-lavender-50: #faf5ff;
+    --color-lavender-100: #f3e8ff;
+    --color-mint-50: #f0fdf4;
+    --color-mint-100: #dcfce7;
+    --color-mint-400: #6ee7b7;
+    --color-warm-white: #fefefe;
+    --color-soft-gray-100: #f1f5f9;
+    --color-soft-gray-200: #e2e8f0;
 }
 
 @media (min-width: 992px) {
@@ -1087,4 +1110,59 @@ legend.form-group-title {
     .main-guest {
         padding-bottom: 6rem;
     }
+}
+
+/* ----- Guest layout fallbacks (when app.css from S3 does not load) ----- */
+body.bg-gradient-guest {
+    background: linear-gradient(to bottom right, #f8fafc, #f0fdfa) !important;
+}
+
+.bg-gradient-hero {
+    background: linear-gradient(135deg, var(--color-lavender-100) 0%, var(--color-teal-100) 50%, var(--color-mint-100) 100%) !important;
+}
+
+.bg-gradient-section-1 {
+    background: linear-gradient(to bottom, var(--color-warm-white) 0%, var(--color-lavender-50) 100%) !important;
+}
+
+.bg-gradient-section-2 {
+    background: linear-gradient(135deg, var(--color-teal-100) 0%, var(--color-mint-100) 100%) !important;
+}
+
+.bg-gradient-section-3 {
+    background: linear-gradient(to bottom, var(--color-teal-50) 0%, var(--color-soft-blue-50) 100%) !important;
+}
+
+.shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+.shadow-soft-lg {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+.card-psychological {
+    background: linear-gradient(to bottom, #ffffff 0%, var(--color-teal-50) 100%);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(13, 148, 136, 0.1);
+}
+
+.text-psychological-primary {
+    color: var(--color-teal-700) !important;
+}
+
+.text-stone-600 {
+    color: #57534e;
+}
+
+.text-stone-700 {
+    color: #44403c;
+}
+
+.bg-teal-50 {
+    background-color: var(--color-teal-50) !important;
+}
+
+.text-teal-300 {
+    color: var(--color-teal-300);
 }

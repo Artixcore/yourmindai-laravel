@@ -5,7 +5,7 @@
         <div class="navbar-guest__inner">
             <a href="{{ route('landing') }}" class="navbar-guest__brand">
                 <!-- <span class="navbar-guest__brand-text">Your Mind Aid</span> -->
-                <img src="https://storaeall.s3.us-east-1.amazonaws.com/public/mindaidlogo.png" alt="Your Mind Aid" class="navbar-guest__brand-logo">
+                <!-- <img src="https://storaeall.s3.us-east-1.amazonaws.com/public/mindaidlogo.png" alt="Your Mind Aid" class="navbar-guest__brand-logo"> -->
                 <span class="navbar-guest__brand-text">Your Mind Aid</span>
             </a>
 

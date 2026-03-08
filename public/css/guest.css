@@ -579,8 +579,17 @@
 .navbar-guest__brand {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     text-decoration: none;
     flex-shrink: 0;
+}
+
+.navbar-guest__brand-logo {
+    display: block;
+    height: 2.25rem;
+    width: auto;
+    max-height: 40px;
+    object-fit: contain;
 }
 
 .navbar-guest__brand-text {
@@ -794,12 +803,18 @@
     letter-spacing: 0.02em;
 }
 
-/* Fieldset/legend: match form-group-title when used for form groups */
+/* Fieldset/legend: match form-group-title when used for form groups; prevent overflow in flex/grid */
+.landing-form--primary fieldset,
+.landing-form--secondary fieldset {
+    min-width: 0;
+}
+
 fieldset .form-group-title,
 legend.form-group-title {
     float: none;
     width: auto;
     margin-bottom: 0.75rem;
+    margin-left: 0;
     padding: 0;
 }
 

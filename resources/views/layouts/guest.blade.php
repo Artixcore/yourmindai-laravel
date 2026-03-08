@@ -22,8 +22,17 @@
         <meta property="og:image" content="{{ asset('images/og-default.png') }}">
     @endif
     
-    <!-- All CSS/JS from local build (Vite → public/build) -->
-    @vite(['resources/css/app.css', 'resources/css/guest.css', 'resources/js/guest.js'])
+    @if(file_exists(public_path('build/manifest.json')))
+        @vite(['resources/css/app.css', 'resources/css/guest.css', 'resources/js/guest.js'])
+    @else
+        {{-- Fallback when Vite manifest missing (e.g. production without npm run build) --}}
+        <link href="{{ asset('app.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/guest.css') }}" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    @endif
 </head>
 <body class="bg-gradient-guest d-flex flex-column min-vh-100">
     <x-navbar />
@@ -50,11 +59,55 @@
     
     <x-footer />
     
-    <!-- Local scripts (public folder) -->
+    @if(!file_exists(public_path('build/manifest.json')))
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" crossorigin="anonymous"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>window.axios = axios; window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';</script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('modal', (o = false) => ({ open: o, toggle() { this.open = !this.open; }, close() { this.open = false; } }));
+            Alpine.data('dropdown', (o = false) => ({ open: o, toggle() { this.open = !this.open; }, close() { this.open = false; } }));
+            Alpine.data('sidebar', (o = false) => ({ open: o, toggle() { this.open = !this.open; }, close() { this.open = false; } }));
+            Alpine.data('backgroundMusic', () => {
+                const stored = localStorage.getItem('bgMusic');
+                const prefs = stored ? JSON.parse(stored) : { volume: 0.4, muted: true };
+                return {
+                    playing: false,
+                    volumePercent: Math.round((prefs.volume ?? 0.4) * 100),
+                    get volume() { return this.volumePercent / 100; },
+                    init() {
+                        const audio = this.$refs.audio;
+                        if (!audio) return;
+                        audio.volume = this.volume;
+                        if (!prefs.muted) audio.play().then(() => { this.playing = true; }).catch(() => {});
+                        audio.addEventListener('play', () => { this.playing = true; });
+                        audio.addEventListener('pause', () => { this.playing = false; });
+                    },
+                    toggle() {
+                        const audio = this.$refs.audio;
+                        if (!audio) return;
+                        if (this.playing) { audio.pause(); prefs.muted = true; }
+                        else { audio.volume = this.volume; audio.play().then(() => { prefs.muted = false; }).catch(() => {}); }
+                        localStorage.setItem('bgMusic', JSON.stringify({ volume: this.volume, muted: prefs.muted }));
+                    },
+                    setVolume(val) {
+                        const v = parseInt(val, 10) / 100;
+                        if (this.$refs.audio) this.$refs.audio.volume = v;
+                        localStorage.setItem('bgMusic', JSON.stringify({ volume: v, muted: !this.playing }));
+                    },
+                };
+            });
+        });
+        window.addEventListener('load', () => { if (typeof AOS !== 'undefined') AOS.init({ duration: 800, easing: 'ease-in-out', once: true, offset: 100 }); });
+        </script>
+    @endif
     <script src="{{ asset('js/app-ajax.js') }}" defer></script>
     <script src="{{ asset('js/notifications.js') }}" defer></script>
-    
-    <!-- Flash messages (SweetAlert from guest.js bundle) -->
+    <!-- Flash messages -->
     <script>
         (function() {
             const error = @json(session('error'));

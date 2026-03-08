@@ -1,0 +1,57 @@
+{
+  "_aos-D0cyRwFx.js": {
+    "file": "assets/aos-D0cyRwFx.js",
+    "name": "aos",
+    "css": [
+      "assets/aos-DvB2Xm2x.css"
+    ]
+  },
+  "_aos-DvB2Xm2x.css": {
+    "file": "assets/aos-DvB2Xm2x.css",
+    "src": "_aos-DvB2Xm2x.css"
+  },
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff": {
+    "file": "assets/bootstrap-icons-BeopsB42.woff",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff"
+  },
+  "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2": {
+    "file": "assets/bootstrap-icons-mSm7cUeB.woff2",
+    "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-BGcwCape.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/guest.css": {
+    "file": "assets/guest-CmTnn3cA.css",
+    "src": "resources/css/guest.css",
+    "isEntry": true,
+    "name": "guest",
+    "names": [
+      "guest.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-KIrssef1.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_aos-D0cyRwFx.js"
+    ]
+  },
+  "resources/js/guest.js": {
+    "file": "assets/guest-BK4A9Q1n.js",
+    "name": "guest",
+    "src": "resources/js/guest.js",
+    "isEntry": true,
+    "imports": [
+      "_aos-D0cyRwFx.js"
+    ]
+  }
+}

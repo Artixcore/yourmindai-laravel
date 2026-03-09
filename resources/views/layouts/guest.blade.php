@@ -27,7 +27,7 @@
     @else
         {{-- Fallback when Vite manifest missing (e.g. production without npm run build) --}}
         <link href="{{ asset('app.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/guest.css') }}" rel="stylesheet">
+        <link href="{{ asset('guest.css') }}" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">

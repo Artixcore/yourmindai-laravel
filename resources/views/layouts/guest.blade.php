@@ -106,7 +106,9 @@
         </script>
     @endif
     <script src="{{ asset('js/app-ajax.js') }}" defer></script>
+    @auth
     <script src="{{ asset('js/notifications.js') }}" defer></script>
+    @endauth
     <!-- Flash messages -->
     <script>
         (function() {

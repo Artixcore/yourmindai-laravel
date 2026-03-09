@@ -36,6 +36,7 @@
             url: countUrl,
             method: 'GET',
             timeout: 10000,
+            skipGlobalErrorHandler: true,
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             success: function(data) {
                 if (data.success && typeof data.count === 'number') {
@@ -77,6 +78,7 @@
         $.ajax({
             url: listUrl,
             method: 'GET',
+            skipGlobalErrorHandler: true,
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             success: function(data) {
                 if (data.success && data.notifications) {
@@ -109,6 +111,7 @@
         $.ajax({
             url: markReadUrl + id + '/read',
             method: 'POST',
+            skipGlobalErrorHandler: true,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
@@ -126,6 +129,7 @@
 
     function init() {
         if (typeof jQuery === 'undefined') return;
+        if (!document.getElementById('notificationDropdown') && !document.getElementById('notificationBadge')) return;
         var $ = jQuery;
 
         poll();
@@ -151,6 +155,7 @@
                 url: $form.attr('action'),
                 method: 'POST',
                 data: $form.serialize(),
+                skipGlobalErrorHandler: true,
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
                 success: function() {
                     updateBadge(0);

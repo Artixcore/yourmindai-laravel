@@ -112,6 +112,7 @@
      */
     $(document).ajaxError(function(event, jqXHR, settings, thrownError) {
         if (settings.skipGlobalErrorHandler) return;
+        if (jqXHR.status === 401 || jqXHR.status === 403) return;
 
         var msg = 'Something went wrong. Please try again.';
         if (jqXHR.status === 0) msg = 'Network error. Please check your connection.';
